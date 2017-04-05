@@ -1,0 +1,58 @@
+Copyright (c) 2015 Marvell Semiconductor Inc.
+
+Confidential. 
+All rights reserved. 
+
+This publication and its contents are proprietary to Marvell. No part of this publication may be reproduced in any form or by any means without the written permission of Marvell Semiconductor Inc.
+
+Release Notes for Marvell 88X32xx 10GBASE-T Phy API
+
+
+Instructions
+------------
+
+This source code is provided as a function library for configuring/controlling and querying status of the Marvell 88X32xx 10GBASE-T Ethernet PHYs. The header files (e.g. mtdAPI.h) together with the API Application Notes and datasheet comprise the documentation for using this API to interface to the PHY.
+
+Refer to the spreadsheet, 'mtdAPI summary.xlsx' for a complete list of API functions and descriptions.
+
+The files mtdAPI.c, mtdDiagnostics.c, mtdEEE.c, mtdXgFastRetrain.c, mtdCunit.c, mtdHunit.c, mtdXunit.c, mtdHXunit.c, mtdAPIInternal.c and mtdFwDownload.c are designed to be compiled/linked with the host processor's code as-is. 
+The files mtdHwCntl.c and mtdHwMsecCntl.c are meant to be specific to the host processor's hardware and must be modified accordingly. The sample code in the hardware-specific files contains code which was used to test the API and was compiled/linked with a test program using MSVC and executed on a Window's-based PC to access a USB-to-MDIO interface in order to test with the PHY evaluation board. 
+The define DB_TEST_ENVIRONMENT in mtdApiTypes.h should be set to 0 for the host environment to remove the PHY test board hardware-specific code.
+
+mtdDiagnostics.h and mtdFwDownload.h contain prototypes of the useful API functions for diagnostics and PHY firmware download. mtdAPIInternal.h contains functions called by mtdFwDownload and provide no high level API interface. No modifications are needed. x3240flashdlslave_0_5_0_0_6407.bin is a PHY firmware image used during firmware download to flash in order to accelerate the download process. The contents of this file must be passed as an input parameter (MTD_U8 slaveData[]) to the mtdUpdateFlashImage function. Similarly the new PHY image to be stored in flash must be provided as an input (MTD_U32 appSize). This PHY firmware image file (.hdr) may be found in the PHY firmware release package.
+
+
+API Errata
+----------
+
+None.
+Refer to the Marvell® 10GBASE-T PHY API Application Notes (document MV-S302449) for instructions on how to use this API. This document is available on the Marvell Extranet Portal.
+
+API revision history
+--------------------
+API version 0.5
+- Added a new function to read the serdes eye data, mtdGetSerdesEyeStatistics()
+- Modified MacSec read/write functions to use a new indirect addressing method provided through the firmware to address an errata in the MacSec. Added a new function for doing a double write to the MacSec, mtdHwMsecDoubleWrite().
+- UPDATE: 6/17/2015  reverted to version to 0.4.0.0 of the x3240flashdlslave.bin file:   x3240flashdlslave_0_4_0_0_6270.bin
+
+
+API version 0.4
+- Added a new diagnostic function for reading and logging registers, mtdCopyRegsToBuf(). Provided initial definitions for registers to be logged. 
+- Made a major change to  mtdGetPhyRevision() in mtdDiagnostics.c so that the function will work with IC revisions 88X3220 A0/Z2 and 88X3240 A0/Z2.
+  NOTE: The 88X3220 A0 must use firmware version 0.3.1.0 or later.
+- Updated version of x3240flashdlslave.bin file to 0.5.0.0. The new version supports higher speed downloads.
+- Fixed a bug in mtdAPIInternal.c that caused a problem on some compilers (variable uninitialized) in flash download.
+
+
+API version 0.3
+- Swapped logic sense of 10GBASE-R block lock variable. Added new functions mtdGetPhyRevision(), mtdIsTunitInLowPowerMode(), mtdIsTunitResponsive(), mtdGetTunitBISTStatus(), mtdGetTunitFirmwareMode() in preparation for A0 support.
+
+
+API version 0.2
+- Added functions for the host interface (H unit) and fiber interface (X unit) in files mtdHunit.h, mtdHxunit.h, and mtdXunit.h. 
+
+API version 0.1
+- Initial release. 
+- Supports 88X3240/20 PHY. 
+
+

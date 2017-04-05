@@ -1,0 +1,47 @@
+-- ============================================================================
+-- MibName   : JOYWARE-SMI
+-- FileName  : joyware-smi.mib
+-- Purpose   : Joyware Enterprise Structure of Management Information
+-- ============================================================================
+JOYWARE-SMI DEFINITIONS ::= BEGIN
+    IMPORTS
+         MODULE-IDENTITY,
+         OBJECT-IDENTITY,
+         enterprises
+                             FROM SNMPv2-SMI;
+
+joyware MODULE-IDENTITY
+    LAST-UPDATED   "201603020000Z"
+    ORGANIZATION   "Joyware Electronic Technology Co.,Ltd"
+    CONTACT-INFO   "Postal: BlockA,Chang TorchHotel,No.259 Wensan Road,Hangzhou,Zhejiang 310012 China
+                    E-mail: jw-snmp@joyware.com
+                       Tel: 800-8571264 "
+    DESCRIPTION    "The Structure of Management Information for the Joyware enterprise."
+
+    -- revision history
+    REVISION       "201603020000Z"
+    DESCRIPTION    "Initial version of this MIB module."
+    ::= { enterprises 33444 }
+
+-- ****************************************************************************
+--  Object under .enterprises.joyware
+-- ****************************************************************************
+jwProducts         OBJECT-IDENTITY
+    STATUS         current
+    DESCRIPTION   "jwProducts is the root OBJECT IDENTIFIER from which sysObjectID
+                   values are assigned. Actual values are defined in JOYWARE-PRODUCTS-MIB."
+    ::= { joyware 1 }
+
+jwModules          OBJECT-IDENTITY
+    STATUS         current
+    DESCRIPTION   "jwModules is the main subtree for mib modules development."
+    ::= { joyware 2 }
+
+-- ****************************************************************************
+--  Object under .enterprises.joyware.jwModules
+-- ****************************************************************************
+jwCommon           OBJECT IDENTIFIER ::= { jwModules 1 }
+jwSwitch           OBJECT IDENTIFIER ::= { jwModules 2 }
+
+
+END

@@ -1,0 +1,40 @@
+
+## VIPS compilation environment #################
+ifeq (VIPS, $(HOME_ENV))
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+ifeq (np5, $(DEVICE))
+C_EXCLUDE_FILE_LIST = mvHwsDiagnostic.c mvHwsPortModeElements.c
+endif
+
+##################################################
+##################################################
+ROOT_DIR = $(subst \,/,$(SW_ROOT))
+include $(ROOT_DIR)/mainLabServices/gtBuild
+
+else
+
+## CPSS compilation environment #################
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+LIB_NAME = cpssGenPortHwConfig.lib
+
+# HWS code with -O2 option GCC on ARM78200 CPU generates bad code
+# It is a GCC bug , so optimization will be disabled here
+ifeq ($(ARM_CPU), 78200)
+ifeq (linux,$(OS_RUN))
+ifeq (EXISTS, $(PM_FAMILY))
+  AD_CFLAGS += -O0
+endif
+endif
+endif
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake
+endif

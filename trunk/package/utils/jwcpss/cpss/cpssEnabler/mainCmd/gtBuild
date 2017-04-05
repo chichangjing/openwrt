@@ -1,0 +1,21 @@
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifeq (BROKER_ONLY, $(DISTRIBUTED_SIMULATION_ROLE))
+    SUBDIRS = NONE
+    C_EXCLUDE_FILE_LIST = ALL
+endif
+
+##################################################
+##################################################
+ifneq (,$(wildcard $(USER_BASE)/cpssEnabler))
+    include $(PROJ_BASE)/gtTopMake
+else
+    include ./gtTopMake
+endif

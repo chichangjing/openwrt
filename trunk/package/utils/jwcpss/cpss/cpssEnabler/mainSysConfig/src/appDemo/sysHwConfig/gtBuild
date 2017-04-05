@@ -1,0 +1,94 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST = gtAppDemoSfPhyIf.c
+
+######################
+## CPSS FAMILY TYPE ##
+######################
+ifeq (EXISTS, $(EX_FAMILY))
+  EXMX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(TG_FAMILY))
+  EXMX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(TD_FAMILY))
+  EXMX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(CHX_FAMILY))
+  DX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(SAL_FAMILY))
+  DX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(PM_FAMILY))
+  PM_DEVICE = EXIST
+endif
+
+
+USE_FA_FILES = NOT_USED
+USE_XBAR_FILES = NOT_USED
+
+EXMX_FILES = gtAppDemoExMxSysConfig.c
+
+DX_FILES =      gtAppDemoDxSysConfig.c          \
+                gtAppDemoLioncubConfig.c        \
+                gtAppDemoQT2025PhyConfig.c      \
+                gtAppDemoSfPhyIf.c              \
+                gtAppDemoTmConfig.c             \
+		gtAppDemoTmUtils.c		\
+                gtAppDemoLion2FabricForBc2.c    \
+                gtAppDemoZarlinkConfig.c
+
+PM_FILES = gtAppDemoExMxPmSysConfig.c
+
+C_FILE_LIST = gtAppInit.c gtAppDemoGenSysConfig.c gtAppDemoPciConfig.c gtAppDemoSmiConfig.c appDemoDb.c
+
+XBAR_FILES = gtAppDemoXbarConfig_stub.c
+ifeq (PRESTERA, $(XBAR_VENDOR))
+  XBAR_FILES = gtAppDemoXbarConfig.c
+endif
+
+FA_FILES = gtAppDemoFaConfig_stub.c
+ifeq (PRESTERA, $(FA_VENDOR))
+  FA_FILES = gtAppDemoFaConfig.c
+endif
+
+
+ifeq (EXIST, $(EXMX_FAMILY))
+ C_FILE_LIST += $(EXMX_FILES)
+ USE_FA_FILES = USED
+ USE_XBAR_FILES = USED
+endif
+
+ifeq (EXIST, $(DX_FAMILY))
+ C_FILE_LIST += $(DX_FILES)
+endif
+
+ifeq (EXIST, $(PM_DEVICE))
+ C_FILE_LIST += $(PM_FILES)
+endif
+
+ifeq (USED, $(USE_FA_FILES))
+ C_FILE_LIST += $(FA_FILES)
+endif
+
+ifeq (USED, $(USE_XBAR_FILES))
+ C_FILE_LIST += $(XBAR_FILES)
+endif
+
+ifeq (EXISTS, $(CHX_FAMILY))
+ CFLAGS += $(FD)IMPL_TM
+endif
+
+LIB_NAME = mainSysConfig.lib
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

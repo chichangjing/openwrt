@@ -1,0 +1,240 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+<%  
+    local ubus = require "luci.ubus"
+    -- 收到设置net应用处理 
+    local netJson = luci.http.formvalue("setNet")
+    if netJson then
+        local setJson = luci.json.decode(netJson)
+        local setNetSnd = {{["ipaddr"] = setJson.ipaddr},{["netmask"] = setJson.netmask},{["gateway"] = setJson.gateway},{["protocol"] = setJson.protocol}}
+        
+        local setNetStatus = ubus.set_args("network2", "network2_set", setNetSnd, 1)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setNetStatus)
+    
+        local getGw = ubus.get_args("network2", "network2_get", {"gateway"}, 2)
+        local gwVal = getGw["ret"][1].gateway 
+        
+        os.execute("ifconfig br-lan %s netmask %s >/dev/null" % {setJson.ipaddr, setJson.netmask})
+        os.execute("route del default gw %s >/dev/null" % gwVal)
+        os.execute("route add default gw %s >/dev/null" % setJson.gateway)
+
+
+        return
+    
+    end
+
+    local getStatus = ubus.get_args("network2", "network2_get", {"ipaddr","netmask","gateway","protocol" }, 2)
+%>
+
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">
+
+function checkIP(ip)
+{
+    obj=ip;
+    var exp=/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+    var reg = obj.match(exp);
+    if(reg==null)
+    {
+        return false;//不合法
+    }
+    else
+    {
+        return true; //合法
+    }
+}
+ 
+function checkMask(mask)
+{
+    obj=mask;
+    var exp=/^(254|252|248|240|224|192|128|0)\.0\.0\.0|255\.(254|252|248|240|224|192|128|0)\.0\.0|255\.255\.(254|252|248|240|224|192|128|0)\.0|255\.255\.255\.(254|252|248|240|224|192|128|0)$/;
+    var reg = obj.match(exp);
+    if(reg==null)
+    {
+         return false; //"非法"
+    }
+     else
+    {
+         return true; //"合法"
+    }
+}    
+
+function setNet(){
+    var a = JSON.parse("{\"ipaddr\":\"\",\"netmask\":\"\",\"gateway\":\"\",\"protocol\":\"\"}"); 
+    //将表格中内容转化为json格式
+    a.ipaddr  = document.getElementById("ipaddr").value;
+    a.netmask = document.getElementById("netmask").value ;
+    a.gateway = document.getElementById("gateway").value ;
+    for(i = 0; i<document.getElementById("protocol").options.length; i++){
+        if(document.getElementById("protocol").options[i].selected == true){
+            a.protocol = document.getElementById("protocol").options[i].value;
+        }
+    }
+
+    if (a.ipaddr=='')
+    {
+        document.getElementById('ipaddr').focus();
+        alert("<%:IP should't be empty%>");
+        return false;
+    }else if(!checkIP(a.ipaddr))
+    {
+        document.getElementById('ipaddr').focus();
+        alert("<%:IP is illegal%>");
+        return false;              
+    }
+
+    if(a.netmask=='')
+    {
+        document.getElementById('netmask').focus();
+        alert('<%:Subnet cannot be empty%>');
+        return false;       
+    }else if(!checkMask(a.netmask))
+    {
+        document.getElementById('netmask').focus();
+        alert("<%:Subnet is illegal%>");
+        return false;     
+    }        
+
+    if(a.gateway=='')
+    {
+        document.getElementById('gateway').focus();
+        alert("<%:Gateway can't be empty%>");
+        return false;       
+    }else if(!checkIP(a.gateway))
+    {
+        document.getElementById('gateway').focus();
+        alert("<%:gateway is illegal%>");
+        return false;                
+    }   
+
+
+    if(a.ipaddr == a.netmask || a.netmask == a.gateway  || a.ipaddr == a.gateway)
+    {
+        alert('<%:Address input error!%>');
+        return false; //3个地址不能相同
+    }
+
+    var static_ip_arr = new Array;
+    var static_mask_arr = new Array;
+    var static_gw_arr = new Array;
+
+    static_ip_arr = a.ipaddr.split(".");
+    static_mask_arr = a.netmask.split(".");
+    static_gw_arr = a.gateway.split(".");
+
+    var res0 = parseInt(static_ip_arr[0]) & parseInt(static_mask_arr[0]);
+    var res1 = parseInt(static_ip_arr[1]) & parseInt(static_mask_arr[1]);
+    var res2 = parseInt(static_ip_arr[2]) & parseInt(static_mask_arr[2]);
+    var res3 = parseInt(static_ip_arr[3]) & parseInt(static_mask_arr[3]);
+
+    var res0_gw = parseInt(static_gw_arr[0]) & parseInt(static_mask_arr[0]);
+    var res1_gw = parseInt(static_gw_arr[1]) & parseInt(static_mask_arr[1]);
+    var res2_gw = parseInt(static_gw_arr[2]) & parseInt(static_mask_arr[2]);
+    var res3_gw = parseInt(static_gw_arr[3]) & parseInt(static_mask_arr[3]);
+
+    if(res0==res0_gw && res1==res1_gw && res2==res2_gw && res3==res3_gw)
+    {
+
+    }else{
+        alert("<%:IP address/ subnet mask/ gateway address doesn't match!%>");
+        return false;
+    }
+    var rcv = <%=luci.json.encode(getStatus)%>;
+    if(a.ipaddr == rcv["ret"][0].ipaddr && a.netmask == rcv["ret"][1].netmask && a.gateway == rcv["ret"][2].gateway)
+    {
+        return false; //3个地址没有更改
+    }
+
+//    alert(JSON.stringify(a));
+    if(confirm("<%:Confirm the modify configuration? It needs to reconnect then...%>")){
+        var interval = window.setInterval(function() {
+            XHR.get('<%=REQUEST_URI%>',{"setNet": JSON.stringify(a)}, function(){});
+            var img = new Image();
+            img.onload = function() {
+                window.clearInterval(interval);
+                location.href = ('https:' == document.location.protocol ? 'https://' : 'http://') + a.ipaddr +'/';
+            };
+
+            img.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + a.ipaddr +'<%=resource%>/icons/loading.gif?' + Math.random();
+        }, 500);
+
+    }
+}
+
+function display(){
+    var rcv = <%=luci.json.encode(getStatus)%>;
+  //  alert('<%=luci.http.getenv("REQUEST_URI")%>');
+  //  document.getElementById("ipaddr").value   = '<%=luci.http.getenv("SERVER_NAME")%>';
+    document.getElementById("ipaddr").value   = rcv["ret"][0].ipaddr;
+    document.getElementById("netmask").value  = rcv["ret"][1].netmask;
+    document.getElementById("gateway").value  = rcv["ret"][2].gateway;
+    for(i = 0; i<document.getElementById("protocol").options.length;i++){
+        if(document.getElementById("protocol").options[i].value == rcv["ret"][3].protocal){
+            document.getElementById("protocol").options[i].selected = true;
+        }
+    }
+
+}
+
+window.onload=display;
+</script>
+
+
+<div class="network"  id = "networkconfig" >
+    <fieldset class=""> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+        <legend><%:Network configuration information%></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+
+        <!--<div class = "network-section-node">-->
+            <table class = "info-section-table">
+                <tr><th><%:IP address  :%></th>
+                    <td><input type="text" name="ipadr"   id = "ipaddr"  value = "" ></td></tr>
+                <tr><th><%:Subnet mask  :%></th>
+                    <td><input type="text" name="subnet"  id = "netmask" value = "" ></td></tr>
+                <tr><th><%:default gateway  :%></th>
+                    <td><input type="text" name="gateway" id = "gateway" value = "" ></td></tr>
+                <tr><th><%:DHCP Client mode  :%></th>
+                    <td>
+                        <select id = "protocol">
+                            <option value="1"><%:Disable%></option>
+                            <option value="2"><%:Enable%></option>
+                         </select>
+                    </td>
+                </tr>
+                <tfoot>
+                    <tr><td colspan="2"><input class="cbi-button cbi-input-apply" type=button name=ok align="center" value="<%:Apply%>" style="width:100px;" onclick="setNet()"></td></tr>
+                </tfoot>
+            </table>
+        <!--</div>-->
+    </fieldset>
+
+
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,24 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifneq (EXISTS, $(ASIC_SIMULATION))
+    C_EXCLUDE_FILE_LIST = ALL
+endif
+
+### check if we me be in NONE PP system
+ifeq (NOT_USED, $(NO_PP_USED))
+  C_EXCLUDE_FILE_LIST = ALL
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake
+

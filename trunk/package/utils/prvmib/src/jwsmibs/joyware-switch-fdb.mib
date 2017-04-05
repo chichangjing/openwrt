@@ -1,0 +1,153 @@
+-- ============================================================================
+-- MibName   : JWS-FDB-MIB
+-- FileName  : joyware-switch-fdb.mib
+-- ============================================================================
+JWS-FDB-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress          FROM SNMPv2-SMI
+        DisplayString, MacAddress, TruthValue, RowStatus            FROM SNMPv2-TC
+        jwSwitch                                                    FROM JOYWARE-SMI
+        JwsPortList, JwsVlanID, JwsEnableValue                      FROM JWS-TC;
+
+jwsFdbMib MODULE-IDENTITY
+    LAST-UPDATED    "201603011200Z"
+    ORGANIZATION    "Joyware Electronic Technology Co.,Ltd"
+    CONTACT-INFO    "Postal: BlockA,Chang TorchHotel,No.259 Wensan Road,Hangzhou,Zhejiang 310012 China
+                     E-mail: jw-snmp@joyware.com
+                        Tel: 800-8571264 "
+    DESCRIPTION     "This MIB module defines MIB objects which provide fdb
+                     extensional information about the Joyware switch devices."
+    -- revision history
+    REVISION        "201603011200Z"
+    DESCRIPTION     "Initial revision."
+    ::= { jwSwitch 6 }
+
+jwsFdbGeneralGroup              OBJECT IDENTIFIER ::= { jwsFdbMib 1 }
+jwsFdbPortSecurityGroup         OBJECT IDENTIFIER ::= { jwsFdbMib 2 }
+
+-- ****************************************************************************
+--                  jwsFdbGeneralGroup
+-- ****************************************************************************
+jwsFdbAgingTime OBJECT-TYPE
+    SYNTAX      Integer32 (15..3825)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The FDB entry's address aging time (in seconds)"
+    DEFVAL     { 330 }
+    ::= { jwsFdbGeneralGroup 1 }
+
+-- ****************************************************************************
+--                  jwsFdbSecurePortTable
+-- ****************************************************************************
+jwsFdbSecurePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JwsFdbSecurePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "This table defines the security status of each secure port."
+    ::= { jwsFdbPortSecurityGroup 1 }
+
+jwsFdbSecurePortEntry OBJECT-TYPE
+    SYNTAX      JwsFdbSecurePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "Information about a table entry."
+    INDEX       { jwsFdbSecurePortIndex }
+    ::= { jwsFdbSecurePortTable 1 }
+
+JwsFdbSecurePortEntry ::= SEQUENCE {
+    jwsFdbSecurePortIndex                     Integer32,
+    jwsFdbSecurePortEnable                    JwsEnableValue
+    }
+
+jwsFdbSecurePortIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "The switch's port index"
+    ::= { jwsFdbSecurePortEntry 1 }
+
+jwsFdbSecurePortEnable OBJECT-TYPE
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Enable/Disable port security."
+    ::= { jwsFdbSecurePortEntry 2 }
+
+
+-- ****************************************************************************
+--                  jwsFdbSecureAddrTable
+-- ****************************************************************************
+
+jwsFdbSecureAddrNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Port trunk channel number."
+    ::= { jwsFdbPortSecurityGroup 2 }
+
+jwsFdbSecureAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JwsFdbSecureAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "This table stores the MAC addresses assigned to each port."
+    ::= { jwsFdbPortSecurityGroup 3 }
+
+jwsFdbSecureAddrEntry OBJECT-TYPE
+    SYNTAX      JwsFdbSecureAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "Information about a table entry."
+    INDEX       { jwsFdbSecureAddrIndex }
+    ::= { jwsFdbSecureAddrTable 1 }
+
+JwsFdbSecureAddrEntry ::= SEQUENCE {
+    jwsFdbSecureAddrIndex                     Integer32,
+    jwsFdbSecureAddrPortId                    Integer32,
+    jwsFdbSecureAddrMacAddress                MacAddress,
+    jwsFdbSecureAddrRowStatus                 RowStatus
+    }
+
+jwsFdbSecureAddrIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The switch's port index"
+    ::= { jwsFdbSecureAddrEntry 1 }
+
+jwsFdbSecureAddrPortId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The switch's port index"
+    ::= { jwsFdbSecureAddrEntry 2 }
+
+jwsFdbSecureAddrMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+               "The MAC address assigned to this port."
+    ::= { jwsFdbSecureAddrEntry 3 }
+
+jwsFdbSecureAddrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+                "The status of this entry.
+                 active(1)        - valid instance
+                 createAndGo(4)   - used to create a new instance.
+                 destroy(6)       - removes an instance."
+    ::= { jwsFdbSecureAddrEntry 4 }
+
+END

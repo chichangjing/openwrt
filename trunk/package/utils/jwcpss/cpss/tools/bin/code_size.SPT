@@ -1,0 +1,119 @@
+BEGIN {
+	PR="NONE"
+	cnt = 0
+	PATTERN="NONE"
+	cnt = 0
+	dir_cnt = 0
+	Directory = "NONE"
+	text = 0
+	data = 0
+	bss = 0
+	dec = 0
+	step_switch = "NONE"
+	
+} 
+
+{
+    if(($1 == "working")&&($2 == "step")&&($3 == "step1"))
+    {
+       step_switch = "STEP1"
+    }
+    if(($1 == "working")&&($2 == "step")&&($3 == "step2"))
+    {
+       step_switch = "STEP2"
+    }
+    
+    if(step_switch == "STEP1")
+    {	
+	if($1 == "script")
+	{
+		PATTERN = $3
+	}
+	if(($2 != "File(s)")&&($4 != ".")&&($4 != "..")&&($3 != "<DIR>")&&($1 != "Total")&&($2 != "Dir(s)")&&($1!="Volume")&&($1!=""))
+	{
+		if ( $1 == "Directory" ){
+			array[cnt] = "@ECHO "$0
+			cnt = cnt + 1
+			PR=$3
+		}
+
+		if (( $1 != "Directory" )&&($5 ~ PATTERN))
+		{
+			array[cnt] = "sizeppc.exe "PR "\\" $5
+			cnt = cnt + 1
+		}
+
+	}
+
+    }
+    if(step_switch == "STEP2")
+    {
+	if($1 == "script")
+	{
+		printf "\n"
+		print  "::::::::::" $3
+	
+	}
+	if ( $1 == "Directory" )
+	{
+		dir_cnt = dir_cnt + 1
+		cnt = 0
+
+		if(dir_cnt > 1)
+		{
+			printf "\n"
+			print  Directory
+			printf "\n"
+
+
+			printf  "        text         data          bss        total  \n"
+			printf  "       --------------------------------------------  \n"
+			printf  "%12d %12d %12d %12d \n",text,data,bss,dec 
+			printf  "       --------------------------------------------  \n"
+		}
+		Directory = $3
+		text = 0
+		data = 0
+		bss = 0
+		dec = 0
+		
+
+	}
+	if(($1 != "Directory" )&&($1 != "text"))
+	{
+		text = text + $1
+		data = data + $2
+		bss = bss + $3
+		dec = dec + $4		
+
+	}
+    } 
+}
+
+END {
+        if(step_switch == "STEP1")
+        {
+		print "@ECHO ------------------------------------------------------------------"
+		for(i = 1; i < cnt; i++)
+		{
+			print array[i]
+			print "@ECHO ------------------------------------------------------------------"
+		}
+	}
+        if(step_switch == "STEP2")
+	{
+			printf "\n"
+			print  Directory
+			printf "\n"
+
+
+			printf  "        text         data          bss        total  \n"
+			printf  "       --------------------------------------------  \n"
+			printf  "%12d %12d %12d %12d \n",text,data,bss,dec 
+			printf  "       --------------------------------------------  \n"
+			printf "\n"
+			printf "\n"						
+						
+	}
+
+}

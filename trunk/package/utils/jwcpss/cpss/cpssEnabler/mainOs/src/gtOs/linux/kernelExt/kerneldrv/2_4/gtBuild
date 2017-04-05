@@ -1,0 +1,5 @@
+# do nothing
+C_FILE_LIST  = NONE
+C_EXCLUDE_FILE_LIST = NONE
+
+include $(PROJ_BASE)/gtTopMake

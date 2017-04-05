@@ -1,0 +1,19 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+### check if we me be in NONE PP system
+ifeq (NOT_USED , $(NO_PP_USED))
+    SUBDIRS = NONE
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

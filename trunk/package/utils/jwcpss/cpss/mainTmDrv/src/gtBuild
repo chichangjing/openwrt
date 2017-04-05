@@ -1,0 +1,16 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =         $(TM_API_PATH_CORE)  $(TM_API_PATH_PLATFORM)
+
+#C_FILE_LIST  =
+#SUBDIRS      =  core platform
+#C_EXCLUDE_FILE_LIST =
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

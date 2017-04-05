@@ -1,0 +1,2 @@
+set PROJ_NAME=cpssEnabler
+set PROJ_BASE=%USER_BASE%\%PROJ_NAME%

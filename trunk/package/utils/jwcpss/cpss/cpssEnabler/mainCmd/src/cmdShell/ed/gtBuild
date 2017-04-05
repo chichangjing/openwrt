@@ -1,0 +1,28 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+ifeq (yes, $(CMD_FS))
+    INCLUDE_PATH += $(FIS)$(CURDIR)/regex$(FIE)
+    C_FILE_LIST += $(wildcard *.c)
+    C_FILE_LIST += regex/ed_regcomp.c regex/ed_regerror.c \
+        regex/ed_regexec.c regex/ed_regfree.c regex/ed_re_cclass.c
+else
+    C_EXCLUDE_FILE_LIST = ALL
+endif
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+    LIB_NAME = ed.lib
+endif
+
+SUBDIRS = NONE
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

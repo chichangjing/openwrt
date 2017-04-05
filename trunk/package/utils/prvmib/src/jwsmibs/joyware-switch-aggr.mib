@@ -1,0 +1,124 @@
+-- ============================================================================
+-- MibName   : JWS-AGGR-MIB
+-- FileName  : joyware-switch-aggr.mib
+-- ============================================================================
+JWS-AGGR-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32                     FROM SNMPv2-SMI
+        RowStatus                                                   FROM SNMPv2-TC
+        jwSwitch                                                    FROM JOYWARE-SMI
+        JwsPortList                                                 FROM JWS-TC;
+
+jwsAggrMib MODULE-IDENTITY
+    LAST-UPDATED    "201603011200Z"
+    ORGANIZATION    "Joyware Electronic Technology Co.,Ltd"
+    CONTACT-INFO    "Postal: BlockA,Chang TorchHotel,No.259 Wensan Road,Hangzhou,Zhejiang 310012 China
+                     E-mail: jw-snmp@joyware.com
+                        Tel: 800-8571264 "
+    DESCRIPTION     "This MIB module defines MIB objects which provide aggregation
+                     configurable information about the Joyware switch devices."
+    -- revision history
+    REVISION        "201603011200Z"
+    DESCRIPTION     "Initial revision."
+    ::= { jwSwitch 7 }
+
+jwsPagMibGroup          OBJECT IDENTIFIER ::= { jwsAggrMib 1 }
+jwsLagMibGroup          OBJECT IDENTIFIER ::= { jwsAggrMib 1 }
+
+-- ****************************************************************************
+--                  jwsPagMibGroup
+-- ****************************************************************************
+jwsPagMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                disabled(1),
+                static(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Port aggregation mode select."
+    DEFVAL      { disabled }
+    ::= { jwsPagMibGroup 1 }
+
+jwsPagStaticConfig   OBJECT IDENTIFIER ::= { jwsPagMibGroup 2 }
+
+jwsPagStaticLoadBalance OBJECT-TYPE
+    SYNTAX  INTEGER {
+            xor(1),
+            hash(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Port trunk load balancing scheme select."
+    DEFVAL  { hash }
+    ::= { jwsPagStaticConfig 1 }
+
+jwsPagChannelNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Port trunk channel number."
+    ::= { jwsPagStaticConfig 2 }
+
+jwsPagStaticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JwsPagStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "A table of the switch's port trunk config entries"
+    ::= { jwsPagStaticConfig 3 }
+
+jwsPagStaticEntry OBJECT-TYPE
+    SYNTAX      JwsPagStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "Switch's port trunk config entry"
+    INDEX       { jwsPagChannelIndex }
+    ::= { jwsPagStaticTable 1 }
+
+JwsPagStaticEntry ::= SEQUENCE {
+    jwsPagChannelIndex                   Integer32,
+    jwsPagChannelTrunkId                 Integer32,
+    jwsPagChannelMembers                 JwsPortList,
+    jwsPagChannelRowStatus               RowStatus
+    }
+
+jwsPagChannelIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Port trunk channel index."
+    ::= { jwsPagStaticEntry 1 }
+
+jwsPagChannelTrunkId OBJECT-TYPE
+    SYNTAX      Integer32 (0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Port trunk group identifier."
+    ::= { jwsPagStaticEntry 2 }
+
+jwsPagChannelMembers OBJECT-TYPE
+    SYNTAX      JwsPortList (SIZE(1..8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Port trunk group members mask."
+    ::= { jwsPagStaticEntry 3}
+
+jwsPagChannelRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+                "The status of this entry.
+                 active(1)        - valid instance
+                 createAndGo(4)   - used to create a new instance.
+                 destroy(6)       - removes an instance."
+    ::= { jwsPagStaticEntry 4 }
+
+END

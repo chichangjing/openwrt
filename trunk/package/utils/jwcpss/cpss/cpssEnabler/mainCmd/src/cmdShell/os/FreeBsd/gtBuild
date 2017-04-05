@@ -1,0 +1,22 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+C_FILE_LIST += $(wildcard *.c) \
+    ../generic/cmdOsData.c \
+	../generic/cmdStream.c \
+	../generic/u_cmdStreamSerial.c \
+	../generic/u_cmdStreamPipe.c \
+	../generic/u_cmdStreamSocket.c \
+    ../generic/cmdStreamTelnetProto.c
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

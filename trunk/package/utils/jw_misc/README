@@ -1,0 +1,9 @@
+cpu_benchmark.sh
+简单将CPU使用率提高到99%的脚本，没有完全达到要求。
+
+led_flash.sh
+测试LED对应的GPIO输出功能，测试GPIO输入功能。
+每一秒闪一下LED，并且打印gpio输入的状态。
+
+pmu_cfg.sh
+批量配置管脚复用寄存器，使用devmem命令。

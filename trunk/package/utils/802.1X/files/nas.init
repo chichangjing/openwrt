@@ -1,0 +1,74 @@
+#!/bin/sh /etc/rc.common
+START=61
+STOP=61
+USE_PROCD=1
+PROG="/usr/sbin/nas"
+PIDFILE=/var/run/nas.pid
+
+ieee802_1x_checkpid() {
+	pid=
+	if [ -f "$1" ] ; then
+		local line p
+		read line < "$PIDFILE"
+		for p in $line ; do
+			[ -z "${p//[0-9]/}" -a -d "/proc/$p" ] && pid="$pid $p"
+		done
+		if [ -n "$pid" ]; then
+			return 0
+		fi
+		return 1 # "Program is dead and /var/run pid file exists"
+	fi
+	return 3 # "Program is not running"
+}
+
+ieee802_1x_check() {
+    config_get nas "$1" 802_1x
+
+    [ "$nas" != "on" ] && return 0
+
+    /usr/sbin/jssdk_sh multicast mgmt-frame set 01-80-c2-00-00-03 enable
+
+	procd_set_param command $PROG
+}
+
+start_service() {
+    uid_line=`jwboardinfo | grep uid`
+    uid=${uid_line:4}
+    if [ "$uid" == "54-10-01-06-01-01-00-00" ] || [ "$uid" == "54-20-01-06-01-02-00-00" ]
+    then
+        {
+            echo "Yuxi customized board, return 802.1x"
+            return
+        }
+    fi
+
+    local pid
+	ieee802_1x_checkpid $PIDFILE
+	if [ -n "$pid" ]; then
+		echo "Program is already running"
+		return
+	fi
+	rm -f $PIDFILE
+
+	procd_open_instance
+
+	config_load nas
+	config_foreach ieee802_1x_check admin
+
+	procd_close_instance 
+}
+
+
+stop_service() {
+	local pid
+
+	ieee802_1x_checkpid $PIDFILE
+	if [ -n "$pid" ]; then
+		kill $pid
+		rm -f $PIDFILE
+		[ -f "$CONFIGFILE" ] && rm -f "$CONFIGFILE"
+		echo "pid $pid is killed"
+	fi
+
+    /usr/sbin/jssdk_sh multicast mgmt-frame set 01-80-c2-00-00-03 disable
+}

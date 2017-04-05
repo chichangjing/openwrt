@@ -1,0 +1,5 @@
+添加该库的头文件和库
+头文件目录
+$(STAGING_DIR)/usr/include/libjwsconvert
+库名称
+libjwsconvert.so

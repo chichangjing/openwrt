@@ -1,0 +1,40 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+LIB_NAME = cpssDrvPpHw.lib
+
+PCI_DIR_EXISTS = NOT_EXISTS
+
+ifeq (EXISTS, $(GT_PCI))
+PCI_DIR_EXISTS = EXISTS
+endif
+
+ifeq (EXISTS, $(GT_PEX))
+PCI_DIR_EXISTS = EXISTS
+endif
+
+ifeq (EXISTS, $(PCI_DIR_EXISTS))
+SUBDIRS += pci
+endif
+
+ifeq (EXISTS, $(GT_SMI))
+SUBDIRS += smi
+endif
+
+ifeq (EXISTS, $(GT_I2C))
+SUBDIRS += twsi
+endif
+
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

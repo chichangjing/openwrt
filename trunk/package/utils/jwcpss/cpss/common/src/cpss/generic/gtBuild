@@ -1,0 +1,19 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+SUBDIRS = events
+ifeq (L_ON,$(LOG_ENABLE))
+    SUBDIRS += log
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

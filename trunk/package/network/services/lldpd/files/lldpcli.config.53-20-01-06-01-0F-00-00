@@ -1,0 +1,8 @@
+configure lldp tx-interval 10
+configure lldp portidsubtype ifname
+configure lldp status disable
+configure system interface pattern !lo,!eth0,!br-lan,Gex-1,Gex-2,Fex-3,Fex-4,Fex-5,Fex-6
+configure system description "Joyware Switch Platform Software"
+configure system hostname JW-SE20-GF2E4-DL
+unconfigure system interface description
+unconfigure system interface promiscuous

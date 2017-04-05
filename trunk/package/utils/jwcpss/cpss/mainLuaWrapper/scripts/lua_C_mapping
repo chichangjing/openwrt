@@ -1,0 +1,39 @@
+# This file contain structure member mapping 
+#
+# Required for compatbility CPSS 4.0 vs CPSS 4.1
+#
+# First collumn is structure name concatenated with member name
+# The second is a structure member name as it shown in Lua
+#
+CPSS_INTERFACE_INFO_STC.devPort.hwDevNum            devNum
+CPSS_INTERFACE_INFO_STC.hwDevNum                    devNum
+
+CPSS_TRUNK_MEMBER_STC.hwDevice                      device
+
+
+CPSS_DXCH_NET_DSA_TO_ANALYZER_STC.devPort.hwDevNum  devNum
+
+CPSS_DXCH_NET_DSA_TO_CPU_STC.hwDevNum               devNum
+
+CPSS_DXCH_NET_DSA_FROM_CPU_STC.srcHwDev             srcDev
+
+CPSS_DXCH_NET_DSA_FORWARD_STC.srcHwDev              srcDev
+
+
+CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_COMMON_STC.srcHwDev        srcDev
+
+CPSS_DXCH_TTI_TRILL_RBID_TABLE_ENTRY_STC.trgHwDevice        trgDevice
+
+CPSS_DXCH_TTI_MAC_TO_ME_SRC_INTERFACE_INFO_STC.srcHwDevice  srcDevice
+
+CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_IP_COMMON_STC.srcHwDev     srcDev
+
+
+
+CPSS_DXCH_IP_COUNTER_SET_INTERFACE_CFG_STC.hwDevNum devNum
+
+
+CPSS_MAC_UPDATE_MSG_EXT_STC.associatedHwDevNum      associatedDevNum
+CPSS_MAC_UPDATE_MSG_EXT_STC.queryHwDevNum           queryDevNum
+CPSS_MAC_UPDATE_MSG_EXT_STC.oldAssociatedHwDevNum   oldAssociatedDevNum
+

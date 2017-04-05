@@ -1,0 +1,57 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH = 
+#INCLUDE_PATH = 
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+	LIB_NAME = gtOs.lib
+endif
+
+ifeq (1, $(LINUX_SIM))
+ifneq (EXISTS, $(RTOS_ON_SIM))
+	INCLUDE_PATH += -I$(DIST_HOME)/include
+endif
+else
+ifeq (6,$(KPATCHLEVEL))
+	#SUBDIRS = 2_6
+	KERNELSUBDIRS = 2_6
+	INCLUDE_PATH = -I$(DIST_HOME)/include -I./kerneldrv/2_6
+else
+ifeq (4,$(KPATCHLEVEL))
+	#SUBDIRS = 2_4
+	KERNELSUBDIRS = 2_4
+	INCLUDE_PATH = -I$(DIST_HOME) -I./kerneldrv/2_4
+else
+	SUBDIRS =
+	$(error kernel not supported)
+endif
+endif
+endif
+
+# flag kernel patches
+ifeq (yes,$(KERNEL_SYSCALL_TABLE_EXPORTED))
+	AD_CFLAGS += -DMVKERNELEXT_SYSCALLS
+endif
+ifeq (yes,$(KERNEL_TASK_STRUCT_EXTENDED))
+	AD_CFLAGS += -DMVKERNELEXT_TASK_STRUCT
+endif
+
+CPU_TARGETS_WITH_LSP_MODULE = \
+    ARMARCH7_ARMADA_385 ARMARCH7_MSYS_2_6_32 ARMARCH7_MSYS_3_4 ARMARCH7_MSYS \
+	ARMARCH7_ARMADAXP_3_4_69 ARMARCH7_ARMADAXP_3.4.69 ARMARCH7_ARMADA_390
+
+ifneq (,$(filter $(CPU_TARGETS_WITH_LSP_MODULE),$(CPU)_$(ARM_CPU)))
+    SUBDIRS = NONE
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

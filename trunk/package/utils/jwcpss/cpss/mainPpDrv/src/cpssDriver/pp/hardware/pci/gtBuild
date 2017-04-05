@@ -1,0 +1,33 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+LIB_NAME = cpssDrvPpHwPci.lib
+
+ifeq (EXISTS, $(ASIC_SIMULATION))
+    C_EXCLUDE_FILE_LIST = cpssDrvPpHwPciCntl.c new_cpssDrvPpHwPciCntl.c new_cpssDrvPpHwPciKernCntl.c
+else
+    C_EXCLUDE_FILE_LIST = cpssDrvPpHwPciCntlSim.c new_cpssDrvPpHwPciCntlSim.c
+    ifeq (linux, $(OS_RUN))
+        ifeq (yes,$(KERNEL_SYSCALL_TABLE_EXPORTED))
+            AD_CFLAGS += -DPRESTERA_SYSCALLS
+        endif
+        ifeq (YES,$(NO_KERN_PP_DRV))
+            C_EXCLUDE_FILE_LIST += new_cpssDrvPpHwPciKernCntl.c
+        endif
+    else
+        C_EXCLUDE_FILE_LIST += new_cpssDrvPpHwPciKernCntl.c
+    endif
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

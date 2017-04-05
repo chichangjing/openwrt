@@ -1,0 +1,190 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+<%
+    local ubus = require "luci.ubus"
+    --收到lldp设置请求
+    local lldp_mode = luci.http.formvalue("setLLDP")
+    if lldp_mode  then
+        local mode = {["admin_status"] = lldp_mode}
+        local modeStatus = ubus.set_args("lldp_config", "lldp_config_set", mode,2)
+
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(modeStatus)
+
+        return
+    end
+
+    --读取lldp内容
+    local modeStatus = ubus.get_args("lldp_config", "lldp_config_get", {"admin_status"},2)
+    local modeVal = modeStatus["ret"][1].admin_status
+    
+    local snd = {}
+    local chan = {"local_port_number","remote_port_description","remote_ip","remote_mac","remote_sys_name","remote_sys_description"}
+    local numVal = 0 
+    local status ={}
+    
+    if (modeVal == "1") then
+        local numStatus = ubus.get_args("lldp_config", "lldp_config_get", {"entry_num"},2)
+        numVal = numStatus["ret"][1].entry_num
+        if numVal ~=nil and tonumber(numVal) > 0  then
+            for i=1,tonumber(numVal) do
+                local pa = string.format("idx-%d",i)
+                snd[i]={[pa] = chan}
+            end
+
+           status = ubus.get_args("lldp_config", "lldp_config_get", snd,1)
+           -- for i,j in pairs(channel) do
+           --     status[i] = conn:call("port_aggr", "port_aggr_get", { get_args={j}})
+           -- end
+
+        end 
+    end
+%>
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript" src="<%=resource%>/xhr.js"></script>
+<script type="text/javascript">//<![CDATA[
+
+
+function setLLDP(){
+    var lldpMode;
+//    alert(lldpMode);
+    for(i=0;i<document.getElementsByName("mode").length;i++){
+        if(document.getElementsByName("mode")[i].checked == true){
+            lldpMode = document.getElementsByName("mode")[i].value
+        }
+    }
+//    alert(lldpMode);
+    XHR.get('<%=REQUEST_URI%>',{ "setLLDP": lldpMode},
+            function(x,rv)
+            {
+//                alert(JSON.stringify(rv));
+                if(rv.ret == "-1"){
+                    alert("<%:Configuration failed%>");
+                }else if(rv.ret == "0"){
+                    alert("<%:Succesfully configured%>");
+                }
+                setTimeout(function(){window.location.reload();},1000)
+            }
+           );
+
+}
+
+function display(){
+    var mode_status = <%=modeVal%>;
+//    alert(mode_status);
+    if(mode_status == "1"){
+        document.getElementsByName("mode")[0].checked = true;       
+        var lldpRcv = <%=luci.json.encode(status)%>;
+        var num = <%=tonumber(numVal)%>;
+
+        var tabObj=document.getElementById("lldpTab");//获取添加数据的表格
+        //       var colsNum=tabObj.rows[0].cells.length;//获取行的列数
+
+        //       alert(JSON.stringify(lldpRcv));
+
+        if(num > 0){
+            for(n=1;n<=num;n++){
+                //       var obj = vlanRcv[n-1]["ret"][0]["idx-"+n];
+                //       var memVal = transForward(obj[2].dot1q_vlan_portlist);
+                //       var tagVal = transForward(obj[3].dot1q_vlan_taglist);
+                //          myFunction(obj,memVal,tagVal);
+
+                var rowsNum = tabObj.rows.length;  //获取当前行数
+                var myNewRow = tabObj.insertRow(rowsNum);//插入新行
+                //          var id = vlanRcv[n-1]["ret"][0]["idx-"+n][0].dot1q_vlan_id; 
+                //          alert(JSON.stringify(vlanRcv[0]["ret"][0]["idx-1"][0].dot1q_vlan_id));
+                var newTdObj1=myNewRow.insertCell(0);
+                newTdObj1.innerHTML=lldpRcv[n-1]["ret"][0]["idx-"+n][0].local_port_number;
+                var newTdObj2=myNewRow.insertCell(1);
+                newTdObj2.innerHTML= lldpRcv[n-1]["ret"][0]["idx-"+n][1].remote_port_description;
+                var newTdObj3=myNewRow.insertCell(2);
+                newTdObj3.innerHTML=lldpRcv[n-1]["ret"][0]["idx-"+n][2].remote_ip;
+                var newTdObj4=myNewRow.insertCell(3);
+                newTdObj4.innerHTML= lldpRcv[n-1]["ret"][0]["idx-"+n][3].remote_mac;
+                var newTdObj5=myNewRow.insertCell(4);
+                newTdObj5.innerHTML= lldpRcv[n-1]["ret"][0]["idx-"+n][4].remote_sys_name;
+                var newTdObj6=myNewRow.insertCell(5);
+                newTdObj6.innerHTML= lldpRcv[n-1]["ret"][0]["idx-"+n][5].remote_sys_description;
+                $(newTdObj6).attr("style","white-space: normal");
+                //  selectMember( n, rcv[n-1]["ret"][0]["idx-"+n][0].port_base_vlan_portlist);
+            }
+        }
+    }
+    else if(mode_status == "2"){
+        document.getElementsByName("mode")[1].checked = true;       
+    }
+}
+
+window.onload = display;
+
+//]]></script>
+
+<div class="lldp"  id = "lldpconfig" >
+    <h3 class="h3"><%:LLDP configuration%></h3>
+    <!--<div class = "cbi-map-descr">
+        <%:LLDP(链路层发现协议)提供了一种标志的链路层发现方式，可以将本端设备的主要能力、管理地址、设备标识、接口标识等信息封装在LLDPDU(链路层发现协议数据单元)中发布给与自己直连的邻居,邻居收到这些信息后将其以标志MIB形式保存起来，以供网络复案例系统查询及判断链路状%>
+        </div>-->
+
+    <fieldset class="lldp-section">
+        <legend><%:LLDP protocol%></legend>
+
+        <table class="miniTab">
+            <tr>
+                <th>LLDP</th>
+                <td>
+                    <input type="radio" name="mode" value="1" checked = true/>&nbsp;<%:Enable%>
+                    <input type="radio" name="mode" value="2" />&nbsp;<%:Disable%>
+                </td>
+            </tr>
+            <tfoot>
+                <tr>
+                    <td colspan="2">
+                        <input type="button" name="ok" value="<%:Apply%>" class="cbi-button cbi-input-apply" onclick="return setLLDP()">
+                    </td>
+                </tr>
+            </tfoot>      
+        </table>
+    </fieldset>
+
+    <fieldset class="">
+        <legend><%:LLDP connection information%></legend>
+        <table id="lldpTab">
+            <tr>
+                <th><%:Local port%></th>
+                <th><%:Adjacent port%></th>
+                <th><%:Adjacent IP%></th>
+                <th><%:Adjacent MAC%></th>
+                <th><%:Adjacent system name%></th>
+                <th><%:Adjacent system description%></th>
+            </tr>
+        </table>
+    </fieldset>
+
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

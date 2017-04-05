@@ -1,0 +1,25 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+PROJ_NAME = mainLabServices
+
+ifneq (np5, $(DEVICE))
+C_EXCLUDE_FILE_LIST = wrDDRTrainingIP.cpp wrHwsDdr3Bap.cpp
+else
+C_EXCLUDE_FILE_LIST = wrHwsMac.cpp wrHwsPcs.cpp wrHwsPort.cpp wrHwsPortAp.cpp wrDDR3.cpp wrHwsDdr3Bap.cpp
+endif
+
+##################################################
+##################################################
+SW_ROOT_DIR = $(subst \,/,$(SW_ROOT))
+
+INCLUDE_PATH += -I$(SW_ROOT_DIR)/mainLabServices/h
+include $(SW_ROOT_DIR)/mainCommon/make/vxWorks/gtCppMake

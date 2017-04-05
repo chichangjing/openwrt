@@ -1,0 +1,76 @@
+#
+
+
+export PRODUCT_TYPE="CPSS"
+export PP_FAMILY=$FAMILY
+#export INCLUDE_UTF="YES"
+PROJECT_DEFS="$PROJECT_DEFS CPSS_PRODUCT"
+
+unset EXCLUDE_XBAR
+unset PSS_CORE_XBAR
+unset PSS_CORE_EX
+unset PSS_CORE_FA
+
+if [ -d "$CPSS_PATH" ]
+then
+    export CPSS_USER_BASE=$CPSS_PATH
+fi
+
+case $PP_FAMILY in
+EX)
+    PROJECT_DEFS="$PROJECT_DEFS INCL_EXDXMX_DRIVER TG_FAMILY CPSS_EX_TG CPSS_EX EX_FAMILY"
+    PROJECT_DEFS="$PROJECT_DEFS IMPL_CM IMPL_FA IMPL_XBARDRIVER"
+    export EXDXMX_DRIVER="EXISTS"
+    export TG_FAMILY="EXISTS"
+    export CPSS_EX_TG="EXISTS"
+    export CPSS_EX="EXISTS"
+    export PRESTERA_FAMILY="EX_FAMILY"
+    export XBAR_VENDOR="PRESTERA"
+    export FA_VENDOR="PRESTERA"
+# access to cpss galtis wrappers  
+    export EX_FAMILY="EXISTS"
+    ;;
+
+DX | DXSX | DXDPSS)
+    PROJECT_DEFS="$PROJECT_DEFS INCL_EXDXMX_DRIVER CPSS_CH CHX_FAMILY CPSS_CH2 DX_FAMILY"
+    export DX_BUILD_TYPE="POC"
+    export EXDXMX_DRIVER="EXISTS"
+    export CHX_FAMILY="EXISTS"
+    export CH3_FAMILY="EXISTS"
+    export CPSS_CH="EXISTS"
+    if [ "$GT_SMI" = "EXISTS" -a $PP_FAMILY = DXSX ]; then
+        export SAL_FAMILY="EXISTS"
+        export CPSS_SAL="EXISTS"
+        PROJECT_DEFS="$PROJECT_DEFS CPSS_SAL"
+    fi
+    export PRESTERA_FAMILY="DX_FAMILY"
+    export EXCLUDE_XBAR="ON"
+    if [ "$PP_FAMILY" = "DXDPSS" ];then
+       export PSS_MODE="PSS_DPSS"
+       export DPSS_DIR="T2CDPSS"
+    fi   
+    ;;
+
+EXMXPM)
+    PROJECT_DEFS="$PROJECT_DEFS INCL_EXDXMX_DRIVER CPSS_EXMXPM EXMXPM_FAMILY"
+    PROJECT_DEFS="$PROJECT_DEFS PSS_CORE_FA PSS_CORE_XBAR"
+    export PM_FAMILY="EXISTS"
+    export EXDXMX_DRIVER="EXISTS"
+    export CPSS_EXMXPM="EXISTS"
+    export PRESTERA_FAMILY="EXMXPM_FAMILY"
+    export EXT_XBAR_VENDOR=CPSS
+    export PSS_CORE_FA=EXISTS
+    export PSS_CORE_XBAR=EXISTS
+    export PM_FAMILY=EXISTS
+    export PRESTERA_FAMILY=EXMXPM_FAMILY
+
+    ;;
+
+*)
+    error_message "Wrong PP_FAMILY - ${PP_FAMILY}"
+    exit 1
+    ;;
+esac
+
+. $tool_build/product/pss_common.inc
+

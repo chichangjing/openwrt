@@ -1,0 +1,13 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH = 
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

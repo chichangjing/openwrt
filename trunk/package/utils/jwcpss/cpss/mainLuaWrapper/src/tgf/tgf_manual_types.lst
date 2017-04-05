@@ -1,0 +1,4 @@
+array_type_custom TGF_MAC_ADDR
+array_type_custom TGF_IPV4_ADDR
+array_type_custom TGF_IPV6_ADDR
+struct TGF_NET_DSA_STC

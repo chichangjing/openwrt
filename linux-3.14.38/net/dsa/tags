@@ -1,0 +1,87 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+DEFINE_MUTEX	dsa.c	/^static DEFINE_MUTEX(dsa_switch_drivers_mutex);$/;"	p	file:
+DSA_HLEN	tag_dsa.c	17;"	d	file:
+DSA_HLEN	tag_edsa.c	17;"	d	file:
+EDSA_HLEN	tag_edsa.c	18;"	d	file:
+LIST_HEAD	dsa.c	/^static LIST_HEAD(dsa_switch_drivers);$/;"	p	file:
+__DSA_PRIV_H	dsa_priv.h	12;"	d
+__read_mostly	tag_dsa.c	/^struct packet_type dsa_packet_type __read_mostly = {$/;"	v	typeref:struct:dsa_packet_type
+__read_mostly	tag_edsa.c	/^struct packet_type edsa_packet_type __read_mostly = {$/;"	v	typeref:struct:edsa_packet_type
+__read_mostly	tag_trailer.c	/^struct packet_type trailer_packet_type __read_mostly = {$/;"	v	typeref:struct:trailer_packet_type
+dev	dsa_priv.h	/^	struct net_device	*dev;$/;"	m	struct:dsa_slave_priv	typeref:struct:dsa_slave_priv::net_device	access:public
+dev_find_class	dsa.c	/^static struct device *dev_find_class(struct device *parent, char *class)$/;"	f	file:	signature:(struct device *parent, char *class)
+dev_is_class	dsa.c	/^static int dev_is_class(struct device *dev, void *class)$/;"	f	file:	signature:(struct device *dev, void *class)
+dev_to_mii_bus	dsa.c	/^static struct mii_bus *dev_to_mii_bus(struct device *dev)$/;"	f	file:	signature:(struct device *dev)
+dev_to_net_device	dsa.c	/^static struct net_device *dev_to_net_device(struct device *dev)$/;"	f	file:	signature:(struct device *dev)
+dsa_cleanup_module	dsa.c	/^module_exit(dsa_cleanup_module);$/;"	v
+dsa_cleanup_module	dsa.c	/^static void __exit dsa_cleanup_module(void)$/;"	f	file:	signature:(void)
+dsa_driver	dsa.c	/^static struct platform_driver dsa_driver = {$/;"	v	typeref:struct:platform_driver	file:
+dsa_driver_version	dsa.c	/^char dsa_driver_version[] = "0.1";$/;"	v
+dsa_init_module	dsa.c	/^module_init(dsa_init_module);$/;"	v
+dsa_init_module	dsa.c	/^static int __init dsa_init_module(void)$/;"	f	file:	signature:(void)
+dsa_link_poll_timer	dsa.c	/^static void dsa_link_poll_timer(unsigned long _dst)$/;"	f	file:	signature:(unsigned long _dst)
+dsa_link_poll_work	dsa.c	/^static void dsa_link_poll_work(struct work_struct *ugly)$/;"	f	file:	signature:(struct work_struct *ugly)
+dsa_netdev_ops	slave.c	/^static const struct net_device_ops dsa_netdev_ops = {$/;"	v	typeref:struct:net_device_ops	file:
+dsa_of_free_platform_data	dsa.c	/^static void dsa_of_free_platform_data(struct dsa_platform_data *pd)$/;"	f	file:	signature:(struct dsa_platform_data *pd)
+dsa_of_match_table	dsa.c	/^static const struct of_device_id dsa_of_match_table[] = {$/;"	v	typeref:struct:of_device_id	file:
+dsa_of_probe	dsa.c	/^static inline int dsa_of_probe(struct platform_device *pdev)$/;"	f	file:	signature:(struct platform_device *pdev)
+dsa_of_probe	dsa.c	/^static int dsa_of_probe(struct platform_device *pdev)$/;"	f	file:	signature:(struct platform_device *pdev)
+dsa_of_remove	dsa.c	/^static inline void dsa_of_remove(struct platform_device *pdev)$/;"	f	file:	signature:(struct platform_device *pdev)
+dsa_of_remove	dsa.c	/^static void dsa_of_remove(struct platform_device *pdev)$/;"	f	file:	signature:(struct platform_device *pdev)
+dsa_of_setup_routing_table	dsa.c	/^static int dsa_of_setup_routing_table(struct dsa_platform_data *pd,$/;"	f	file:	signature:(struct dsa_platform_data *pd, struct dsa_chip_data *cd, int chip_index, struct device_node *link)
+dsa_probe	dsa.c	/^static int dsa_probe(struct platform_device *pdev)$/;"	f	file:	signature:(struct platform_device *pdev)
+dsa_rcv	tag_dsa.c	/^static int dsa_rcv(struct sk_buff *skb, struct net_device *dev,$/;"	f	file:	signature:(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt, struct net_device *orig_dev)
+dsa_remove	dsa.c	/^static int dsa_remove(struct platform_device *pdev)$/;"	f	file:	signature:(struct platform_device *pdev)
+dsa_shutdown	dsa.c	/^static void dsa_shutdown(struct platform_device *pdev)$/;"	f	file:	signature:(struct platform_device *pdev)
+dsa_slave_change_rx_flags	slave.c	/^static void dsa_slave_change_rx_flags(struct net_device *dev, int change)$/;"	f	file:	signature:(struct net_device *dev, int change)
+dsa_slave_close	slave.c	/^static int dsa_slave_close(struct net_device *dev)$/;"	f	file:	signature:(struct net_device *dev)
+dsa_slave_create	dsa_priv.h	/^struct net_device *dsa_slave_create(struct dsa_switch *ds,$/;"	p	signature:(struct dsa_switch *ds, struct device *parent, int port, char *name)
+dsa_slave_create	slave.c	/^dsa_slave_create(struct dsa_switch *ds, struct device *parent,$/;"	f	signature:(struct dsa_switch *ds, struct device *parent, int port, char *name)
+dsa_slave_ethtool_ops	slave.c	/^static const struct ethtool_ops dsa_slave_ethtool_ops = {$/;"	v	typeref:struct:ethtool_ops	file:
+dsa_slave_get_drvinfo	slave.c	/^static void dsa_slave_get_drvinfo(struct net_device *dev,$/;"	f	file:	signature:(struct net_device *dev, struct ethtool_drvinfo *drvinfo)
+dsa_slave_get_ethtool_stats	slave.c	/^static void dsa_slave_get_ethtool_stats(struct net_device *dev,$/;"	f	file:	signature:(struct net_device *dev, struct ethtool_stats *stats, uint64_t *data)
+dsa_slave_get_link	slave.c	/^static u32 dsa_slave_get_link(struct net_device *dev)$/;"	f	file:	signature:(struct net_device *dev)
+dsa_slave_get_settings	slave.c	/^dsa_slave_get_settings(struct net_device *dev, struct ethtool_cmd *cmd)$/;"	f	file:	signature:(struct net_device *dev, struct ethtool_cmd *cmd)
+dsa_slave_get_sset_count	slave.c	/^static int dsa_slave_get_sset_count(struct net_device *dev, int sset)$/;"	f	file:	signature:(struct net_device *dev, int sset)
+dsa_slave_get_strings	slave.c	/^static void dsa_slave_get_strings(struct net_device *dev,$/;"	f	file:	signature:(struct net_device *dev, uint32_t stringset, uint8_t *data)
+dsa_slave_init	slave.c	/^static int dsa_slave_init(struct net_device *dev)$/;"	f	file:	signature:(struct net_device *dev)
+dsa_slave_ioctl	slave.c	/^static int dsa_slave_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)$/;"	f	file:	signature:(struct net_device *dev, struct ifreq *ifr, int cmd)
+dsa_slave_mii_bus_init	dsa_priv.h	/^void dsa_slave_mii_bus_init(struct dsa_switch *ds);$/;"	p	signature:(struct dsa_switch *ds)
+dsa_slave_mii_bus_init	slave.c	/^void dsa_slave_mii_bus_init(struct dsa_switch *ds)$/;"	f	signature:(struct dsa_switch *ds)
+dsa_slave_nway_reset	slave.c	/^static int dsa_slave_nway_reset(struct net_device *dev)$/;"	f	file:	signature:(struct net_device *dev)
+dsa_slave_open	slave.c	/^static int dsa_slave_open(struct net_device *dev)$/;"	f	file:	signature:(struct net_device *dev)
+dsa_slave_phy_read	slave.c	/^static int dsa_slave_phy_read(struct mii_bus *bus, int addr, int reg)$/;"	f	file:	signature:(struct mii_bus *bus, int addr, int reg)
+dsa_slave_phy_write	slave.c	/^static int dsa_slave_phy_write(struct mii_bus *bus, int addr, int reg, u16 val)$/;"	f	file:	signature:(struct mii_bus *bus, int addr, int reg, u16 val)
+dsa_slave_priv	dsa_priv.h	/^struct dsa_slave_priv {$/;"	s
+dsa_slave_priv::dev	dsa_priv.h	/^	struct net_device	*dev;$/;"	m	struct:dsa_slave_priv	typeref:struct:dsa_slave_priv::net_device	access:public
+dsa_slave_priv::parent	dsa_priv.h	/^	struct dsa_switch	*parent;$/;"	m	struct:dsa_slave_priv	typeref:struct:dsa_slave_priv::dsa_switch	access:public
+dsa_slave_priv::phy	dsa_priv.h	/^	struct phy_device	*phy;$/;"	m	struct:dsa_slave_priv	typeref:struct:dsa_slave_priv::phy_device	access:public
+dsa_slave_priv::port	dsa_priv.h	/^	u8			port;$/;"	m	struct:dsa_slave_priv	access:public
+dsa_slave_set_mac_address	slave.c	/^static int dsa_slave_set_mac_address(struct net_device *dev, void *a)$/;"	f	file:	signature:(struct net_device *dev, void *a)
+dsa_slave_set_rx_mode	slave.c	/^static void dsa_slave_set_rx_mode(struct net_device *dev)$/;"	f	file:	signature:(struct net_device *dev)
+dsa_slave_set_settings	slave.c	/^dsa_slave_set_settings(struct net_device *dev, struct ethtool_cmd *cmd)$/;"	f	file:	signature:(struct net_device *dev, struct ethtool_cmd *cmd)
+dsa_switch_destroy	dsa.c	/^static void dsa_switch_destroy(struct dsa_switch *ds)$/;"	f	file:	signature:(struct dsa_switch *ds)
+dsa_switch_probe	dsa.c	/^dsa_switch_probe(struct mii_bus *bus, int sw_addr, char **_name)$/;"	f	file:	signature:(struct mii_bus *bus, int sw_addr, char **_name)
+dsa_switch_setup	dsa.c	/^dsa_switch_setup(struct dsa_switch_tree *dst, int index,$/;"	f	file:	signature:(struct dsa_switch_tree *dst, int index, struct device *parent, struct mii_bus *bus)
+dsa_xmit	dsa_priv.h	/^netdev_tx_t dsa_xmit(struct sk_buff *skb, struct net_device *dev);$/;"	p	signature:(struct sk_buff *skb, struct net_device *dev)
+dsa_xmit	tag_dsa.c	/^netdev_tx_t dsa_xmit(struct sk_buff *skb, struct net_device *dev)$/;"	f	signature:(struct sk_buff *skb, struct net_device *dev)
+edsa_netdev_ops	slave.c	/^static const struct net_device_ops edsa_netdev_ops = {$/;"	v	typeref:struct:net_device_ops	file:
+edsa_rcv	tag_edsa.c	/^static int edsa_rcv(struct sk_buff *skb, struct net_device *dev,$/;"	f	file:	signature:(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt, struct net_device *orig_dev)
+edsa_xmit	dsa_priv.h	/^netdev_tx_t edsa_xmit(struct sk_buff *skb, struct net_device *dev);$/;"	p	signature:(struct sk_buff *skb, struct net_device *dev)
+edsa_xmit	tag_edsa.c	/^netdev_tx_t edsa_xmit(struct sk_buff *skb, struct net_device *dev)$/;"	f	signature:(struct sk_buff *skb, struct net_device *dev)
+parent	dsa_priv.h	/^	struct dsa_switch	*parent;$/;"	m	struct:dsa_slave_priv	typeref:struct:dsa_slave_priv::dsa_switch	access:public
+phy	dsa_priv.h	/^	struct phy_device	*phy;$/;"	m	struct:dsa_slave_priv	typeref:struct:dsa_slave_priv::phy_device	access:public
+port	dsa_priv.h	/^	u8			port;$/;"	m	struct:dsa_slave_priv	access:public
+register_switch_driver	dsa.c	/^EXPORT_SYMBOL_GPL(register_switch_driver);$/;"	v
+register_switch_driver	dsa.c	/^void register_switch_driver(struct dsa_switch_driver *drv)$/;"	f	signature:(struct dsa_switch_driver *drv)
+trailer_netdev_ops	slave.c	/^static const struct net_device_ops trailer_netdev_ops = {$/;"	v	typeref:struct:net_device_ops	file:
+trailer_rcv	tag_trailer.c	/^static int trailer_rcv(struct sk_buff *skb, struct net_device *dev,$/;"	f	file:	signature:(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt, struct net_device *orig_dev)
+trailer_xmit	dsa_priv.h	/^netdev_tx_t trailer_xmit(struct sk_buff *skb, struct net_device *dev);$/;"	p	signature:(struct sk_buff *skb, struct net_device *dev)
+trailer_xmit	tag_trailer.c	/^netdev_tx_t trailer_xmit(struct sk_buff *skb, struct net_device *dev)$/;"	f	signature:(struct sk_buff *skb, struct net_device *dev)
+unregister_switch_driver	dsa.c	/^EXPORT_SYMBOL_GPL(unregister_switch_driver);$/;"	v
+unregister_switch_driver	dsa.c	/^void unregister_switch_driver(struct dsa_switch_driver *drv)$/;"	f	signature:(struct dsa_switch_driver *drv)

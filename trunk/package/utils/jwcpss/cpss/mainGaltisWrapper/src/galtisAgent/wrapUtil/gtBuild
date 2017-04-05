@@ -1,0 +1,71 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+SUBDIRS = NONE
+
+ifeq (EXISTS, $(CHX_FAMILY))
+    USE_DXCH=USE
+    SUBDIRS =
+endif
+
+ifeq (EXISTS, $(PM_FAMILY))
+    USE_EXMXPM=USE
+    SUBDIRS =
+endif
+
+ifeq (EXISTS, $(SAL_FAMILY))
+    USE_DXSAL=USE
+    SUBDIRS =
+endif
+
+ifeq (EXISTS, $(EX_FAMILY))
+    USE_EXMX=USE
+    SUBDIRS =
+endif
+
+ifeq (EXISTS, $(TG_FAMILY))
+    USE_EXMX=USE
+    SUBDIRS =
+endif
+
+ifeq (EXISTS, $(TD_FAMILY))
+    USE_EXMX=USE
+    SUBDIRS =
+endif
+
+ifeq (DUNE, $(XBAR_VENDOR))
+    USE_DUNE=USE
+    SUBDIRS =
+endif
+
+ifeq (USE,$(USE_EXMX))
+    SUBDIRS += exMx
+endif
+
+ifeq (USE,$(USE_DXCH))
+    SUBDIRS += dxCh
+endif
+
+ifeq (USE,$(USE_EXMXPM))
+    SUBDIRS += exMxPm
+endif
+
+ifeq (USE,$(USE_DXSAL))
+    SUBDIRS += dxSal
+endif
+
+ifeq (USE,$(USE_DUNE))
+    SUBDIRS += fx950
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

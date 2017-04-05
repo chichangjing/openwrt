@@ -1,0 +1,19 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+ifeq (1, $(LINUX_SIM))
+#C_EXCLUDE_FILE_LIST = 
+else
+C_EXCLUDE_FILE_LIST = stubs.c miiInf.c
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

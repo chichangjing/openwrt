@@ -1,0 +1,44 @@
+/* ldscript file to be used by ld for libhelper.so DSO for i386 architecture.
+*/
+SECTIONS
+{
+/* The only purpose of this script to place ALL code and data of helper library
+on fixed well-known addresses. In this way every client will have helper code/data
+on the same addresses, so libcpss library can safely refer to libhelper library inside
+different clients.
+
+Otherwise dynamic linker can place helper library on different addesses for different clients,
+so libcpss cannot reefer correctly to the libhelper library in the same manner for all clients.
+
+*/
+. = 0x10f00000;
+.hash : { *(.hash) }
+.dynsym : { *(.dynsym) }
+.dynstr : { *(.dynstr) }
+.gnu.version : { *(.gnu.version) }
+.gnu.version_r : { *(.gnu.version_r) }
+.rel.dyn : { *(.rel.dyn) }
+.rel.plt : { *(.rel.plt) }
+.init : { *(.init) }
+.plt : { *(.plt) }
+.text : { *(.text) }
+.fini : { *(.fini) }
+.rodata : { *(.rodata) }
+.eh_frame : { *(.eh_frame) }
+.ctors : { *(.ctors) }
+.dtors : { *(.dtors) }
+.jcr : { *(.jcr) }
+.dynamic : { *(.dynamic) }
+.got : { *(.got) }
+.got.plt : { *(.got.plt) }
+.data : { *(.data) }
+.bss : { *(.bss) }
+
+/* Shared data section, access rights RW.
+   This section contain BSS and DATA sections of mainOS library which are located in special
+   section "MAINOS". The __SHARED_DATA_MAINOS attribute should be used to mark data.
+   This section is shared for all clients. Shared Library initialization routines find this
+   section by begin address and remap it into the shared buffer.
+*/
+MAINOS 0x10f80000 : { *(MAINOS) }
+}

@@ -1,0 +1,83 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+<%
+    local ubus = require "luci.ubus"
+    
+    if luci.http.formvalue("save") then
+        local saveMode = {["save_config"] = "2"}
+        local saveStatus = ubus.set_args("sysinfo", "sysinfo_set", saveMode,2)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(saveStatus)
+
+        return
+    end
+
+%>
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">//<![CDATA[
+
+function saveConfig(){
+    if(confirm("<%:Are you sure you want to save all the modified Settings?%>")){
+        // 异步提交数据
+        XHR.get('<%=REQUEST_URI%>',{ "save": "1"},
+                function(x,rv)
+                {
+                    if(rv.ret == "-1"){
+                        alert("<%:save failure%>");
+                    }else{
+                        alert("<%:save successful%>");
+                    }
+                }
+               );
+
+    }else{
+        ;
+    }
+
+}
+
+//]]></script>
+
+<div class="save"  id = "save-config" >
+
+    <fieldset class="clear-section"> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+    <legend><%:Save all the modified Settings%></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+
+        <div class = "save-section-node">
+            <div style="text-align:center; width:500px;">
+                <input type=button class="cbi-button cbi-input-apply" name=ok align="center" value="<%:Save%>" style="width:100px;" onclick="saveConfig()">
+            </div>
+
+        </div>
+    
+    </fieldset>
+
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

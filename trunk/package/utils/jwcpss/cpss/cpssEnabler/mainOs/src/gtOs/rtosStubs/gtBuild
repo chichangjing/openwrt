@@ -1,0 +1,19 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+ifneq (VXWORKS,$(OS_RUN))
+#the linux and the free bsd already have there code in the "os linux/freeBsd simulation" dir
+# for example in: <cpssEnabler\mainOs\src\gtOs\linuxSim\stubs>
+    C_FILE_LIST = NONE
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

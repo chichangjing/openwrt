@@ -1,0 +1,765 @@
+switchd.h下添加#include <init/ssdk_init.h>
+
+switchd.c下添加
+	定义
+	#define def_init_cfg  {.reg_mode = HSL_MDIO};
+
+	ssdk_init_cfg init_cfg = def_init_cfg;
+
+	main函数添加
+	/* jssdk init */
+	
+	init_cfg.reg_mode = HSL_MDIO;
+	
+	init_cfg.reg_func.mdio_set = NULL;
+	
+	init_cfg.reg_func.mdio_get = NULL;
+	
+	ssdk_init(0, &init_cfg);
+	
+
+
+/****************************************************************************************
+		               port ctrl function      
+ ****************************************************************************************/
+ #include "fal/fal_port_ctrl.h" 
+ #include "sal/os/aos_types.h"
+ #include "fal/fal_type.h"
+
+/*description:
+ *	per port type get,type:fe/fx/ge/gx
+ *inputs:
+ *	dev_id  - device id
+ *	port_id - port id
+ *outpouts:
+ *	type -  port type: fe/fx/ge/gx
+ * 	comb_port - 用来获取端口状态值，获取到的值为“1”说明这个端口是comb端口，可设置下拉属性，“0”说明下拉属性不可设；
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_port_type_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_type_t *type, fal_port_comb_t *comb_port);
+
+
+/*description:
+ *	per port link status get,status: link_up,lingk_down
+ *inputs:
+ *	dev_id  - device id
+ *	port_id - port id
+ *outpouts:
+ *	status -  port link status: link_up,link_down
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_port_link_status_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_link_status_t *status);
+
+
+/*description:
+ *	per port admin mode set,mode: enable,disable
+ *inputs:
+ *	dev_id  - device id
+ *	port_id - port id
+ *	enable  - port admin mode: enable or disable
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_port_admin_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_enable_t enable);
+
+
+/*description:
+ *	per port admin mode get,admin mode: enable,disable
+ *inputs:
+ *	dev_id  - device id
+ *	port_id - port id
+ *outpouts:
+ *	enable -  port admin mode get: enable or disable
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_port_admin_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_enable_t *enable);
+
+
+/*description:
+ *	per port physical mode set,physical mode :auto-neg,half-10,full-10,half-100,full-100,full-1000
+ *inputs:
+ *	dev_id  - device id
+ *	port_id - port id
+ *	mode    - auto-neg,half-10,full-10,half-100,full-100,full-1000
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_port_physical_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_physical_mode_t mode);
+
+
+/*description:
+ *	all port physical mode set,physical mode :auto-neg,half-10,full-10,half-100,full-100,full-1000
+ *inputs:
+ *	dev_id  - device id
+ *	port_id - port id
+ *outpouts:
+ *	status  - per port physical mode get - auto-neg,half-10,full-10,half-100,full-100,full-1000
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_port_physical_status_get(a_uint32_t dev_id, fal_port_t port_id, fal_port_physical_status_t *status);
+
+
+/*description:
+ *	per port flowerctrl mode set,flowerctrl  mode :enable,disable
+ *inputs:
+ *	dev_id  - device id
+ *	port_id - port id
+ *	enable  - flowerctrl mode set,enable or disable
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_port_flowctrl_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_enable_t enable);
+
+
+/*description:
+ *	per port flowerctrl mode get,flowerctrl  mode :enable,disable
+ *inputs:
+ *	dev_id  - device id
+ *	port_id - port id
+ *outpouts:
+ *	enable  - per port flowerctrl mode get,enable or disable
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_port_flowctrl_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_enable_t *enable);
+
+
+/*description:
+ *	all port all status show,port type,admin mode,link status,physical status,flowerctrl mode,
+ *inputs:
+ *	dev_id  - device id
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_port_test_show_all(a_uint32_t dev_id);
+
+
+/*description:
+ *	set comb_port,comb_port have 4 value,1000base-x/100base-fx/copper/auto-detect;
+ *inputs:
+ *	dev_id  - device id
+ *	port_id - port id
+ *	comb_type - comb_type ,"1" Force 1000Base-X;"2" Force 100Base-FX;"3" Force Copper; "4" Auto-detect mode;
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_port_comb_type_set(a_uint32_t dev_id, fal_port_t port_id, fal_port_comb_type_t comb_type)；
+
+
+/****************************************************************************************
+				port mirror function
+ ****************************************************************************************/
+ #include "fal/fal_mirror.h"
+ #include "fal/fal_type.h"
+ #include "sal/os/aos_types.h"
+ 
+/*description:
+ *	This routine sets Ingress/Engress Monitor Destination Port
+ *inputs:
+ *	dev_id  - device id
+ *	port_id - mirror destination port set
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t	fal_mirror_dest_port_set(a_uint32_t dev_id, fal_port_t port_id);
+
+/*description:
+ *	This routine gets Ingress/Engress Monitor Destination Port
+ *inputs:
+ *	dev_id  - device id
+ *	port_id - mirror destination port get
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t	fal_mirror_dest_port_get(a_uint32_t dev_id, fal_port_t *port_id);
+
+
+/*description:
+ *	This routine set source port mode 
+ *inputs:
+ *	dev_id  - device id
+ *	source_port - mirror source port set
+ *	mode 	- mirror source port mode set tx/rx/both/disable
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t	fal_mirror_source_port_mode_set(a_uint32_t dev_id, fal_port_t source_port, fal_mirror_mode_t mode);
+
+/*description:
+ *	This routine get source port mode 
+ *inputs:
+ *	dev_id  - device id
+ *	source_port - mirror source port set
+ *outpouts:
+ *	*mode 	- mirror source port mode set tx/rx/both/disable
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t	fal_mirror_source_port_mode_get(a_uint32_t dev_id, fal_port_t source_port, fal_mirror_mode_t *mode);
+
+
+/*description:
+ *	This routine gets Ingress/Engress Monitor Destination Port
+ *inputs:
+ *	dev_id  - device id
+ *	port_id - mirror destination port get
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t	fal_mirror_dest_port_get(a_uint32_t dev_id, fal_port_t *port_id);
+
+ 
+
+/****************************************************************************************
+				port trunk function
+ ****************************************************************************************/
+ #include "fal/fal_trunk.h" 
+ #include "sal/os/aos_types.h"
+ #include "fal/fal_type.h"
+
+
+/*description:
+ *	This routine set the trunk pag mode ,disable or static,only set static all function will be enable
+ *inputs:
+ *	dev_id      - device id
+ *	pag_mode    - set the trunk pag mode disable/static  
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t	fal_trunk_pag_mode_set(a_uint32_t dev_id,fal_trunk_mode_t pag_mode);
+
+
+/*description:
+ *	This routine get the trunk pag mode 
+ *inputs:
+ *	dev_id      - device id
+ *outpouts:
+ *	pag_mode    - get the trunk pag mode   
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t	fal_trunk_pag_mode_get(a_uint32_t dev_id,fal_trunk_mode_t *pag_mode);
+
+
+/*description:
+ *	This routine set the trunk load balance,hash or xor mode
+ *inputs:
+ *	dev_id  - device id
+ *	mode    - set the trunk load balance mode hash/xor  
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t	fal_trunk_load_balance_set(a_uint32_t dev_id, fal_trunk_load_balance_t mode);
+
+
+/*description:
+ *	This routine get the trunk load balance,hash or xor mode
+ *inputs:
+ *	dev_id  - device id
+ *outpouts:
+ *	mode    - the trunk load balance mode hash/xor  
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t	fal_trunk_load_balance_get(a_uint32_t dev_id, fal_trunk_load_balance_t *mode);
+
+
+/*description:
+ *	create a new trunk group with new trunk id and new group members 
+ *inputs:
+ *	dev_id   - device id
+ *	trunk_id - trunk id set,from 1 to 16
+ *	*trunk_members -trunk members set,the max trunk member is 8, portList format;
+ *	member_size - portList type byte size, eg. 10-20,member_size = 2 byte
+ *outpouts:
+ *	none 
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t	fal_trunk_row_create(a_uint32_t dev_id, fal_trunk_id_t trunk_id, fal_trunk_members_t *trunk_members, a_uint32_t member_size);
+
+
+/*description:
+ *	destroy a trunk group  
+ *inputs:
+ *	dev_id   - device id
+ *	trunk_id - the trunk id has set before
+ *outpouts:
+ *	none 
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t	fal_trunk_row_destroy(a_uint32_t dev_id, fal_trunk_id_t trunk_id);
+
+
+/*description:
+ *	per row trunk group show  
+ *inputs:
+ *	dev_id   - device id
+ * 	
+ *outpouts:
+ *	trunk_members
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t	fal_trunk_show_row_status(a_uint32_t dev_id, fal_trunk_id_t trunk_id, a_uint32_t *trunk_members);
+
+
+/****************************************************************************************
+				Mib_info 流量统计
+ ****************************************************************************************/
+ #include "fal/fal_mib.h" 
+ #include "sal/os/aos_types.h"
+ #include "fal/fal_type.h"
+
+/*description:
+ *	get per port Mib_info
+ *inputs:
+ *	dev_id   - device id
+ * 	port_id  - port id
+ *outpouts:
+ *	mib_info - 
+ *return:
+ *	SW_OK or Error Code	
+ *
+ * typedef struct {
+        a_uint32_t RxGoodByteLo;        
+        a_uint32_t RxGoodByteHi;
+        a_uint32_t RxUnicastPkts;
+        a_uint32_t RxBroadcastPkts;
+        a_uint32_t RxMulticastPkts;
+        a_uint32_t RxPausePkts;
+
+        a_uint32_t TxByteLo;
+        a_uint32_t TxByteHi;
+        a_uint32_t TxUnicastPkts;
+        a_uint32_t TxBroadcastPkts;
+        a_uint32_t TxMulticastPkts;
+        a_uint32_t TxPausePkts;
+ *  }fal_mib_info_t;
+ */
+sw_error_t fal_mib_info_get(a_uint32_t dev_id, fal_port_t port_id, fal_mib_info_t *mib_Info);
+
+
+/*description:
+ *	clear all ports min_info  
+ *inputs:
+ *	dev_id   - device id
+ * 	port_id  - port id
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+static sw_error_t _mv88e6097_mib_info_clear(a_uint32_t dev_id, fal_port_t port_id);
+
+
+/****************************************************************************************
+				Rate Limit
+ ****************************************************************************************/
+ #include "fal/fal_rate.h" 
+ #include "sal/os/aos_types.h"
+ #include "fal/fal_type.h"
+
+/*description:
+ *	port egress rate limit set 
+ *inputs:
+ *	dev_id   - device id
+ * 	port_id  - port id
+ *	speed    - egress data rate limit 
+ *	enable   - mode if the port egress rate limit feature is enable
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_rate_bucket_egrl_set(a_uint32_t dev_id,fal_port_t port_id,fal_rate_speed_t speed,fal_enable_t enable);
+
+/*description:
+ *	port egress rate limit get 
+ *inputs:
+ *	dev_id   - device id
+ * 	port_id  - port id
+ *outpouts:
+ *	speed    - egress data rate limit 
+ *	enable   - mode if the port egress rate limit feature is enable
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_rate_bucket_egrl_get(a_uint32_t dev_id,fal_port_t port_id,fal_rate_speed_t *speed,fal_enable_t *enable);
+
+/*description:
+ *	port ingress rate limit set 
+ *inputs:
+ *	dev_id    - device id
+ * 	port_id   - port id
+ *	bucket_id - bucket id select(0 ~ 4) 
+ *	type_mask - limit data packet type (bit0 ~ bit4) 
+ *	speed     - ingress data rate limit 
+ *	enable    - mode if the port ingress rate limit feature is enable
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_rate_bucket_pirl_set(a_uint32_t dev_id,fal_port_t port_id,fal_rate_bucket_t bucket_id,fal_rate_mask_t type_mask,fal_rate_speed_t speed,fal_enable_t enable);
+
+/*description:
+ *	port ingress rate limit get
+ *inputs:
+ *	dev_id    - device id
+ * 	port_id   - port id
+ *	bucket_id - bucket id select(0 ~ 4) 
+ *outpouts:
+ *	type_mask - limit data packet type (bit0 ~ bit4)  get
+ *	speed     - ingress data rate limit 
+ *	enable    - mode if the port ingress rate limit feature is enable
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_rate_bucket_pirl_get(a_uint32_t dev_id,fal_port_t port_id,fal_rate_bucket_t bucket_id,fal_rate_mask_t *type_mask,fal_rate_speed_t *speed,fal_enable_t *enable);
+
+
+/****************************************************************************************
+				Multicast
+ ****************************************************************************************/
+ #include "fal/fal_multicast.h" 
+ #include "sal/os/aos_types.h"
+ #include "fal/fal_type.h"
+
+/*description:
+ *	static multicast feature enable or disable
+ *inputs:
+ *	dev_id    - device id
+ *	enable    - enable or disable static multicast feature
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_multicast_enable_set(a_uint32_t dev_id, fal_enable_t enable);
+
+/*description:
+ *	show static multicast feature if enable / disable
+ *inputs:
+ *	dev_id    - device id
+ *outpouts:
+ *	enable    - static multicast feature enable status show
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_multicast_enable_get(a_uint32_t dev_id, fal_enable_t *enable);
+
+/*description:
+ *	If multicast feature enable ,this function Creates the new entry in multicast MAC address table
+ *inputs:
+ *	dev_id   	  - device id
+ *	*multicast_members - multicast members,eg:123456,0x12 become first octet,0x34 second octet,just like multicast_addr
+ *	*multicast_addr   - multicast address input,eg:01-00-5E-11-22-33,multicast_addr[0]=0x01;..
+ *	members_size      - input members octet size,eg: 123456,members_size = 3
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_multicast_row_create(a_uint32_t dev_id, fal_multicast_members_t *multicast_members, fal_multicast_addr_t *multicast_addr, a_uint32_t members_size);
+
+/*description:
+ *	If multicast feature enable ,this function Destroy a multicast MAC address table
+ *inputs:
+ *	dev_id   	  - device id
+ *	*multicast_members - multicast members,eg:123456,0x12 become first octet,0x34 second octet,just like multicast_addr
+ *	*multicast_addr   - multicast address input,eg:01-00-5E-11-22-33,multicast_addr[0]=0x01;..
+ *	members_size      - input members octet size,eg: 123456,members_size = 3
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_multicast_row_destroy(a_uint32_t dev_id,fal_multicast_members_t *multicast_members, fal_multicast_addr_t *multicast_addr, a_uint32_t members_size);
+
+
+/****************************************************************************************
+				Vlan
+ ****************************************************************************************/
+ #include "fal/fal_vlan.h" 
+ #include "sal/os/aos_types.h"
+ #include "fal/fal_type.h"
+
+/*description:
+ *	set vlan mode to port-based vlan or ieee8021q vlan
+ *inputs:
+ *	dev_id   - device id
+ *	mode	 - vlan mode: port-based/ieee8021q		
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_vlan_mode_set(a_uint32_t dev_id, fal_vlan_mode_t mode);
+
+
+/*description:
+ *	get current vlan mode 
+ *inputs:
+ *	dev_id   - device id		
+ *outpouts:
+ *	*mode	 - vlan mode: port-based/ieee8021q
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_vlan_mode_get(a_uint32_t dev_id, fal_vlan_mode_t *mode);
+
+
+/*description:
+ *	port-baesd vlan set function
+ *inputs:
+ *	dev_id  	- device id	
+ * 	port_id  	- port id
+ *	*vlan_members 	- jwsportlist	type, include port-based vlan members
+ *	member_size 	- portlist octec size
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_port_based_vlan_set(a_uint32_t dev_id, fal_port_t port_id, fal_vlan_members_t *vlan_members, a_uint32_t member_size);
+
+
+/*description:
+ *	create iee8021q vlan function 
+ *inputs:
+ *	dev_id  	- device id	
+ * 	vlan_id  	- set vlan id
+ *	*port_members 	- jwsportlist type, include ieee8021q vlan members
+ *	member_size 	- portlist octec size
+ *	*egress_tag	- jwsportlist type, egress tag with fream tag or untag
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_8021q_vlan_row_create(a_uint32_t dev_id, fal_vlan_id_t vlan_id, fal_vlan_members_t *port_members, a_uint32_t member_size, fal_vlan_egress_tag_t *egress_tag);
+
+
+/*description:
+ *	destroy ieee8021q vlan with specific vlan id
+ *inputs:
+ *	dev_id  	- device id	
+ * 	vlan_id  	- vlan id which will be destroy
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_8021q_vlan_row_destroy(a_uint32_t dev_id, fal_vlan_id_t vlan_id);
+
+
+/*description:
+ *	destroy ieee8021q vlan with specific vlan id
+ *inputs:
+ *	dev_id  	- device id	
+ *outpouts:
+ *	*vlan_id	- vlan id output
+ *	*egress_tag     - output egress tag,egress_tag[0]'s members include Port 1 ~ Port 8,egress_tag[1]'s members include Port 9~ Port 10
+
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_8021q_vlan_row_status(a_uint32_t dev_id, fal_vlan_id_t *vlan_id, fal_vlan_egress_tag_t *egress_tag);
+
+
+
+/****************************************************************************************
+				QoS
+ ****************************************************************************************/
+ #include "fal/fal_qos.h" 
+ #include "sal/os/aos_types.h"
+ #include "fal/fal_type.h"
+
+
+/*description:
+ *	Qos port priority map rule set, only when port priority assign mode set tag-ip both, this feature is useful
+ *inputs:
+ *	dev_id  	- device id	
+ *	port_id		- port id
+ *	qos_map		- select per port Qos map, ip-mapping/tag-mapping
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_qos_port_prio_map_rule_set(a_uint32_t dev_id, fal_port_t port_id, fal_qos_map_t qos_map);
+
+
+/*description:
+ *	Qos port schedule mode set, set per port's schedule mode: WRR or SR
+ *inputs:
+ *	dev_id  	- device id	
+ *	port_id		- port id
+ *	schedule_mode	- set per port schedule mode, WRR or SR
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_qos_port_schedule_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_qos_schedule_mode_t schedule_mode);
+
+
+/*description:
+ *	Get per port Qos schedule mode 
+ *inputs:
+ *	dev_id  	- device id	
+ *	port_id		- port id
+ *outpouts:
+ *	*schedule_mode	- get per port schedule mode, WRR or SR
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_qos_port_schedule_mode_get(a_uint32_t dev_id, fal_port_t port_id, fal_qos_schedule_mode_t *schedule_mode);
+
+
+/*description:
+ *	Set Qos tag prioruty map
+ *inputs:
+ *	dev_id  	- device id	
+ *	*tag_mapping  	- input tag mapping table
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_qos_tag_prio_map_set(a_uint32_t dev_id, fal_tag_map_t *tag_mapping);
+
+
+/*description:
+ *	Set Qos ip prioruty map
+ *inputs:
+ *	dev_id  	- device id	
+ *	*ip_mapping  	- input ip mapping table
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_qos_ip_prio_map_set(a_uint32_t dev_id, fal_ip_map_t *ip_mapping);
+
+
+/*description:
+ *	Set Qos port priority assign mode,use-default/use-tag/use-ip/use-tag-ip, when set use-tag-ip mode, fal_qos_port_prio_map_rule_set()function should be set;
+ *inputs:
+ *	dev_id  	- device id	
+ *	port_id 	- port id 
+ *	assign_mode	- Qos port priority assign mode select,use-default/use-tag/use-ip/use-tag-ip
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_qos_port_prio_assign_mode_set(a_uint32_t dev_id, fal_port_t port_id, fal_qos_assign_mode_t assign_mode);
+
+
+/*description:
+ *	Set Qos ip prioruty map
+ *inputs:
+ *	dev_id  	- device id	
+ *	port_id		- port id
+ *	priority	- set per port default prio,lowest / low / high / highest
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_qos_port_default_prio_set(a_uint32_t dev_id, fal_port_t port_id, fal_qos_prio_t priority);
+
+
+
+
+/****************************************************************************************
+				FDB
+ ****************************************************************************************/
+ #include "fal/fal_mac.h" 
+ #include "sal/os/aos_types.h"
+ #include "fal/fal_type.h"
+
+
+/*description:
+ *	Set MAC address table aging old time ,default 300s
+ *inputs:
+ *	dev_id  	- device id	
+ *	aging_time	- aging old time
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_mac_aging_timeout_set(a_uint32_t dev_id, fal_mac_aging_t aging_time);
+
+
+/*description:
+ *	Set FDB secure port and enable 
+ *inputs:
+ *	dev_id  	- device id	
+ *	port_id 	- port_id: secure port select;
+ *	enable		- enable secure port
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_mac_secure_port_enable_set(a_uint32_t dev_id, fal_port_t port_id, fal_enable_t enable);
+
+
+/*description:
+ *	add secure mac to mac address table with static
+ *inputs:
+ *	dev_id  	- device id	
+ *	port_id 	- port_id: only if this port_id has been set enable, can set this function
+ *	*mac_addr 	- mac address which will bind to secure port, and this mac mast be unique
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_mac_row_create(a_uint32_t dev_id, fal_port_t port_id, fal_fdb_mac_t *mac_addr);
+
+
+/*description:
+ *	delete mac from mac address table 
+ *inputs:
+ *	dev_id  	- device id	
+ *	*mac_addr 	- delete mac address
+ *	port_id		- delete mac with a ensure port
+ *outpouts:
+ *	none
+ *return:
+ *	SW_OK or Error Code	
+ */
+sw_error_t fal_mac_row_destroy(a_uint32_t dev_id, fal_fdb_mac_t *mac_addr, fal_port_t port_id);
+

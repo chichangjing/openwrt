@@ -1,0 +1,20 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+#LIB_NAME = mainExtUtils.lib
+
+ifneq (linux, $(OS_RUN))
+    C_EXCLUDE_FILE_LIST = ALL
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

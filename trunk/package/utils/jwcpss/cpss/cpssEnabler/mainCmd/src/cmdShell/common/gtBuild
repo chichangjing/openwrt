@@ -1,0 +1,26 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifeq (PSS, $(PRODUCT_TYPE))
+C_EXCLUDE_FILE_LIST += cmdExtServices.c
+endif
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+	LIB_NAME = mainCmd.lib
+endif
+
+ifeq (yes,$(CMD_LUA_CLI))
+    AD_CFLAGS += $(FD)CMD_LUA_CLI
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

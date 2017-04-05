@@ -1,0 +1,696 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+
+<%
+   local ubus = require "luci.ubus"
+   local portNum = ubus.getPortNum()
+   -- 收到页面跳转处理 
+    if luci.http.formvalue("select") then
+        local selectMode = {}
+        if luci.http.formvalue("select") == "1" then
+            selectMode = {["mode"] = "1"}
+        else
+            selectMode = {["mode"] = "2"}
+        end
+        local selectStatus = ubus.set_args("vlan_config", "vlan_config_set",selectMode,2)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(selectStatus)
+
+        return
+    end
+    
+   -- 收到设置base应用处理 
+    local baseJson = luci.http.formvalue("setBase")
+    if baseJson then
+        local setBaseJson = luci.json.decode(baseJson)
+
+        local setBaseStatus = {}
+        local setBaseSnd = {}
+    
+        for i=1, portNum do
+            pVal = string.format("port-%d",i)
+            setBaseSnd[i]={[pVal]={{["port_base_vlan_portlist"] = setBaseJson.data[i].base_members}}} 
+        end
+        setBaseStatus = ubus.set_args("vlan_config","vlan_config_set",setBaseSnd,1)
+
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setBaseStatus)
+
+        return
+    end
+
+   -- 收到设置vlan应用处理 
+    local vlanJson = luci.http.formvalue("setVlan")
+    if vlanJson then
+        local setVlanJson = luci.json.decode(vlanJson)
+        local pVal = string.format("idx-%s",setVlanJson.idx)
+        local setVlanSnd={[pVal]={{["dot1q_vlan_id"] = setVlanJson.vlan_id},{["dot1q_vlan_name"] =setVlanJson.vlan_name},{["dot1q_vlan_portlist"] =setVlanJson.vlan_mem},{["dot1q_vlan_taglist"] =setVlanJson.vlan_tag}}} 
+        
+        local setVlanStatus = ubus.set_args("vlan_config","vlan_config_set",setVlanSnd,2)
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setVlanStatus)
+
+        return
+    
+    end
+    -- 收到删除vlan 处理
+    local delJson = luci.http.formvalue("delVlan")
+    if delJson then
+        local delVlanJson = luci.json.decode(delJson)
+        local idxVal = string.format("idx-%s",delVlanJson.idx)
+        
+        local delVlanStatus = ubus.clear_args("vlan_config","vlan_config_clear",idxVal)
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(delVlanStatus)
+
+        return
+    
+    end
+ 
+    local typeStatus = ubus.getPortType(portNum)
+    
+-- 先获得模式
+    local modeStatus = ubus.get_args("vlan_config", "vlan_config_get", {"mode"},2 )
+    local modeVal = modeStatus["ret"][1].mode  
+    
+    local getBaseSnd = {}
+    local getBaseStatus = {}
+    local getVlanSnd = {}
+    local getVlanStatus = {}
+    local numVal = 0
+    -- 对mode 进行判断
+    if modeVal == "1" then --base
+       for i=1, portNum do
+            pa = string.format("port-%d",i)
+            getBaseSnd[i]={[pa] = {"port_base_vlan_portlist"}}
+       end
+       getBaseStatus = ubus.get_args("vlan_config", "vlan_config_get", getBaseSnd,1 )
+        
+    elseif modeVal == "2" then -- 802.1
+        --先获取num
+        local numStatus = ubus.get_args("vlan_config", "vlan_config_get", {"dot1q_vlan_num"},2 )
+        numVal = numStatus["ret"][1].dot1q_vlan_num  
+        if numVal ~=nil and tonumber(numVal) > 0 then 
+            for i=1, tonumber(numVal) do
+                pa = string.format("idx-%d",i)
+                getVlanSnd[i]={[pa] = {"dot1q_vlan_id","dot1q_vlan_name","dot1q_vlan_portlist","dot1q_vlan_taglist"}}
+            end
+            getVlanStatus = ubus.get_args("vlan_config", "vlan_config_get", getVlanSnd,1 )
+        end
+
+    end
+
+
+%>
+<%+header%>
+<script type="text/javascript">//<![CDATA[
+//字节串 字节数
+var OCTET_NUM = Math.ceil(<%=portNum%>/8);
+
+//对数值高低换位
+function shift_fun(len,data) {
+    for(var i= 0,tmp = 0;i<len;i++) {
+        tmp=((data>>i)&0x01)|tmp;
+        if(i<len-1)
+            tmp=tmp<<1;
+    }
+    return tmp;
+}
+//转前端格式
+function transForward(num){
+    var ss = num.split("-");//将字符串按某个字符切割成若干个字符串，并以数组形式返回
+    var aa = 0;
+    if(OCTET_NUM > 1){
+        for(var n = 0; n < OCTET_NUM -1; n++){//避免最后一个字节乘0处理
+            aa += parseInt(ss[n],16)*256*(OCTET_NUM-1-n);
+        }
+        aa += parseInt(ss[OCTET_NUM-1],16);
+    }else{
+        aa = parseInt(ss[OCTET_NUM-1],16);
+    }
+
+    return shift_fun(OCTET_NUM * 8,aa);
+}
+//转后台格式“XX-X"
+function transBackward(num){
+
+    var data = shift_fun(OCTET_NUM * 8,num);
+    var sda = new Array();
+    for(var n = 0; n < OCTET_NUM - 1; n++){
+        sda[n] = parseInt((data / (256 * (OCTET_NUM - 1 - n))) % 256).toString(16);
+    }
+    sda[OCTET_NUM -1] = (data % 256).toString(16);
+    return sda.join("-");
+}
+$(document).ready(function(){
+    var modeObj =  $("#mode");
+    var mode_val = '<%=modeVal%>';
+    modeObj[0].selectedIndex = mode_val-1;
+
+    var typeRcv = <%=luci.json.encode(typeStatus)%>;
+    setPortHTMLByName(typeRcv);
+    /*
+    console.log(typeRcv)
+    $.each(typeRcv, function(i,val) {
+        var rcv = val.ret[0]["port-"+(i+1)];
+        if(rcv[0].type == "4"){
+            for(j=0; j<document.getElementsByName("port"+(i+1)).length; j++){
+                document.getElementsByName("port"+(i+1))[j].innerHTML = "G"+(i+1);
+            }
+        }
+        else if(rcv[0].type == "2"){
+            for(j=0; j<document.getElementsByName("port"+(i+1)).length; j++){
+                document.getElementsByName("port"+(i+1))[j].innerHTML = "F"+(i+1);
+            }
+        }
+    });*/
+
+    if(mode_val == "1"){
+        $("#con_one_1").show();
+        $("#con_one_2").hide();
+
+        var rcv = <%=luci.json.encode(getBaseStatus)%>;
+        for(var n=1;n<=<%=portNum%>;n++){
+            selectMember( n, rcv[n-1]["ret"][0]["port-"+n][0].port_base_vlan_portlist);
+        }
+    }else{
+        $("#con_one_1").hide();
+        $("#con_one_2").show();
+
+        var vlanRcv = <%=luci.json.encode(getVlanStatus)%>;
+        console.log(vlanRcv)
+ //       alert(JSON.stringify(vlanRcv));
+        var num = <%=tonumber(numVal)%>;
+        for(n=1;n<=num;n++){
+            var obj = vlanRcv[n-1]["ret"][0]["idx-"+n];
+            var memVal = transForward(obj[2].dot1q_vlan_portlist);
+            var tagVal = transForward(obj[3].dot1q_vlan_taglist);
+            myFunction(obj,memVal,tagVal);
+        }
+        document.getElementsByName("chkArr")[0].disabled = true;
+    }
+    //模式切换
+    modeObj.on("change",function(){
+        if(this.value == "1"){
+            if(confirm("<%:are you sure you want to switch configuration?%>")){
+                $("#con_one_1").show();
+                $("#con_one_2").hide();
+
+                // 异步提交数据
+                XHR.get('<%=REQUEST_URI%>',{ "select": 1},
+                        function(x,rv){ 
+                            if(rv.ret == "-1"){
+                                alert("<%:switch failure%>");
+                            }else{
+                                alert("<%:successfully switch%>");
+                                window.location.reload();
+                            }
+                        });
+            }else{
+                this.selectedIndex = 1;
+            }
+        }else{
+            if(confirm("<%:are you sure you want to switch configuration?%>")){
+
+                // 异步提交数据
+                XHR.get('<%=REQUEST_URI%>',{ "select": 2},
+                        function(x,rv){ 
+                            if(rv.ret == "-1"){
+                                alert("<%:switch failure%>");
+                            }else{
+                                $("#con_one_1").hide();
+                                $("#con_one_2").show();
+                                alert("<%:successfully switch%>");
+                                window.location.reload(); 
+                            }
+                        });
+            }else{
+                this.selectedIndex = 0;
+            }
+        }
+    });
+    //添加光标焦点
+    $("[data-click=addFocus]").on("click",function(){
+        $('#vlan_id').focus();
+    });
+    //vlan端口选择切换
+    $("[name=vlanPort]").each(function(){
+        $(this).on("click",function(){
+            var val = this.value;
+            if(this.checked == true){
+                $("[name=tagMode"+val+"][value='1']")[0].checked=true;
+                //获得设置utag列的所有值
+                var strUtmem = "";
+                $("#myTab tr:gt(1) td:nth-child(6)").each(function () {
+                    if($(this).text()!="NULL"){
+                        strUtmem += $(this).text()+" ";
+                    }
+                });
+                if(strUtmem.search("\\bP"+val+"\\b")!=-1){
+                    $("[name=tagMode"+val+"][value='2']")[0].disabled=true;
+                    $("[name=tagMode"+val+"][value='1']")[0].disabled=false;
+                    return;
+                }else{
+                    $("[name=tagMode"+val+"]").each(function(){
+                        this.disabled=false;
+                    })
+                }
+            }else{
+                $("[name=tagMode"+val+"]").each(function(){
+                    this.checked=false;
+                    this.disabled=true;
+                })
+            }
+        })
+    })
+
+    //绑定双向选择
+    $("[name^=basePort]:not(:disabled)").each(function(){
+        $(this).click(function(){
+            var num = this.name.replace("basePort","").split("_").reverse().join("_");
+            $("[name^=basePort"+num+"]")[0].checked = this.checked;
+        });
+    });
+});
+//设置 base 模式的应用
+function setBase(){
+    var a = JSON.parse("{\"data\":[]}");
+    //获得列表数值
+    for (var i = 1; i <=<%=portNum%>; i++) { //10行，每个端口一行
+        var para = new Object();//这里一定要new新的对象，要不然保存的都是一样的数据；都是最后一行的数据
+        var memVal = 0;
+        for(var j=1;j<=<%=portNum%>;j++){//10个portlist
+            if(j != i){
+                if($("[name^=basePort"+j+"_]")[i-1].checked == true){
+                    memVal |=  1<<(j-1);
+                }
+            }
+        }
+
+        var data = shift_fun(OCTET_NUM * 8,memVal);
+        var sda = new Array();
+        for(var n = 0; n < OCTET_NUM - 1; n++){
+            sda[n] = parseInt((data / (256 * (OCTET_NUM - 1 - n))) % 256).toString(16);
+        }
+        sda[OCTET_NUM -1] = (data % 256).toString(16);
+
+        para.base_members = sda.join("-");
+        a.data.push(para);
+    }
+    // alert(JSON.stringify(a));
+    //异步提交数据
+    XHR.get('<%=REQUEST_URI%>',{"setBase": JSON.stringify(a),},
+            function(x,rv) {
+                var flag = 0;
+                for(var i = 0; i < rv.length; i++){
+                    if(rv[i].ret == "-1"){
+                        flag = 1;
+                        alert("<%:NO.%>"+(i+1)+"<%:configuration failure%>");
+                        window.location.reload();
+                        return ;
+                    }
+                }
+                if(flag == 0){
+                    alert("<%:Succesfully configured%>");
+                }
+            }
+    );
+}
+function setVlan(){
+    //组成JSON格式
+    var a = JSON.parse("{\"idx\":\"\",\"vlan_id\":\"\",\"vlan_name\":\"\",\"vlan_mem\":\"\",\"vlan_tag\":\"\"}");
+    //获得idx
+    a.idx = $("#myTab tr").length;
+
+    //获得vlan_id
+    a.vlan_id = $.trim($("#vlan_id").val());
+    if( (a.vlan_id == 0) || isNaN(a.vlan_id)){
+        alert("<%:Vlan_id cannot be nul and number only%>");
+        return;
+    }
+    if((Number(a.vlan_id) < 2)||(Number(a.vlan_id) > 4094)){
+        alert("<%:Vlan_id range 2~4094%>");
+        return;
+    }
+    //获得vlan_name
+    a.vlan_name =  $.trim($("#vlan_name").val());
+    if(a.vlan_name == 0){
+        alert("<%:Vlan_name cannot be nul%>");
+        return;
+    }
+    //判断是否重名
+    for(var r=1;r<a.idx;r++){
+        if(parseInt(a.vlan_id)==$("#myTab tr:eq("+r+") td:eq(1)").text()){
+            alert("<%:Vlan_id must unique%>");
+            return;
+        }
+        if(a.vlan_name.toLowerCase()==$("#myTab tr:eq("+r+") td:eq(2)").text()){
+            alert("<%:Vlan_name must unique%>");
+            return;
+        }
+    }
+//获得vlan_mem vlan_tag
+    var memVal = 0;
+    var tagVal = 0;
+    for (var i = 0; i < document.getElementsByName("vlanPort").length; i++) {
+        if (document.getElementsByName("vlanPort")[i].checked == true) {
+            memVal |= 1 << i;
+            if(document.getElementsByName("tagMode" + (i + 1))[0].checked){
+                tagVal |= 1 << i;
+            }
+        }
+    }
+    if(memVal == 0){
+        alert("<%:Choose first%>");
+        return;
+    }
+    //vlan_mem
+    a.vlan_mem = transBackward(memVal);
+    //获得vlan_tag
+    a.vlan_tag = transBackward(tagVal);
+
+    //console.log("发送给后台数据："+JSON.stringify(a));
+    //异步提交数据
+    XHR.get('<%=REQUEST_URI%>',{"setVlan": JSON.stringify(a)},
+            function(x,rv) {
+                //    alert(JSON.stringify(rv));
+                if(rv.ret == "0"){
+                    alert("<%:Succesfully configured%>");
+                    empSel();
+                    myFunction(a,memVal,tagVal);
+                }
+                else if (rv.ret == "-1"){
+                    alert("<%:Configuration failed%>");
+                    window.location.reload();
+                }
+            }
+    );
+}
+//添加行
+function myFunction(obj,mem,tag) {
+    //XHR提交成功后在列表中增加tag和untag
+ //   alert(mem.toString(2));
+
+    for (var j = 0, retData = [], tagData = [], unTagData = []; j < <%=portNum%>; j++) {
+        if (( (mem >> j) & 0x01 ) == 1) {
+            var p = "P" + (j + 1);
+            retData.push(p);
+            if(( (tag >> j) & 0x01 ) == 1){ //tagged
+                tagData.push(p);
+            }else{  //untagged
+                unTagData.push(p);
+            }
+        }
+    }
+    //删除已经设定的utagg成员默认值
+    for(var i= 0,len=unTagData.length; i<len; i++ ){
+        var str = $("#myTab tr:eq(1) td:last").text();
+        $("#myTab tr:eq(1) td:last").text(str.replace(unTagData[i],""));
+        $("#myTab tr:eq(1) td:nth-child(4)").text(str.replace(unTagData[i],""));
+    }
+    //在列表中增加新内容
+    var tabObj = document.getElementById("myTab");//获取添加数据的表格
+    var rowsNum = tabObj.rows.length;  //获取当前行数
+
+    var myNewRow = tabObj.insertRow(rowsNum);//插入新行
+    myNewRow.insertCell(0).innerHTML = "<input type='checkbox' name='chkArr' id=" +"chkArr"+ rowsNum +
+    " /><input type='hidden' name='menVal' value="+mem+
+    " /><input type='hidden' name='tagVal' value="+tag+
+    " /><input type='text' name='idx' style='width:30px' readonly='true'  value=" + rowsNum + " >";
+    myNewRow.insertCell(1).innerHTML = obj.vlan_id || obj[0].dot1q_vlan_id;
+    myNewRow.insertCell(2).innerHTML = obj.vlan_name || obj[1].dot1q_vlan_name;
+    myNewRow.insertCell(3).innerHTML = retData.join();
+    myNewRow.insertCell(4).innerHTML = tagData.length == 0 ? "NULL" : tagData.join();
+    myNewRow.insertCell(5).innerHTML = unTagData.length == 0 ? "NULL" : unTagData.join();
+}
+
+//清空vlan所配置选项
+function empSel(){
+    $("#vlan_id").val(" "); //已填写input
+    $("#vlan_name").val(" ");
+    $("#con_one_2 input:checked").each(function(){
+        this.checked = false;
+        if(this.type == "radio"){
+            $("[name="+this.name+"]").each(function(){this.disabled = true})
+        }
+    });
+}
+//删除行
+function delVlan(){
+    var chkObj=document.getElementsByName("chkArr");
+    var tabObj=document.getElementById("myTab");
+    var a = JSON.parse("{\"idx\":\"\"}");
+
+    var rowsNum = tabObj.rows.length;  //获取当前行数
+    var colsNum=tabObj.rows[rowsNum-1].cells.length;//获取行的列数
+
+    for(var k=0;k<chkObj.length;k++){
+        if(chkObj[k].checked){
+            //下发ubus 删除该组信息
+            a.idx = k+1;
+            //异步提交数据
+            XHR.get('<%=REQUEST_URI%>',{ "delVlan": JSON.stringify(a)},
+                    function(x,rv)
+                    {
+                //        var flag = 0;
+                        for(var i = 0; i < rv.length; i++){
+                            if(rv[i].ret == "-1"){
+                  //              flag = 1;
+                                alert("<%:NO.%>"+(i+1)+"<%:configuration failure%>");
+                                window.location.reload();
+                                return ;
+                            }
+                        }
+                    }
+            );
+            // console.log(tabObj.rows[1].lastElementChild);
+            //在默认utagg值中插入
+            var strArr = tabObj.rows[1].cells[5].innerHTML.split(",");
+
+            var utagArr = tabObj.rows[k+1].cells[5].innerHTML.split(",");
+            for(var i=0;i<utagArr.length;i++){
+                var num = utagArr[i].replace(/[^0-9]/ig,"");
+                strArr[num-1] = utagArr[i];
+                tabObj.rows[1].cells[5].innerHTML = $("#myTab")[0].rows[1].cells[3].innerHTML = strArr.join(",");
+            }
+            //页面删除行
+            tabObj.deleteRow(k+1);
+            k=-1;
+        }
+    }
+    //序号重新排列
+    var newObj=document.getElementById("myTab");
+    var curRows = newObj.rows.length;  //获取当前行数
+    for(var n=0;n<(curRows-1);n++){
+        document.getElementsByName("idx")[n].value = n+1;
+    }
+    alert("<%:delete success%>");
+}
+
+function selectMember(idx,member){
+    var idxVal = idx;
+    var data = transForward(member);
+
+    for(j=1;j<=<%=portNum%>;j++){
+        if(((data >> (j-1)) & 1) == 0){
+            $("[name^=basePort"+j+"_]")[idxVal-1].checked = false;
+        }
+    }
+
+}
+
+//修改设置选项
+function modVlan(){
+    var cheObj = $("#myTab input:checked");
+    if (cheObj.length==0) {
+        alert("<%:Please select a group to modify%>");
+        return;
+    }else if(cheObj.length>1){
+        alert("<%:Does not support batch change, please select a set to modify%>");
+        return;
+    }else{
+        if(confirm("<%:the existing configuration changes, can only be deleted after reconfiguration. Sure you want to continue to modify?%>")){
+            $('#vlan_id').focus();
+
+            $("#vlan_id").val(cheObj.parent().next().text());
+            $("#vlan_name").val(cheObj.parent().next().next().text());
+            var menVal = Number(cheObj.next().val());
+            var tagVal = Number(cheObj.next().next().val());
+            delVlan();
+
+            var strArr = $("#myTab tr:nth-child(2) td:last").text().split(",");
+            for(j=1,len=menVal.toString(2).length;j<=len;j++){
+                if(((menVal >>(j-1)) & 1) == 1){
+                    $("#vlanPort"+j).checked = true;
+                    $("#vlanPort"+j).click();
+                    if(( (tagVal >>(j-1)) & 1 ) == 1){ //tagged
+                        $("input[name=tagMode"+j+"]")[0].checked = true;
+                    }else{  //untagged
+                        $("input[name=tagMode"+j+"]")[1].checked = true;
+                        //在默认utagg值中插入
+                        strArr[j-1] = "P"+j;
+                        $("#myTab tr:nth-child(2) td:last").text(strArr.join(","));
+                    }
+                }
+            }
+        }
+    }
+}
+//]]></script>
+
+<div class="vlan"  id = "vlanconfig" >
+ <!--   <h3 class="h3"><%:VLAN配置%></h3>
+    <div class = "cbi-map-descr"><%:VLAN指把一个局域网划分为多个逻辑VLAN，同一个VLAN中的设备之间可以相互东西，不同VLAN种的设备无法通信，这样广播报文被现在在一个VLAN中，大大提高了局域网的安全性%></div>
+ -->
+    <fieldset class=""> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+        <!-- <div> -->
+            <table id = "vlan-mode">
+                <tr>
+                    <th style="text-align:left"><%:VLAN configuration mode :%>
+                        <select id="mode">
+                            <option selected value="1">portbased</option>
+                            <option value="2">ieee8021q</option>
+                        </select>
+                    </th>
+                </tr>
+            </table>
+        <!-- </div> -->
+    </fieldset>
+ 
+ <div id="con_one_1" class="hover">
+    <fieldset class="vlan-section">
+        <legend><%:Basic vlan port%></legend>
+        <div class = "cbi-map-descr">
+            <%:Check:Communicate%>&nbsp;&nbsp;&nbsp<%:Blank:isolution%>
+        </div>
+        <!-- <div> -->
+            <table>
+                <tr>
+                    <th><%:Port%></th>
+                    <% for i=1,portNum do %>
+                    <th name = "port<%=i%>"><%=i%></th>
+                    <% end %>
+                </tr>
+                <% for i=1,portNum do %>
+                <tr>
+                    <td name = "port<%=i%>"><%=i%></td>
+                    <%for j=1,portNum do%>
+                    <% if j==i then %>
+                    <td ><input type="checkbox" name="basePort<%=j%>_<%=i%>" style="display:none" disabled = "true"><%:N/A%></td>
+                    <% else %>
+                    <td><input type="checkbox" name="basePort<%=j%>_<%=i%>" checked = "true" ></td>
+                    <%end%>
+                    <%end%>
+                </tr>
+                <% end %>
+            </table>
+        <!-- </div>  -->
+        <div class="cbi-button-grow">
+            <input type="submit" name="ok" value="<%:Apply%>" class="cbi-button cbi-input-apply" onclick="setBase()">
+        </div>
+    </fieldset>
+ </div>
+ <div id="con_one_2" style="display:none">
+    <fieldset class="">        
+        <legend><%:8021 vlan list%></legend>
+          <!-- <div> -->
+            <table id = "myTab">
+                <tr>
+                    <th><%:serial number%></th>
+                    <th><%:vlan id%></th>
+                    <th><%:vlan name%></th>
+                    <th><%:member%></th>
+                    <th><%:tagged member%></th>
+                    <th><%:untagged member%></th>
+                </tr>
+<!--
+                <tr>
+                    <td>
+                        <input type="checkbox" name="chkArr" disabled = true >
+                        <input type="text" name="idx" style="width:30px" readonly="true" value="1"></td>
+                    <td><%:1%></td>
+                    <td><%:default%></td>
+                    <td><%:P1,P2,P3,P4,P5,P6,P7,P8,P9,P10%></td>
+                    <td><%:NULL%></td>
+                    <td><%:P1,P2,P3,P4,P5,P6,P7,P8,P9,P10%></td>
+                </tr>
+-->
+            </table>
+           <!-- </div> -->
+            <div class="cbi-button-grow">
+                <td><input type="button" name="ok" value="<%:Add%>" class="cbi-button cbi-button-add" data-click="addFocus"></td>
+                <td><input type="button" name="ok" value="<%:Edit%>" class="cbi-button cbi-input-remove" onclick="modVlan()"></td>
+                <td><input type="submit" name="ok" value="<%:Delete%>" class="cbi-button cbi-button-remove" onclick="delVlan()"></td>
+            </div>
+
+        <legend><%:8021 vlan configuration%></legend>
+            
+        <!-- <div class = "vlan-section-node"> -->
+            <table>
+                <tr>
+                    <th>
+                        <span class="title-center"><%:vlan ID : %></span>
+                        <input type="text" id="vlan_id" value=" ">
+                    </th>
+                </tr> 
+                <tr>
+                    <th>
+                        <span class="title-center"><%:vlan name : %></span>
+                        <input type="text" id="vlan_name" value=" ">
+                    </th>
+                </tr>
+            </table> 
+        <!-- </div> -->
+
+          <!-- <div> -->
+            <table class="tableThree">
+                <tr>
+                    <th><%:Port%></th>
+                    <th><%:Choose%></th>
+                    <th><%:Type%></th>
+                </tr>
+                <%for i=1,portNum do%>
+                <tr>
+                    <td name = "port<%=i%>"><%=i%></td>
+                    <td><input type="checkbox" name = "vlanPort" id ="vlanPort<%=i%>" value="<%=i%>"></td>
+                    <td>
+                        <input type="radio" name="tagMode<%=i%>"value="1" disabled = "true" />&nbsp;tagged&nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="tagMode<%=i%>"value="2" disabled = "true" />&nbsp;untagged&nbsp;&nbsp;&nbsp;
+                    </td>        
+                </tr>
+                <%end%>
+            </table> 
+          <!-- </div> -->
+            <div class="cbi-button-grow">
+                <input type="submit" name="ok" value="<%:Apply%>" class="cbi-button cbi-input-apply" onclick="setVlan()">
+            </div>
+    </fieldset>
+  </div>
+
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

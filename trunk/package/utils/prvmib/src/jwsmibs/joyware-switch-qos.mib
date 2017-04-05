@@ -1,0 +1,211 @@
+-- ============================================================================
+-- MibName   : JWS-QOS-MIB
+-- FileName  : joyware-switch-qos.mib
+-- ============================================================================
+JWS-QOS-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32                     FROM SNMPv2-SMI
+        DisplayString                                               FROM SNMPv2-TC
+        jwSwitch                                                    FROM JOYWARE-SMI;
+
+jwsQosMib MODULE-IDENTITY
+    LAST-UPDATED    "201603011200Z"
+    ORGANIZATION    "Joyware Electronic Technology Co.,Ltd"
+    CONTACT-INFO    "Postal: BlockA,Chang TorchHotel,No.259 Wensan Road,Hangzhou,Zhejiang 310012 China
+                     E-mail: jw-snmp@joyware.com
+                        Tel: 800-8571264 "
+    DESCRIPTION     "This MIB module defines MIB objects which provide QOS
+                     configurable information about the Joyware switch devices."
+    -- revision history
+    REVISION        "201603011200Z"
+    DESCRIPTION     "Initial revision."
+    ::= { jwSwitch 5 }
+
+jwsQosConfigGroup               OBJECT IDENTIFIER ::= { jwsQosMib 1 }
+
+--jwsQosPortConfigTable         OBJECT IDENTIFIER ::= { jwsQosConfigGroup 1 }
+--jwsQosPriority8021pTable      OBJECT IDENTIFIER ::= { jwsQosConfigGroup 2 }
+--jwsQosPriorityDscpTable       OBJECT IDENTIFIER ::= { jwsQosConfigGroup 3 }
+
+-- ****************************************************************************
+--                  jwsQosPortConfigTable
+-- ****************************************************************************
+jwsQosPortConfigTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF JwsQosPortConfigEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "This table provides qos port priority configuration."
+     ::= { jwsQosConfigGroup 1 }
+
+jwsQosPortConfigEntry OBJECT-TYPE
+     SYNTAX      JwsQosPortConfigEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "Information about a table entry."
+     INDEX       { jwsQosPortIndex }
+     ::= { jwsQosPortConfigTable 1 }
+
+JwsQosPortConfigEntry ::= SEQUENCE {
+     jwsQosPortIndex                     Integer32,
+     jwsQosPortPrioAssignMode            INTEGER,
+     jwsQosPortPrioMapRule               INTEGER,
+     jwsQosPortDefaultPrioLevel          INTEGER,
+     jwsQosPortSchedulingMode            INTEGER
+     }
+
+jwsQosPortIndex OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                                 "Port index."
+         ::= { jwsQosPortConfigEntry 1 }
+
+jwsQosPortPrioAssignMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 useDefault(1),
+                 useTag(2),
+                 useIp(3),
+                 useTagIp(4)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "Config qos port priority assignment:
+                  useDefault  - Use port defaults priority.
+                  useTag      - If the frame is tagged, the frame's tag
+                                 determine priority, otherwise use port defaults.
+                  useIp       - If the frame is IPv4 or IPv6, DSCP determine priority
+                                 otherwise use port defaults.
+                  useTagIp    - If the frame is tagged and also IPv4 or IPv6, TagIfBoth
+                                 determine priority."
+     DEFVAL      { useTag }
+     ::= { jwsQosPortConfigEntry 2 }
+
+jwsQosPortPrioMapRule OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 ipMapping(1),
+                 tagMapping(2)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "If the frame is both tagged and its also IPv4 or IPv6:
+                  ipMapping   - IP priority determne queue priority assignment.
+                  tagMapping  - IEEE Tag priority determne queue priority assignment."
+     DEFVAL      { tagMapping }
+     ::= { jwsQosPortConfigEntry 3 }
+
+jwsQosPortDefaultPrioLevel OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 prioLowest(1),
+                 prioLow(2),
+                 prioHigh(3),
+                 prioHighest(4)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "The port default priority level."
+     DEFVAL      { prioLowest }
+     ::= { jwsQosPortConfigEntry 4 }
+
+jwsQosPortSchedulingMode  OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 qosSR(1),
+                 qosWRR(2)
+                 }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "Config qos schedule mode:
+                  qosSR       - Strict Priority mode
+                  qosWRR      - Weight Round Robin mode"
+     DEFVAL      { qosSR }
+     ::= { jwsQosPortConfigEntry 5 }
+
+-- ****************************************************************************
+--                  jwsQosPriority8021pTable
+-- ****************************************************************************
+jwsQosPriority8021pTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF JwsQosPriority8021pEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "This table provides qos 802.1p priority map configuration ."
+     ::= { jwsQosConfigGroup 2 }
+
+jwsQosPriority8021pEntry OBJECT-TYPE
+     SYNTAX      JwsQosPriority8021pEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "Information about a table entry."
+     INDEX       { jwsQos8021pPriorityIndex }
+     ::= { jwsQosPriority8021pTable 1 }
+
+JwsQosPriority8021pEntry ::= SEQUENCE {
+     jwsQos8021pPriorityIndex            Integer32,
+     jwsQos8021pPriorityQueueId          Integer32
+     }
+
+jwsQos8021pPriorityIndex  OBJECT-TYPE
+     SYNTAX      Integer32 (0..7)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "Priority number."
+     ::= { jwsQosPriority8021pEntry 1 }
+
+jwsQos8021pPriorityQueueId  OBJECT-TYPE
+     SYNTAX      Integer32 (0..3)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "Priority queue number."
+     ::= { jwsQosPriority8021pEntry 2 }
+
+-- ****************************************************************************
+--                  jwsQosPriorityDscpTable
+-- ****************************************************************************
+jwsQosPriorityDscpTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF JwsQosPriorityDscpEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "This table provides qos Dscp priority map configuration ."
+     ::= { jwsQosConfigGroup 3 }
+
+jwsQosPriorityDscpEntry OBJECT-TYPE
+     SYNTAX      JwsQosPriorityDscpEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "Information about a table entry."
+     INDEX       { jwsQosDscpPriorityIndex }
+     ::= { jwsQosPriorityDscpTable 1 }
+
+JwsQosPriorityDscpEntry ::= SEQUENCE {
+     jwsQosDscpPriorityIndex            Integer32,
+     jwsQosDscpPriorityQueueId          Integer32
+     }
+
+jwsQosDscpPriorityIndex  OBJECT-TYPE
+     SYNTAX      Integer32 (0..63)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+                 "Priority number."
+     ::= { jwsQosPriorityDscpEntry 1 }
+
+jwsQosDscpPriorityQueueId  OBJECT-TYPE
+     SYNTAX      Integer32 (0..3)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "Priority queue number."
+     ::= { jwsQosPriorityDscpEntry 2 }
+
+END

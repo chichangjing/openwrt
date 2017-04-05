@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CpssFunctionPrototypes>
+ <Structures count="5">
+  <Structure name="CPSS_EXMXPM_EXTERNAL_TCAM_BIND_STC">
+   <!-- error: cannot identify type class CPSS_EXMXPM_EXTERNAL_TCAM_RULE_WRITE_FUNC extTcamRuleWriteFunc; -->
+   <!-- error: cannot identify type class CPSS_EXMXPM_EXTERNAL_TCAM_RULE_READ_FUNC extTcamRuleReadFunc; -->
+   <!-- error: cannot identify type class CPSS_EXMXPM_EXTERNAL_TCAM_ACTION_WRITE_FUNC extTcamActionWriteFunc; -->
+   <!-- error: cannot identify type class CPSS_EXMXPM_EXTERNAL_TCAM_ACTION_READ_FUNC extTcamActionReadFunc; -->
+  </Structure>
+  <Structure name="CPSS_EXMXPM_PP_PHASE1_INIT_INFO_STC">
+   <Member class="int" name="devNum" type="GT_U8"/>
+   <Member class="int" name="busBaseAddr" type="GT_U32"/>
+   <Member class="int" name="internalPciBase" type="GT_U32"/>
+   <Member class="int" name="intVecNum" type="GT_U32"/>
+   <Member class="int" name="intMask" type="GT_UINTPTR"/>
+   <Member class="int" name="coreClock" type="GT_U32"/>
+   <Member class="enum" name="mngInterfaceType" type="CPSS_PP_INTERFACE_CHANNEL_ENT"/>
+   <Member class="enum" name="ppHAState" type="CPSS_SYS_HA_MODE_ENT"/>
+   <Member class="struct" name="powerDownPortsBmp" type="CPSS_PORTS_BMP_STC"/>
+   <Member class="bool" name="ingressBufferMemoryEnableScrambling" type="GT_BOOL"/>
+   <Member class="struct" name="ingressBufferSramCfg" type="CPSS_EXMXPM_SRAM_CFG_STC"/>
+   <Member class="enum" name="ingressBufferSize" type="CPSS_EXMXPM_BUFFER_SIZE_ENT"/>
+   <Member class="bool" name="egressBufferMemoryEnableScrambling" type="GT_BOOL"/>
+   <Member class="enum" name="egressBufferRamType" type="CPSS_EXMXPM_RAM_TYPE_ENT"/>
+   <Member class="struct" name="egressBufferRamCfg" type="CPSS_EXMXPM_EGRESS_RAM_CFG_UNT"/>
+   <Member class="enum" name="egressBufferSize" type="CPSS_EXMXPM_BUFFER_SIZE_ENT"/>
+   <Member class="enum" name="lpmSramCfgType" type="CPSS_EXMXPM_LPM_SRAM_CFG_ENT"/>
+   <Member array="3" class="bool" name="lpmSramUsedArray" type="GT_BOOL"/>
+   <Member array="3" class="struct" name="lpmSramCfgArray" type="CPSS_EXMXPM_SRAM_CFG_STC"/>
+   <Member class="bool" name="controlSramUsed" type="GT_BOOL"/>
+   <Member class="struct" name="controlSramCfg" type="CPSS_EXMXPM_SRAM_CFG_STC"/>
+   <Member class="enum" name="controlSramProtect" type="CPSS_EXMXPM_CSU_PROTECT_ENT"/>
+   <Member class="struct" name="extDramCfg" type="CPSS_EXMXPM_EXT_DRAM_CFG_STC"/>
+   <Member class="bool" name="externalTcamUsed" type="GT_BOOL"/>
+   <Member class="int" name="numOfPortGroups" type="GT_U32"/>
+   <!-- error: unhandled line CPSS_PP_PORT_GROUP_INIT_INFO_STC *multiPortGroupsInfoPtr; -->
+  </Structure>
+  <Structure name="CPSS_EXMXPM_PP_PHASE2_INIT_INFO_STC">
+   <Member class="int" name="newDevNum" type="GT_U8"/>
+   <Member class="int" name="netIfHostInterfacesBmpUsed" type="GT_U32"/>
+   <!-- error: cannot identify type class CPSS_NET_IF_CFG_STC netIfCfg; -->
+   <!-- error: cannot identify type class CPSS_AUQ_CFG_STC auqCfg; -->
+   <Member class="bool" name="separateFuqUsed" type="GT_BOOL"/>
+   <!-- error: cannot identify type class CPSS_AUQ_CFG_STC fuqCfg; -->
+  </Structure>
+  <Structure name="CPSS_EXMXPM_POLICER_METER_TB_PARAMS_UNT">
+   <!-- error: unhandled line struct {...} srTcmParams; -->
+   <!-- error: unhandled line struct {...} trTcmParams; -->
+  </Structure>
+  <Structure name="CPSS_EXMXPM_EXT_DRAM_CFG_STC">
+   <Member class="enum" name="luDunitDramSize" type="CPSS_DRAM_SIZE_ENT"/>
+   <Member class="enum" name="fwdDunitDramSize" type="CPSS_DRAM_SIZE_ENT"/>
+   <Member class="bool" name="externalDramInUse" type="GT_BOOL"/>
+   <Member array="14" class="struct" name="luDunitCfgArray" type="CPSS_EXMXPM_EXT_DRAM_DUNIT_CFG_STC"/>
+   <Member array="8" class="struct" name="fwdDunitCfgArray" type="CPSS_EXMXPM_EXT_DRAM_DUNIT_CFG_STC"/>
+   <Member class="enum" name="dramBanksLogicalMode" type="CPSS_EXMXPM_EXT_MEMORY_LOGICAL_MODE_ENT"/>
+   <!-- error: unhandled line CPSS_EXMXPM_EXT_DRAM_STATIC_CFG *luDramStaticParams; -->
+   <Member class="int" name="luDramStaticNumOfCfg" type="GT_U32"/>
+   <!-- error: unhandled line CPSS_EXMXPM_EXT_DRAM_STATIC_CFG *fwdDramStaticParams; -->
+   <Member class="int" name="fwdDramStaticNumOfCfg" type="GT_U32"/>
+  </Structure>
+ </Structures>
+</CpssFunctionPrototypes>

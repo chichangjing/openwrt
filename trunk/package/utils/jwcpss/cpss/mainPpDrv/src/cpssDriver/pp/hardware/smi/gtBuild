@@ -1,0 +1,22 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+LIB_NAME = cpssDrvPpHwSmi.lib
+
+ifeq (EXISTS, $(ASIC_SIMULATION))
+    C_EXCLUDE_FILE_LIST = cpssDrvPpHwSmiCntl.c
+else
+    C_EXCLUDE_FILE_LIST = cpssDrvPpHwSmiCntlSim.c
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

@@ -1,0 +1,15 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+LIB_NAME = gtStack
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

@@ -1,0 +1,89 @@
+
+config admin admin
+	option rstp off
+
+config bridge bridge
+	option bridgeprio 32768
+	option hello  2
+	option maxage 20
+	option fdelay 15
+
+config port gex01
+	option portid 1
+	option portnonstp no
+	option portprio 128
+	option portpathcost 0
+    option portautocost 1
+    option portedge 2
+
+config port gex02
+	option portid 2
+	option portnonstp no
+	option portprio 128
+	option portpathcost 0
+    option portautocost 1
+    option portedge 2
+
+config port fex03
+	option portid 3
+	option portnonstp no
+	option portprio 128
+	option portpathcost 0
+    option portautocost 1
+    option portedge 2
+
+config port fex04
+	option portid 4
+	option portnonstp no
+	option portprio 128
+	option portpathcost 0
+    option portautocost 1
+    option portedge 2
+
+config port fex05
+	option portid 5
+	option portnonstp no
+	option portprio 128
+	option portpathcost 0
+    option portautocost 1
+    option portedge 2
+
+config port fex06
+	option portid 6
+	option portnonstp no
+	option portprio 128
+	option portpathcost 0
+    option portautocost 1
+    option portedge 2
+
+config port fex07
+	option portid 7
+	option portnonstp no
+	option portprio 128
+	option portpathcost 0
+    option portautocost 1
+    option portedge 2
+
+config port fex08
+	option portid 8
+	option portnonstp no
+	option portprio 128
+	option portpathcost 0
+    option portautocost 1
+    option portedge 2
+
+config port fex09
+	option portid 9
+	option portnonstp no
+	option portprio 128
+	option portpathcost 0
+    option portautocost 1
+    option portedge 2
+
+config port fex10
+	option portid 10
+	option portnonstp no
+	option portprio 128
+	option portpathcost 0
+    option portautocost 1
+    option portedge 2

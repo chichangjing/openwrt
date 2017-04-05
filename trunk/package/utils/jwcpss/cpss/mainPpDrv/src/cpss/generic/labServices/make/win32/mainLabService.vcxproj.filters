@@ -1,0 +1,668 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{7ec02346-b40b-4359-bafa-d12eb2164c76}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\common">
+      <UniqueIdentifier>{b5704fe9-7f98-41f7-aa6a-30552cef7abd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices">
+      <UniqueIdentifier>{74a9cf24-0fff-42cf-95a0-0e3225f16323}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\serdes">
+      <UniqueIdentifier>{b92ea7b8-ef91-4e75-a497-5034af9eb999}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\port">
+      <UniqueIdentifier>{10ccefc7-f462-4794-a317-9f25f78e04b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\silicon">
+      <UniqueIdentifier>{d8db5ea5-be26-47f4-a9f5-c5b0aa2c0d7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\apEngine">
+      <UniqueIdentifier>{8c50fcc3-f4f9-4c53-ad64-0eb2e9b35801}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ddr3">
+      <UniqueIdentifier>{3abddd49-da46-4dc2-8431-306cdc27370c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{685a2631-8329-4263-8a46-74072acf12cc}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files\common No. 1">
+      <UniqueIdentifier>{39c29201-9d2e-4183-a3aa-c78007bcf8c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hwServices No. 1">
+      <UniqueIdentifier>{7d8a6fc6-19d8-4383-bbc1-df45fb8677df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hwServices No. 1\serdes No. 1">
+      <UniqueIdentifier>{194fe146-810e-4cea-9a31-f3e63f53576a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hwServices No. 1\pcs No. 1">
+      <UniqueIdentifier>{b0951d9e-003b-4aae-a9e1-551def71e7a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ddr3">
+      <UniqueIdentifier>{43683397-6a13-4776-b6ff-4df91062b7eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ddr3\Bap">
+      <UniqueIdentifier>{c55e115d-eb12-4911-8322-c2dd3dcaa438}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\mac">
+      <UniqueIdentifier>{b842d74a-482d-426e-b4ec-7f8a9abbc4c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\pcs">
+      <UniqueIdentifier>{a3745d36-6d3b-4eb2-8592-c48f8f91d8b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ddr3\ddr3libv2">
+      <UniqueIdentifier>{61feb328-4053-4f27-b45b-e82e1ee5f346}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ddr3\ddr3libv2\Silicon">
+      <UniqueIdentifier>{8038515c-a704-429d-ac69-aaad3bc791b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ddr3\ddr3libv2\Driver">
+      <UniqueIdentifier>{20c19ac0-f738-417e-8bf2-da3ccb1205cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hwServices No. 1\mac">
+      <UniqueIdentifier>{f61182ef-440d-4f4f-b20b-ded9e445b7a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hwServices No. 1\port">
+      <UniqueIdentifier>{474b9898-e51b-48f5-923d-5320030bec82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hwServices No. 1\private">
+      <UniqueIdentifier>{1e2f1f08-9958-41ca-952e-3e23e2531bf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ddr3\ddr3libv2">
+      <UniqueIdentifier>{a8810750-97ed-473c-a12f-aee44749e560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ddr3\ddr3libv2\Silicon">
+      <UniqueIdentifier>{049b8633-3121-4e4d-830c-67c7bd69d978}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ddr3\ddr3libv2\driver">
+      <UniqueIdentifier>{00ec1cd5-3cc1-47a6-8d8f-1019aaa420c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ddr3\ddr3libv2\Bap">
+      <UniqueIdentifier>{2a9c4d62-dfb6-4114-937a-12c7c494aa8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\silicon\alleycat3">
+      <UniqueIdentifier>{1a591cca-af62-43d4-88ba-ddac9e006c73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\silicon\bobcat2">
+      <UniqueIdentifier>{15eff2fa-33f9-478a-906e-34f4e52a3e29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\silicon\hooper">
+      <UniqueIdentifier>{7b144159-94a8-407c-821d-ff511fab5fcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\silicon\lion2">
+      <UniqueIdentifier>{dbf55fd7-38de-445e-b503-66e73ffbb27c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\common">
+      <UniqueIdentifier>{a05e9447-c601-4c83-8c22-03a3a401fb15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\serdes\40nm">
+      <UniqueIdentifier>{ae4af37e-d655-4905-99ca-eb2eb1c1b68e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\serdes\28nm">
+      <UniqueIdentifier>{36e7c079-9e51-4d42-a087-465da79088ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\serdes\avago">
+      <UniqueIdentifier>{6a0123aa-ba0c-4248-9a10-09f04be775a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\serdes\avago\aapl">
+      <UniqueIdentifier>{5ade8e32-5bae-4e87-a7c5-490c249a3b43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\serdes\avago\aapl\includes">
+      <UniqueIdentifier>{dc8e9607-7d08-462b-9828-318b5048157f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\silicon\bobk">
+      <UniqueIdentifier>{97609970-be52-48ff-bbfc-d12e40252da8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hwServices\serdes\avago\aapl\marvell">
+      <UniqueIdentifier>{b100c951-aedf-4e23-b978-418f981c95db}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\port\gop\src\port\mac\cgMac\mvHwsCgMacDb.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\cgMac\mvHwsCgMacIf.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\common\configElementDb\mvCfgSeqDbIf.c">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\common\configElementDb\mvCfgSeqExecuter.c">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\geMac\mvHwsGeMac28nmIf.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\geMac\mvHwsGeMacSgIf.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\geMac\mvHwsGeMacDb.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\geMac\mvHwsGeMacIf.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\hglMac\mvHwsHglMacDb.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\hglMac\mvHwsHglMacIf.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\hglMac\mvHwsHglMacRev2If.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\ilknMac\mvHwsIlknMacDb.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\ilknMac\mvHwsIlknMacIf.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\tcamMac\mvHwsTcamMacDb.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\tcamMac\mvHwsTcamMacIf.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\xgMac\mvHwsXgMac28nmIf.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\xgMac\mvHwsXgMacDb.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\xgMac\mvHwsXgMacIf.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\xgMac\mvHwsXgMacRev2If.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMac28nmDb.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMac28nmIf.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMacDb.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMacDbRev3.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMacIf.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMacRev2If.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMacRev3If.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\cgPcs\mvHwsCgPcsDb.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\cgPcs\mvHwsCgPcsIf.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\hglPcs\mvHwsHglPcsDb.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\hglPcs\mvHwsHglPcsIf.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\ilknPcs\mvHwsIlknPcsDb.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\ilknPcs\mvHwsIlknPcsIf.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcs28nmDb.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcs28nmIf.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcsDb.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcsDb_v3.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcsIf.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcsIf_v2_0.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcsIf_v3.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\gPcs\mvHwsGPcs28nmIf.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\gPcs\mvHwsGPcsIf.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\gPcs\mvHwsGPcsDb.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\mvHwsMacIf.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mvHwsPcsIf.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mvHwsPortApIf.c">
+      <Filter>Source Files\hwServices\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mvHwsPortCfgIf.c">
+      <Filter>Source Files\hwServices\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mvHwsPortInitIf.c">
+      <Filter>Source Files\hwServices\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\tcamPcs\mvHwsTcamPcsDb.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\tcamPcs\mvHwsTcamPcsIf.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\xPcs\mvHwsXPcsDb.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\xPcs\mvHwsXPcsIf.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\apEngine\mvZ80Code.c">
+      <Filter>Source Files\hwServices\apEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\common\coCpu\mvHwsPortApCoCpuIf.c">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\common\siliconIf\mvHwsSiliconIf.c">
+      <Filter>Source Files\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3Debug.c">
+      <Filter>Source Files\ddr3\ddr3libv2\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingHwAlgos.c">
+      <Filter>Source Files\ddr3\ddr3libv2\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingStatic.c">
+      <Filter>Source Files\ddr3\ddr3libv2\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3Training.c">
+      <Filter>Source Files\ddr3\ddr3libv2\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingBist.c">
+      <Filter>Source Files\ddr3\ddr3libv2\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingCentralization.c">
+      <Filter>Source Files\ddr3\ddr3libv2\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingDb.c">
+      <Filter>Source Files\ddr3\ddr3libv2\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingIpEngine.c">
+      <Filter>Source Files\ddr3\ddr3libv2\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingIpIf.c">
+      <Filter>Source Files\ddr3\ddr3libv2\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingLeveling.c">
+      <Filter>Source Files\ddr3\ddr3libv2\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingPbs.c">
+      <Filter>Source Files\ddr3\ddr3libv2\driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Silicon\mvHwsDdr3Bc2.c">
+      <Filter>Source Files\ddr3\ddr3libv2\Silicon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\bap\src\mvHwsDdr3Bap.c">
+      <Filter>Source Files\ddr3\Bap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mac\cgMac\mvHwsCgMacRev3If.c">
+      <Filter>Source Files\hwServices\mac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\cgPcs\mvHwsCgPcsIf_Rev3.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\pcs\gPcs\mvHwsGPcsIf_v2.c">
+      <Filter>Source Files\hwServices\pcs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\alleycat3\mvHwsAlleycat3PortModeElements.c">
+      <Filter>Source Files\hwServices\silicon\alleycat3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\alleycat3\mvHwsAlleycat3DevInit.c">
+      <Filter>Source Files\hwServices\silicon\alleycat3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\alleycat3\mvHwsAlleycat3PortCfgIf.c">
+      <Filter>Source Files\hwServices\silicon\alleycat3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\alleycat3\mvHwsAlleycat3PortInitIf.c">
+      <Filter>Source Files\hwServices\silicon\alleycat3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobcat2\mvHwsBobcat2PortModeElements.c">
+      <Filter>Source Files\hwServices\silicon\bobcat2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobcat2\mvHwsBobcat2DevInit.c">
+      <Filter>Source Files\hwServices\silicon\bobcat2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobcat2\mvHwsBobcat2PortCfgIf.c">
+      <Filter>Source Files\hwServices\silicon\bobcat2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobcat2\mvHwsBobcat2PortInitIf.c">
+      <Filter>Source Files\hwServices\silicon\bobcat2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\hooper\mvHwsHooperPortCfgIf.c">
+      <Filter>Source Files\hwServices\silicon\hooper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\hooper\mvHwsHooperDevInit.c">
+      <Filter>Source Files\hwServices\silicon\hooper</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\lion2\mvHwsLion2PortModeElements.c">
+      <Filter>Source Files\hwServices\silicon\lion2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\lion2\mvHwsLion2DevInit.c">
+      <Filter>Source Files\hwServices\silicon\lion2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\lion2\mvHwsLion2PortCfgIf.c">
+      <Filter>Source Files\hwServices\silicon\lion2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\lion2\mvHwsLion2PortInitIf.c">
+      <Filter>Source Files\hwServices\silicon\lion2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\common\mvHwsPortModeElements.c">
+      <Filter>Source Files\hwServices\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\common\mvHwsPortMiscIf.c">
+      <Filter>Source Files\hwServices\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mvHwsIpcApis.c">
+      <Filter>Source Files\hwServices\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mvHwsPortIpcIf.c">
+      <Filter>Source Files\hwServices\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH28nm\mvComPhyH28nmDb.c">
+      <Filter>Source Files\hwServices\serdes\28nm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH28nmRev3\mvComPhyH28nmRev3If.c">
+      <Filter>Source Files\hwServices\serdes\28nm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH28nm\mvComPhyH28nmEom.c">
+      <Filter>Source Files\hwServices\serdes\28nm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH28nm\mvComPhyH28nmIf.c">
+      <Filter>Source Files\hwServices\serdes\28nm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH28nmRev3\mvComPhyH28nmRev3Db.c">
+      <Filter>Source Files\hwServices\serdes\28nm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH\mvComPhyHDb_v1_0.c">
+      <Filter>Source Files\hwServices\serdes\40nm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyHRev2\mvComPhyHDb_v2_0.c">
+      <Filter>Source Files\hwServices\serdes\40nm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH\mvComPhyHEom.c">
+      <Filter>Source Files\hwServices\serdes\40nm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH\mvComPhyHIf_v1_0.c">
+      <Filter>Source Files\hwServices\serdes\40nm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyHRev2\mvComPhyHIf_v2_0.c">
+      <Filter>Source Files\hwServices\serdes\40nm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\aacs.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\aacs_server.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\aapl_core.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\gpio_mdio.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\i2c.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\library.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\logging.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\mdio.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\pmd.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\sbus.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\serdes_core.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\spico.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\user_code.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\mvHwsSerdesIf.c">
+      <Filter>Source Files\hwServices\serdes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\mvAvagoSerdesIf.c">
+      <Filter>Source Files\hwServices\serdes\avago</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobk\mvHwsBobKPortModeElements.c">
+      <Filter>Source Files\hwServices\silicon\bobk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobk\mvHwsBobKDevInit.c">
+      <Filter>Source Files\hwServices\silicon\bobk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobk\mvHwsBobKPortInitIf.c">
+      <Filter>Source Files\hwServices\silicon\bobk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobk\mvHwsBobKPortCfgIf.c">
+      <Filter>Source Files\hwServices\silicon\bobk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\marvell\mv_hws_avago_serdes_if.c">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\marvell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Silicon\mvHwsDdr3BobK.c">
+      <Filter>Source Files\ddr3\ddr3libv2\Silicon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\port\gop\src\port\mvHwsPortApCtrlIf.c">
+      <Filter>Source Files\hwServices\port</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\port\gop\h\common\configElementDb\mvCfgElementDb.h">
+      <Filter>Header Files\common No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\common\siliconIf\mvSiliconIf.h">
+      <Filter>Header Files\common No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyH\mvComPhyEomIf.h">
+      <Filter>Header Files\hwServices No. 1\serdes No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyH\mvComPhyHDb.h">
+      <Filter>Header Files\hwServices No. 1\serdes No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyH\mvComPhyHIf.h">
+      <Filter>Header Files\hwServices No. 1\serdes No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyHRev2\mvComPhyHRev2Db.h">
+      <Filter>Header Files\hwServices No. 1\serdes No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyHRev2\mvComPhyHRev2If.h">
+      <Filter>Header Files\hwServices No. 1\serdes No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\serdes\mvHwsSerdesPrvIf.h">
+      <Filter>Header Files\hwServices No. 1\serdes No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\pcs\mmPcs\mvHwsMMPcsDb.h">
+      <Filter>Header Files\hwServices No. 1\pcs No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\pcs\mmPcs\mvHwsMMPcsIf.h">
+      <Filter>Header Files\hwServices No. 1\pcs No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\pcs\mmPcs\mvHwsMMPcsV2If.h">
+      <Filter>Header Files\hwServices No. 1\pcs No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\pcs\mvHwsPcsIf.h">
+      <Filter>Header Files\hwServices No. 1\pcs No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyH28nm\mvComPhyH28nmIf.h">
+      <Filter>Header Files\hwServices No. 1\serdes No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyH28nm\mvComPhyH28nmDb.h">
+      <Filter>Header Files\hwServices No. 1\serdes No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\pcs\mmPcs\mvHwsMMPcs28nmIf.h">
+      <Filter>Header Files\hwServices No. 1\pcs No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\pcs\xPcs\mvHwsXPcsIf.h">
+      <Filter>Header Files\hwServices No. 1\pcs No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\pcs\gPcs\mvHwsGPcs28nmIf.h">
+      <Filter>Header Files\hwServices No. 1\pcs No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyH28nm\mvComPhyH28nmEomIf.h">
+      <Filter>Header Files\hwServices No. 1\serdes No. 1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\mac\mvHwsMacIf.h">
+      <Filter>Header Files\hwServices No. 1\mac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\mvHwsPortApInitIf.h">
+      <Filter>Header Files\hwServices No. 1\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\mvHwsPortInitIf.h">
+      <Filter>Header Files\hwServices No. 1\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\mvHwsPortCfgIf.h">
+      <Filter>Header Files\hwServices No. 1\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\private\mvHwsPortApCoCpuIf.h">
+      <Filter>Header Files\hwServices No. 1\private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\private\mvPortModeElements.h">
+      <Filter>Header Files\hwServices No. 1\private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\private\mvHwsPortApInitIfPrv.h">
+      <Filter>Header Files\hwServices No. 1\private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\private\mvHwsPortPrvIf.h">
+      <Filter>Header Files\hwServices No. 1\private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\private\mvHwsPortTypes.h">
+      <Filter>Header Files\hwServices No. 1\private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\private\mvHwsPortMiscIf.h">
+      <Filter>Header Files\hwServices No. 1\private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIp.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingLeveling.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpBist.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpCentralization.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpDb.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpDef.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpEngine.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpFlow.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpPbs.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpPrvIf.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpStatic.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\silicon\mvHwsDdr3BC2.h">
+      <Filter>Header Files\ddr3\ddr3libv2\Silicon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\bap\h\mvHwsDdr3Bap.h">
+      <Filter>Header Files\ddr3\ddr3libv2\Bap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\mvDdrTrainingIpDb.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\mvDdrTopologyDef.h">
+      <Filter>Header Files\ddr3\ddr3libv2\driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\system_includes.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\aacs_server.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\aapl.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\aapl_core.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\aapl_library.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\asic_info.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\gpio_mdio.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\i2c.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\logging.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\mdio.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\pmd.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\sbus.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\serdes_core.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\spico.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\mvHwsIpcApis.h">
+      <Filter>Header Files\hwServices No. 1\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\h\port\mvHwsIpcDefs.h">
+      <Filter>Header Files\hwServices No. 1\port</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\marvell\mv_hws_avago_if.h">
+      <Filter>Source Files\hwServices\serdes\avago\aapl\marvell</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

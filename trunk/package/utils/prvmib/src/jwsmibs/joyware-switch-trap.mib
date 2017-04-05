@@ -1,0 +1,320 @@
+-- ============================================================================
+-- MibName   : JWS-TRAP-MIB
+-- FileName  : joyware-switch-trap.mib
+-- ============================================================================
+JWS-TRAP-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32                     FROM SNMPv2-SMI
+        DisplayString                                               FROM SNMPv2-TC
+        jwSwitch                                                    FROM JOYWARE-SMI
+        JwsEnableValue                                              FROM JWS-TC;
+
+jwsTrapMib MODULE-IDENTITY
+    LAST-UPDATED    "201603011200Z"
+    ORGANIZATION    "Joyware Electronic Technology Co.,Ltd"
+    CONTACT-INFO    "Postal: BlockA,Chang TorchHotel,No.259 Wensan Road,Hangzhou,Zhejiang 310012 China
+                     E-mail: jw-snmp@joyware.com
+                        Tel: 800-8571264 "
+    DESCRIPTION     "This MIB module defines MIB objects which provide trap
+                     configurable information about the Joyware switch devices."
+    -- revision history
+    REVISION        "201603011200Z"
+    DESCRIPTION     "Initial revision."
+    ::= { jwSwitch 100 }
+
+jwsTrapConfigGroup        OBJECT IDENTIFIER ::= { jwsTrapMib 1 }
+jwsTrapObjectGroup        OBJECT IDENTIFIER ::= { jwsTrapMib 2 }
+jwsTrapDefineGroup        OBJECT IDENTIFIER ::= { jwsTrapMib 3 }
+
+-- ************************************************************************
+--               jwsTrapConfigGroup
+-- ************************************************************************
+jwsTrapPowerSupplyEnableValue OBJECT-TYPE                  -- [ Config for power supply trap ]
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Power supply trap admin mode."
+    ::= { jwsTrapConfigGroup 1 }
+
+jwsTrapPortConfigTable OBJECT-TYPE                         -- [ Config for port trap ]
+    SYNTAX      SEQUENCE OF JwsTrapPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides port trap configuration."
+    ::= { jwsTrapConfigGroup 2 }
+
+jwsTrapPortConfigEntry OBJECT-TYPE
+    SYNTAX      JwsTrapPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a table entry."
+    INDEX       { jwsTrapPortId }
+    ::= { jwsTrapPortConfigTable 1 }
+
+JwsTrapPortConfigEntry ::= SEQUENCE {
+    jwsTrapPortId                           Integer32,
+    jwsTrapPortStatusEnableValue            JwsEnableValue,
+    jwsTrapPortTxThresholdEnableValue       JwsEnableValue,     -- Downstream
+    jwsTrapPortTxThresholdPercentage        Integer32,          -- Downstream
+    jwsTrapPortRxThresholdEnableValue       JwsEnableValue,     -- Upsteam
+    jwsTrapPortRxThresholdPercentage        Integer32           -- Upsteam
+    }
+
+jwsTrapPortId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port number."
+    ::= { jwsTrapPortConfigEntry 1 }
+
+jwsTrapPortStatusEnableValue OBJECT-TYPE
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port status trap admin mode."
+    DEFVAL      { disable }
+    ::= { jwsTrapPortConfigEntry 2 }
+
+jwsTrapPortTxThresholdEnableValue OBJECT-TYPE
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port rate thresold admin mode for down stream ."
+    ::= { jwsTrapPortConfigEntry 3 }
+
+jwsTrapPortTxThresholdPercentage OBJECT-TYPE
+    SYNTAX      Integer32 (1..99)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port rate thresold percentage for down stream."
+    ::= { jwsTrapPortConfigEntry 4 }
+
+jwsTrapPortRxThresholdEnableValue OBJECT-TYPE
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port rate thresold admin mode for up stream ."
+    ::= { jwsTrapPortConfigEntry 5 }
+
+jwsTrapPortRxThresholdPercentage OBJECT-TYPE
+    SYNTAX      Integer32 (1..99)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port rate thresold percentage for up stream."
+    ::= { jwsTrapPortConfigEntry 6 }
+
+
+jwsTrapRingConfigTable OBJECT-TYPE                         -- [ Config for ring status trap ]
+    SYNTAX      SEQUENCE OF JwsTrapRingConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides ring trap configuration."
+    ::= { jwsTrapConfigGroup 3 }
+
+jwsTrapRingConfigEntry OBJECT-TYPE
+    SYNTAX      JwsTrapRingConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Information about a table entry."
+    INDEX       { jwsTrapRingId }
+    ::= { jwsTrapRingConfigTable 1 }
+
+JwsTrapRingConfigEntry ::= SEQUENCE {
+    jwsTrapRingId                       Integer32,
+    jwsTrapRingStatusEnableValue        JwsEnableValue
+    }
+
+jwsTrapRingId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Ring index."
+    ::= { jwsTrapRingConfigEntry 1 }
+
+jwsTrapRingStatusEnableValue OBJECT-TYPE
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Ring status trap admin mode."
+    DEFVAL      { disable }
+    ::= { jwsTrapRingConfigEntry 2 }
+
+-- ************************************************************************
+--               jwsTrapObjectGroup
+-- ************************************************************************
+jwsTrapObjPowerSupplyStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                pw1ok-and-pw2ok(1),
+                pw1ok-and-pw2fail(2),
+                pw1fail-and-pw2ok(3),
+                pw1fail-and-pw2fail(4)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is used in the traps to indicate power supply status."
+    ::= { jwsTrapObjectGroup 1 }
+
+jwsTrapObjPortId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is used in the traps to indicate port id."
+    ::= { jwsTrapObjectGroup 2 }
+
+jwsTrapObjPortStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                link-up(1),
+                link-down(2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is used in the traps to indicate port status."
+    ::= { jwsTrapObjectGroup 3 }
+
+jwsTrapObjPortRateDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                upstream(1),
+                downstream(2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is used in the traps to indicate port data stream direction."
+    ::= { jwsTrapObjectGroup 4 }
+
+jwsTrapObjPortRatePercentage OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is used in the traps to indicate port rate percentage."
+    ::= { jwsTrapObjectGroup 5 }
+
+jwsTrapObjRingId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is used in the traps to indicate ring id."
+    ::= { jwsTrapObjectGroup 6 }
+
+jwsTrapObjRingStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                health(1),
+                failure(2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is used in the traps to indicate ring status."
+    ::= { jwsTrapObjectGroup 7 }
+
+jwsTrapPowerChannelId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is used in the traps to indicate power channel id."
+    ::= { jwsTrapObjectGroup 2000 }
+
+jwsTrapPowerChannelIdStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                power-up(1),
+                power-down(2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is used in the traps to indicate power channel status."
+    ::= { jwsTrapObjectGroup 2001 }
+
+-- ************************************************************************
+--               jwsTrapDefineGroup
+-- ************************************************************************
+jwsTrapPowerSupply NOTIFICATION-TYPE
+    OBJECTS     {
+                jwsTrapObjPowerSupplyStatus
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that one of power-supply unit is change
+         to down/fail status."
+    ::= { jwsTrapDefineGroup 1000 }
+
+jwsTrapPortStatus NOTIFICATION-TYPE
+    OBJECTS     {
+                jwsTrapObjPortId,
+                jwsTrapObjPortStatus
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that the port status change to link-up/link-down."
+    ::= { jwsTrapDefineGroup 1001 }
+
+jwsTrapPortRateThreshold  NOTIFICATION-TYPE
+    OBJECTS     {
+                jwsTrapObjPortId,
+                jwsTrapObjPortRateDirection,
+                jwsTrapObjPortRatePercentage
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that the port rate threshold overflow."
+    ::= { jwsTrapDefineGroup 1002 }
+
+jwsTrapRingStatus NOTIFICATION-TYPE
+    OBJECTS     {
+                jwsTrapObjRingId,
+                jwsTrapObjRingStatus
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that the ring status change."
+    ::= { jwsTrapDefineGroup 1003 }
+
+jwsLldpRemTablesChange NOTIFICATION-TYPE
+    OBJECTS     {
+                jwsLldpStatsRemTablesInserts,
+                jwsLldpStatsRemTablesDeletes,
+                jwsLldpStatsRemTablesDrops,
+                jwsLldpStatsRemTablesAgeouts
+                }
+    STATUS      current
+    DESCRIPTION
+        "A lldpRemTablesChange notification is sent when the value
+        of lldpStatsRemTableLastChangeTime changes.  It can be
+        utilized by an NMS to trigger LLDP remote systems table
+        maintenance polls.
+
+        Note that transmission of lldpRemTablesChange
+        notifications are throttled by the agent, as specified by the
+        'lldpNotificationInterval' object."
+    ::= { jwsTrapDefineGroup 1004 }
+
+jwsTrapPowerChannelStatus NOTIFICATION-TYPE
+    OBJECTS     {
+                jwsTrapPowerChannelId,
+                jwsTrapPowerChannelIdStatus
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that the power channel status change to power-up/power-down."
+    ::= { jwsTrapDefineGroup 2000 }
+
+END

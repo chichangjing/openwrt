@@ -1,0 +1,99 @@
+###
+### doc
+### Generic Linux Driver for the following cpus.
+### ----------------------------------------------------------
+###
+### xcat
+### gda8548
+### ep8548
+### discoduo
+### orion2 (5281_amc)
+### prpmc orion1
+### mips64
+### intel64 (jumpgen)
+###
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+        LIB_NAME = mainExtDrv.lib
+endif
+
+ifeq (YES,$(APP_DEMO_ONLY))
+	SUBDIRS = i2cDrv
+endif
+#
+# flag kernel patches
+#TODO: check if it is applicable for ARMARCH7_MSYS
+ifeq (yes,$(KERNEL_SYSCALL_TABLE_EXPORTED))
+	AD_CFLAGS += -DPRESTERA_SYSCALLS
+endif
+
+#
+# don't build kernel module for MSYS, ARMADAXP_3_4, it is included into LSP
+CPU_TARGETS_WITH_LSP_MODULE = \
+    ARMARCH7_MSYS \
+    ARMARCH7_MSYS_2_6_32 \
+    ARMARCH7_ARMADA_385 \
+	ARMARCH7_ARMADA_390 \
+    ARMARCH7_ARMADAXP_3_4_69 ARMARCH7_ARMADAXP_3.4.69
+
+ifneq (,$(filter $(CPU_TARGETS_WITH_LSP_MODULE),$(CPU)_$(ARM_CPU)))
+    APP_DEMO_ONLY=YES
+endif
+ifeq (NO,$(LINUX_BUILD_KERNEL))
+    APP_DEMO_ONLY=YES
+endif
+
+#
+# Raw sockets
+RAWSOCK_IMPL = genDrvRawSocketXCat.c genDrvRawSocketStub.c genDrvRawSocketMvMux.c
+ifeq (EXISTS,$(XCAT_DRV))
+    RAWSOCK_USE = genDrvRawSocketXCat.c
+endif
+ifneq (,$(filter $(CPU_TARGETS_WITH_LSP_MODULE),$(CPU)_$(ARM_CPU)))
+    RAWSOCK_USE = genDrvRawSocketMvMux.c
+	AD_CFLAGS += -DRAW_SOCKET_MV_MUX
+endif
+ifeq (,$(RAWSOCK_USE))
+    RAWSOCK_USE = genDrvRawSocketStub.c
+endif
+
+C_EXCLUDE_FILE_LIST = $(filter-out $(RAWSOCK_USE), $(RAWSOCK_IMPL))
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake
+
+
+
+ifeq (YES,$(APP_DEMO_ONLY))
+	COPY_MODULES=
+	KERNELSUBDIRS=
+else
+	KERNEL_MODULE_SUBDIR = kerneldrv_genericLinuxDrv
+	KERNELSUBDIRS = $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)
+	COPY_MODULES = copy_kernel_module
+endif
+
+ifeq (NO,$(LINUX_BUILD_KERNEL))
+    COPY_MODULES=
+	KERNELSUBDIRS=
+endif
+
+build_dir: $(SCRAP_DIR) $(LIB_DIR) $(COPY_MODULES)
+
+copy_kernel_module:
+	rm -rf $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)
+	-mkdir $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)
+	cp -R kerneldrv/* $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)
+	cp ../../../h/gtExtDrv/drivers/prvExtDrvLinuxMapping.h $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)/include
+

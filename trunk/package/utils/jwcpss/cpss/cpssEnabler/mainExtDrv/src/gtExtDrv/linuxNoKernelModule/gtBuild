@@ -1,0 +1,59 @@
+###
+### doc
+### Generic Linux Driver based on /proc/ and /dev/mem
+### ----------------------------------------------------------
+###
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+        LIB_NAME = mainExtDrv.lib
+endif
+
+## Uncomment to eneble interrupt emulation by polling
+## interrupt summary register
+AD_CFLAGS += $(FD)NOKM_DRV_EMULATE_INTERRUPTS
+
+## Allow use of MSYS SRAM for DMA I/O
+#AD_CFLAGS += $(FD)USE_PP_SRAM
+
+#ifeq (YES,$(APP_DEMO_ONLY))
+#	SUBDIRS = i2cDrv
+#endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake
+
+## comment to build kernel module
+#APP_DEMO_ONLY=YES
+
+ifeq (YES,$(APP_DEMO_ONLY))
+	COPY_MODULES=
+	KERNELSUBDIRS=
+else
+	KERNEL_MODULE_SUBDIR = kerneldrv_dmadrv
+	KERNELSUBDIRS = $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)
+	COPY_MODULES = copy_kernel_module
+endif
+
+ifeq (NO,$(LINUX_BUILD_KERNEL))
+    COPY_MODULES=
+	KERNELSUBDIRS=
+endif
+
+build_dir: $(SCRAP_DIR) $(LIB_DIR) $(COPY_MODULES)
+
+copy_kernel_module:
+	rm -rf $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)
+	-mkdir $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)
+	cp -R dmadriver/* $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)
+

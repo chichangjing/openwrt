@@ -1,0 +1,8 @@
+configure lldp tx-interval 10
+configure lldp portidsubtype ifname
+configure lldp status disable
+configure system interface pattern !lo,!eth0,!br-lan,Gex-1,Fex-2,Fex-3,Fex-4,Fex-5,Gex-6
+configure system description "Joyware Switch Platform Software"
+configure system hostname OB9331DTA(G1.E4)
+unconfigure system interface description
+unconfigure system interface promiscuous

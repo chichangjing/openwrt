@@ -1,0 +1,270 @@
+-- ============================================================================
+-- MibName   : JWS-IFEXT-MIB
+-- FileName  : joyware-switch-ifext.mib
+-- ============================================================================
+JWS-IFEXT-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+        Counter32, Counter64                                        FROM SNMPv2-SMI
+        DisplayString, RowStatus, TruthValue                        FROM SNMPv2-TC
+        jwSwitch                                                    FROM JOYWARE-SMI
+        JwsPortType, JwsEnableValue, JwsOperState,
+        JwsPhysicalMode, JwsPhysicalState, JwsDot1dState            FROM JWS-TC;
+
+jwsIfExtMib MODULE-IDENTITY
+    LAST-UPDATED    "201603011200Z"
+    ORGANIZATION    "Joyware Electronic Technology Co.,Ltd"
+    CONTACT-INFO    "Postal: BlockA,Chang TorchHotel,No.259 Wensan Road,Hangzhou,Zhejiang 310012 China
+                     E-mail: jw-snmp@joyware.com
+                        Tel: 800-8571264 "
+    DESCRIPTION     "This MIB module defines MIB objects which provide interface
+                     extensional information about the Joyware switch devices."
+    -- revision history
+    REVISION        "201603011200Z"
+    DESCRIPTION     "Initial revision."
+    ::= { jwSwitch 2 }
+
+jwsIfExtPortInfo                OBJECT IDENTIFIER ::= { jwsIfExtMib 1 }
+jwsIfExtEthStats                OBJECT IDENTIFIER ::= { jwsIfExtMib 2 }
+
+-- ****************************************************************************
+--                  jwsIfExtPortInfo
+-- ****************************************************************************
+jwsIfExtPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JwsIfExtPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of the switch's physical port basic config/status entries"
+    ::= { jwsIfExtPortInfo 1 }
+
+jwsIfExtPortEntry OBJECT-TYPE
+    SYNTAX      JwsIfExtPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Switch's physical port basic config/status entry"
+    INDEX       { jwsIfExtPortIfIndex }
+    ::= { jwsIfExtPortTable 1 }
+
+JwsIfExtPortEntry ::= SEQUENCE {
+    jwsIfExtPortIfIndex                 Integer32,
+    jwsIfExtPortType                    JwsPortType,
+    jwsIfExtPortAdminMode               JwsEnableValue,
+    jwsIfExtPortOperState               JwsOperState,
+    jwsIfExtPortPhysicalMode            JwsPhysicalMode,
+    jwsIfExtPortPhysicalState           JwsPhysicalState,
+    jwsIfExtPortFlowControlMode         JwsEnableValue
+    }
+
+jwsIfExtPortIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the ifIndex in ifTable."
+    ::= { jwsIfExtPortEntry 1 }
+
+jwsIfExtPortType OBJECT-TYPE
+    SYNTAX      JwsPortType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The switch's Port Type"
+    ::= { jwsIfExtPortEntry 2 }
+
+jwsIfExtPortAdminMode OBJECT-TYPE
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The switch's Port Admin Mode"
+    ::= { jwsIfExtPortEntry 3 }
+
+jwsIfExtPortOperState OBJECT-TYPE
+    SYNTAX      JwsOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The switch's Port operational status"
+    ::= { jwsIfExtPortEntry 4 }
+
+jwsIfExtPortPhysicalMode OBJECT-TYPE
+    SYNTAX      JwsPhysicalMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The switch's port speed mode. This is the configured physical mode.
+         This object is read-only for gigabit ports"
+    ::= { jwsIfExtPortEntry 5 }
+
+jwsIfExtPortPhysicalState OBJECT-TYPE
+    SYNTAX      JwsPhysicalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The switch's port physical speed status. This is the current actual speed."
+    ::= { jwsIfExtPortEntry 6 }
+
+jwsIfExtPortFlowControlMode OBJECT-TYPE
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Config flowcontrol allows you to enable or disable
+         802.3x flow control for this port. This value
+         applies to only full-duplex mode ports. "
+    ::= { jwsIfExtPortEntry 7 }
+
+-- ****************************************************************************
+--                  jwsIfExtEthStats
+-- ****************************************************************************
+jwsIfExtEthStatsClearAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                noAction(1),
+                action(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear ethernet statistics counters."
+    ::= { jwsIfExtEthStats 1 }
+
+jwsIfExtEthStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JwsIfExtEthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of the switch's port ethernet statistics."
+    ::= { jwsIfExtEthStats 2 }
+
+jwsIfExtEthStatsEntry OBJECT-TYPE
+    SYNTAX      JwsIfExtEthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Switch's port ethernet statistics entry"
+    INDEX       { jwsIfExtEthStatsIfIndex }
+    ::= { jwsIfExtEthStatsTable 1 }
+
+JwsIfExtEthStatsEntry ::= SEQUENCE {
+    jwsIfExtEthStatsIfIndex                 Integer32,
+    jwsIfExtEthStatsClear                   TruthValue,
+    jwsIfExtEthStatsRxBytes                 Counter64,
+    jwsIfExtEthStatsRxUcastPkts             Counter32,
+    jwsIfExtEthStatsRxBcastPkts             Counter32,
+    jwsIfExtEthStatsRxMcastPkts             Counter32,
+    jwsIfExtEthStatsRxPausePkts             Counter32,
+    jwsIfExtEthStatsTxBytes                 Counter64,
+    jwsIfExtEthStatsTxUcastPkts             Counter32,
+    jwsIfExtEthStatsTxBcastPkts             Counter32,
+    jwsIfExtEthStatsTxMcastPkts             Counter32,
+    jwsIfExtEthStatsTxPausePkts             Counter32,
+    jwsIfExtEthMaxSpeedValue                Integer32
+    }
+
+jwsIfExtEthStatsIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the ifIndex in ifTable."
+    ::= { jwsIfExtEthStatsEntry 1 }
+
+jwsIfExtEthStatsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is to clear the port statistics."
+    ::= { jwsIfExtEthStatsEntry 2 }
+
+jwsIfExtEthStatsRxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bytes received."
+    ::= { jwsIfExtEthStatsEntry 3 }
+
+jwsIfExtEthStatsRxUcastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unicast packets received."
+    ::= { jwsIfExtEthStatsEntry 4 }
+
+jwsIfExtEthStatsRxBcastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Broadcast packets received."
+    ::= { jwsIfExtEthStatsEntry 5 }
+
+jwsIfExtEthStatsRxMcastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Multicast packets received."
+    ::= { jwsIfExtEthStatsEntry 6 }
+
+jwsIfExtEthStatsRxPausePkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pauce packets received."
+    ::= { jwsIfExtEthStatsEntry 7 }
+
+jwsIfExtEthStatsTxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bytes transmitted."
+    ::= { jwsIfExtEthStatsEntry 8 }
+
+jwsIfExtEthStatsTxUcastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unicast packets transmitted."
+    ::= { jwsIfExtEthStatsEntry 9 }
+
+jwsIfExtEthStatsTxBcastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Broadcast packets transmitted."
+    ::= { jwsIfExtEthStatsEntry 10 }
+
+jwsIfExtEthStatsTxMcastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Multicast packets transmitted."
+    ::= { jwsIfExtEthStatsEntry 11 }
+
+jwsIfExtEthStatsTxPausePkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pauce packets transmitted."
+    ::= { jwsIfExtEthStatsEntry 12 }
+
+jwsIfExtEthMaxSpeedValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the ifIndex in ifTable."
+    ::= { jwsIfExtEthStatsEntry 13 }
+END
+

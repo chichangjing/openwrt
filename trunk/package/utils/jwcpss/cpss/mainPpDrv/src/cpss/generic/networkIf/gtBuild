@@ -1,0 +1,23 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifeq (1,$(SHARED_MEMORY))
+  INCLUDE_PATH += $(OS_PATH)
+endif
+
+LIB_NAME = cpssGenericNetworkIf.lib
+ifneq (L_ON,$(LOG_ENABLE))
+    C_EXCLUDE_FILE_LIST += prvCpssGenNetworkIfLog.c
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

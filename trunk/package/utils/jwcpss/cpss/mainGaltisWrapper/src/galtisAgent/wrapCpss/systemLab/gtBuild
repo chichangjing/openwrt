@@ -1,0 +1,30 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifneq (EXISTS, $(PM_FAMILY))
+    C_EXCLUDE_FILE_LIST = wrDDR3.c
+endif
+
+ifeq (YES, $(CPP_LINK))
+    CFLAGS+= -DMV_HWS_INCLUDE_INTERFACE_TEST
+endif
+
+## CPSS compilation environment #################
+SW_ROOT_DIR = $(subst \,/,$(SW_ROOT))
+INCLUDE_PATH += -I$(SW_ROOT_DIR)/mainPpDrv/src/cpss/generic/labServices/port/gop/src/port/serdes/avago/aapl/marvell
+
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

@@ -1,0 +1,17 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      = NONE
+#C_EXCLUDE_FILE_LIST =
+
+# set to one of xmlparser, mxml, NONE
+SUBDIRS = mxml
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

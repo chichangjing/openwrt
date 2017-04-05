@@ -1,0 +1,59 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+
+ifeq (1, $(LINUX_SIM))
+    ifeq (Linux, $(OS_TARGET))
+        SUBDIRS      = linux
+    endif
+    ifeq (FreeBSD, $(OS_TARGET))
+        SUBDIRS = FreeBSD
+    endif
+else
+    ifeq (linux, $(OS_RUN))
+        SUBDIRS      = linux
+    endif
+    ifeq (uClinux, $(OS_RUN))
+        SUBDIRS      = uClinux
+    endif
+    ifeq (win32, $(OS_RUN))
+	SUBDIRS      = win32
+    # osTimeRT implementation required
+	C_EXCLUDE_FILE_LIST = osTestPerf.c
+    endif
+    ifeq (VXWORKS, $(OS_RUN))
+	SUBDIRS      = vxWorks
+    endif
+    ifeq (FreeBSD, $(OS_RUN))
+        SUBDIRS      = FreeBSD
+    endif
+endif
+
+#C_EXCLUDE_FILE_LIST =
+
+# Some shared abilities (PP DMA shared init) is used even without
+# shared memory approach. So we always include this folder.
+# For details see gtBuild for sharedMemory subdirectory.
+SUBDIRS += sharedMemory
+
+ifeq (EXISTS, $(RTOS_ON_SIM))
+    ifneq (linux, $(OS_RUN))
+        SUBDIRS += rtosStubs
+    endif
+endif
+
+
+
+#Shared memory requires additional module
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+        LIB_NAME = gtOs.lib
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

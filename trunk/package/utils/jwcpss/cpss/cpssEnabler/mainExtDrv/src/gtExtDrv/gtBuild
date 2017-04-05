@@ -1,0 +1,95 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+SUBDIR =
+
+ifeq (VXWORKS, $(OS_RUN))
+
+  ifeq (DUNE, $(XBAR_VENDOR))
+    ifeq (DUNE, $(BSP_VENDOR))
+      SUBDIR = dune0011a
+    else
+      SUBDIR = genericDrv
+    endif
+  endif
+
+  # if $(CPU) in list then use generic driver
+  ifneq (,$(filter PPC603 PPC85XX ARMARCH7,$(CPU)))
+        SUBDIR = genericDrv
+  endif
+
+  ifeq (PPC604, $(CPU))
+        SUBDIR = gt64260
+  endif
+  ifeq (ARMARCH4, $(CPU))
+       SUBDIR  = gt88e6218
+  endif
+
+  ifeq (ARMARCH5, $(CPU))
+    # genericDrv for PCI, PCI_SMI, PCI_SMI_I2C
+    ifneq (,$(filter GT_MNG_PCI GT_MNG_PCI_SMI GT_MNG_PCI_SMI_I2C,$(MANAGEMENT_BUS)))
+       SUBDIR  = genericDrv
+    else
+       SUBDIR = gt88e6218
+    endif
+  endif
+endif
+
+ifeq (linux, $(OS_RUN))
+  GENERIC_LINUX_DRV_CPUS = PPC85XX EP3041A MIPS64 INTEL64 ARMARCH5 ARMARCH7
+  ifeq (EXISTS,$(INTEL64_DRV))
+    GENERIC_LINUX_DRV_CPUS += i386
+  endif
+  # if cpu in generic list
+  ifneq (,$(filter $(GENERIC_LINUX_DRV_CPUS),$(CPU)))
+        ifeq (6, $(KPATCHLEVEL))
+                SUBDIR = genericLinuxDrv
+        endif
+  endif
+
+  # Legacy devices
+  ifeq (PPC603, $(CPU))
+        ifeq (6, $(KPATCHLEVEL))
+                SUBDIR = gtLinux_2_6_8245
+        endif
+  endif
+  ifeq (PPC604, $(CPU))
+        SUBDIR = 
+  endif
+  ifeq (YES, $(LINUX_NOKM))
+        SUBDIR = linuxNoKernelModule
+  endif
+endif
+
+ifeq (FreeBSD, $(OS_RUN))
+   SUBDIR = gtFreeBsd85xx
+endif
+
+ifeq (win32, $(OS_RUN))
+  SUBDIR = simWin32
+endif
+
+#Linux simulation section
+ifeq (1, $(LINUX_SIM))
+    SUBDIR = simWin32
+endif
+
+ifeq (EXISTS, $(RTOS_ON_SIM))
+  SUBDIRS = rtosSim version
+  
+  # take the next files from the "real HW external driver" for that CPU/board.
+  C_FILE_LIST = \
+	$(wildcard $(SUBDIR)/*UartDrv.c) \
+        $(wildcard $(SUBDIR)/*ResetDrv.c) 
+else
+  SUBDIRS = $(SUBDIR) version
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

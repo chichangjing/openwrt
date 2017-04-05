@@ -1,0 +1,189 @@
+-- ============================================================================
+-- MibName   : JWS-RSTP-MIB
+-- FileName  : joyware-switch-rstp.mib
+-- ============================================================================
+JWS-RSTP-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32          FROM SNMPv2-SMI
+        DisplayString, RowStatus                                    FROM SNMPv2-TC
+        jwSwitch                                                    FROM JOYWARE-SMI;
+
+jwsRstpMib MODULE-IDENTITY
+    LAST-UPDATED    "201603011200Z"
+    ORGANIZATION    "Joyware Electronic Technology Co.,Ltd"
+    CONTACT-INFO    "Postal: BlockA,Chang TorchHotel,No.259 Wensan Road,Hangzhou,Zhejiang 310012 China
+                     E-mail: jw-snmp@joyware.com
+                        Tel: 800-8571264 "
+    DESCRIPTION     "This MIB module defines MIB objects which provide RSTP
+                     configurable information about the Joyware switch devices."
+    -- revision history
+    REVISION        "201603011200Z"
+    DESCRIPTION     "Initial revision."
+    ::= { jwSwitch 12 }
+
+JwsBridgeId ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "The Bridge-Identifier used by the Spanning Tree
+                     Protocol to uniquely identify a bridge. The first
+                     two octets represent the bridge priority (in big
+                     endian format) while the remaining six octets
+                     represent the main MAC address of the bridge."
+    SYNTAX          OCTET STRING (SIZE (8))
+
+JwsTimeout ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d4"
+    STATUS          current
+    DESCRIPTION     "Time out value in 4 byte"
+    SYNTAX          Integer32
+
+
+jwsRstpGroup         OBJECT IDENTIFIER ::= { jwsRstpMib 1 }
+
+-- ****************************************************************************
+--                  jwsVlanMngtGroup
+-- ****************************************************************************
+jwsStpAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enable(1),
+                disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "STP enable status"
+    DEFVAL      { disabled }
+    ::= { jwsRstpGroup 1 }
+
+jwsStpPriority OBJECT-TYPE
+    SYNTAX       INTEGER (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+                "Bridge Priority, an Unsigned value used to represent the priority
+                component of a Bridge Identifier. Valid Bridge Priorities are in the
+                range 0 through 61440, in steps of 4096."
+    ::= { jwsRstpGroup 2 }
+
+
+jwsStpMaxAge OBJECT-TYPE
+    SYNTAX       JwsTimeout {6..40}
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+                "The maximum age of Spanning Tree Protocol information learned from
+                the network on any port before it is discarded, in units of hundredths of
+                a second.  This is the actual value that this bridge is currently using."
+    ::= { jwsRstpGroup 3 }
+
+jwsStpHelloTime OBJECT-TYPE
+    SYNTAX       JwsTimeout {1..10}
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+                "The amount of time between the transmission of Configuration bridge PDUs
+                by this node on any port when it is the root of the spanning tree or trying
+                to become so, in units of a second. This is the actual value that this bridge is
+                currently using."
+    ::= { jwsRstpGroup 4 }
+
+jwsStpForwardDelay OBJECT-TYPE
+    SYNTAX       JwsTimeout {4..30}
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+                "This time value, measured in units of a second, controls how fast a port
+                changes its spanning state when moving towards the Forwarding state. The
+                value determines how long the port stays in each of the Listening and
+                Learning states, which precede the Forwarding state.  This value is also
+                used, when a topology change has been detected and is underway, to age
+                all dynamic entries in the Forwarding Database.  [Note that this value is
+                the one that this bridge is currently using, in contrast to
+                dot1dStpBridgeForwardDelay which is the value that this bridge and all
+                others would start using if/when this bridge were to become the root.]"
+    ::= { jwsRstpGroup 5 }
+
+    -- ------------------------------------------------
+    -- Lay 2 span tree protocol STP/RSTP port MIB table
+    -- ------------------------------------------------
+jwsStpPortTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF JwsStpPortEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+                "A table containing Spanning Tree Protocol information
+                about the members of each bridge interface."
+    ::= { jwsRstpGroup 6 }
+
+jwsStpPortEntry OBJECT-TYPE
+    SYNTAX       JwsStpPortEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+                "A list of Spanning Tree Protocol information about
+                a specific member of a bridge interface."
+    INDEX  { jwsStpPort }
+    ::= { jwsStpPortTable 1 }
+
+JwsStpPortEntry ::= SEQUENCE {
+    jwsStpPort                     Integer32,
+    jwsStpPortEnable               INTEGER,
+    jwsStpPortPriority             Integer32,
+    jwsStpPortPathCost             Integer32,
+    jwsStpPortPathCostAutoCalculate   INTEGER
+    }
+
+jwsStpPort OBJECT-TYPE
+    SYNTAX       Integer32 (1..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+                "The system interface index of the interface corresponding
+                to this port, for which the management entity has Spanning
+                Tree Protocol information."
+    ::= { jwsStpPortEntry 1 }
+
+jwsStpPortEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The administrative Spanning Tree Protocol state of the
+                port - value of enabled(1) indicates that the port is
+                participating in the Spanning Tree Protocol operation."
+    ::= { jwsStpPortEntry 2 }
+
+jwsStpPortPriority OBJECT-TYPE
+    SYNTAX       Integer32 (0..255)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+                "The STP priority of this port that is contained in the first
+                octet of its Port Identifier. The second octet contains the
+                value of jwsStpPort."
+    ::= { jwsStpPortEntry 3 }
+
+jwsStpPortPathCost OBJECT-TYPE
+    SYNTAX       Integer32 (1..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+                "The contribution of the path through this port, when the port
+                is the Root Port, to the total cost of the path to the root
+                bridge for this bridge."
+    ::= { jwsStpPortEntry 4 }
+
+jwsStpPortPathCostAutoCalculate OBJECT-TYPE
+    SYNTAX       INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+                "auto to calculate path cost."
+    ::= { jwsStpPortEntry 5 }
+
+END

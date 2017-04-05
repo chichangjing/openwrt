@@ -1,0 +1,60 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+LIB_NAME = cpssDrvPpInterruptsDxExMx.lib
+
+######################
+## EXMX FAMILY TYPE ##
+######################
+ifeq (EXISTS, $(EX_FAMILY))
+  EXMX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(TG_FAMILY))
+  EXMX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(TD_FAMILY))
+  EXMX_FAMILY = EXIST
+endif
+
+## Common files
+C_FILE_LIST  = cpssDrvPpIntInterrupts.c cpssDrvPpIntInit.c cpssDrvPpIntCtrl.c
+
+## Add EXMX files
+ifeq (EXIST, $(EXMX_FAMILY))
+  C_FILE_LIST += cpssDrvPpIntExMxEventsUnify.c cpssDrvPpIntDefTwistD.c \
+                 cpssDrvPpIntDefTwistC.c cpssDrvPpIntDefTiger.c
+endif
+
+## Add DXCHX files
+ifeq (EXISTS, $(CHX_FAMILY))
+  C_FILE_LIST += cpssDrvPpIntDxChEventsUnify.c cpssDrvPpIntDefDxChXcat.c \
+                 cpssDrvPpIntDefCheetah3.c cpssDrvPpIntDefCheetah2.c \
+                 cpssDrvPpIntDefCheetah.c \
+                 cpssDrvPpIntDefDxChLionB.c cpssDrvPpIntDefDxChXcat2.c \
+                 cpssDrvPpIntDefDxChLion2.c \
+                 cpssDrvPpIntDefDxChBobcat2.c cpssDrvPpIntDefDxChXcat3.c \
+                 cpssDrvPpIntDefDxChBobcat3.c cpssDrvPpIntDefDxChBobK.c
+endif
+
+## Add DX Sal files
+ifeq (EXISTS, $(SAL_FAMILY))
+  C_FILE_LIST += cpssDrvPpIntDxSalEventsUnify.c cpssDrvPpIntDefSalsa.c
+endif
+
+## Add EXMXPM files
+ifeq (EXISTS, $(PM_FAMILY))
+  C_FILE_LIST += cpssDrvPpIntExMxPmEventsUnify.c cpssDrvPpIntDefPuma.c \
+                 cpssDrvPpIntDefPuma3.c
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

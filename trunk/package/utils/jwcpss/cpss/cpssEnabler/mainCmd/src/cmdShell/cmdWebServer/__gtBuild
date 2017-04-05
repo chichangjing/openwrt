@@ -1,0 +1,28 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+INCLUDE_PATH += $(FIS)$(LUA_SRCPATH)$(FIE)
+
+
+ifneq (yes.yes, $(CMD_WEBSRV).$(CMD_LUA_CLI))
+    C_EXCLUDE_FILE_LIST = ALL
+endif
+
+ifeq (yes,$(CMD_FS))
+  AD_CFLAGS += $(FD)CMD_LUA_FS
+endif
+
+ifeq (1,$(SHARED_MEMORY))
+	LIB_NAME = mainCmd.lib
+endif
+
+##################################################
+include $(PROJ_BASE)/gtTopMake

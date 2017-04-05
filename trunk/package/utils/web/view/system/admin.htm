@@ -1,0 +1,132 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+<%  
+    local ubus = require "luci.ubus"
+--    local log  = require "luci.log"
+    -- 收到设置net应用处理 
+    local netJson = luci.http.formvalue("setPasswd")
+    if netJson then
+        local setJson = luci.json.decode(netJson)
+        local oldPassd = setJson.oldPassd
+        local newPassd = setJson.newPassd
+
+        local rv = {
+            ret = 0 
+        }
+        luci.http.prepare_content("application/json")
+
+        local setNetStatus = luci.sys.user.checkpasswd(luci.dispatcher.context.authuser, oldPassd)
+        
+        if setNetStatus  then
+--            log.print_r(setNetStatus)
+            if luci.sys.user.setpasswd(luci.dispatcher.context.authuser, newPassd) == 0 then
+                rv.ret = 1
+                luci.http.write_json(rv)
+                return                
+            else 
+                rv.ret = 2
+                luci.http.write_json(rv)
+                return                
+            end
+        end
+        luci.http.write_json(rv)
+
+        return
+    
+    end
+
+%>
+
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">
+
+function modifyPassword(){
+    var a = JSON.parse("{\"oldPassd\":\"\",\"newPassd\":\"\",\"checkPassd\":\"\"}"); 
+    //将表格中内容转化为json格式
+    a.oldPassd  = document.getElementById("oldPassd").value;
+    a.newPassd = document.getElementById("newPassd").value ;
+    a.checkPassd = document.getElementById("checkPassd").value ;
+
+    if(confirm("<%:Change password and reconnect？ It needs to reconnect then...%>")){
+
+        if(a.newPassd != a.checkPassd){
+            alert("<%:New password cant be the same of old%>");
+            return ;
+        }
+        XHR.get('<%=REQUEST_URI%>',{"setPasswd": JSON.stringify(a)}, function(x, rv){
+            if(rv.ret == "0"){
+                alert("<%:check error%>");
+            }
+            else if(rv.ret == "1"){
+                var interval = window.setInterval(function() {
+                    var img = new Image();
+                    img.onload = function() {
+                        window.clearInterval(interval);
+                        location.href = ('https:' == document.location.protocol ? 'https://' : 'http://') + '<%=luci.http.getenv("SERVER_NAME")%>/';
+                    };
+
+                    img.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + '<%=luci.http.getenv("SERVER_NAME")%><%=resource%>/icons/loading.gif?' + Math.random();
+                }, 500);
+
+            }
+            else {
+                alert("<%:Set a password error%>");
+            }
+
+        });
+
+    }
+    //    alert(JSON.stringify(a));
+}
+
+</script>
+
+
+<div class="network"  id = "networkconfig" >
+    <fieldset class=""> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+        <legend><%:Password change%></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+
+        <!--<div class = "network-section-node">-->
+            <table class = "info-section-table">
+                <tr><th><%:Old password%></th>
+                    <td><input type="password" id = "oldPassd"   value = "" ></td></tr>
+                <tr><th><%:New password%></th>
+                    <td><input type="password" id = "newPassd"   value = "" ></td></tr>
+                <tr><th><%:Confirm%></th>
+                    <td><input type="password" id = "checkPassd" value = "" ></td></tr>
+                <tfoot>
+                    <tr><td colspan="2"><input class="cbi-button cbi-input-apply" type=button name=ok align="center" value="<%:Apply%>" style="width:100px;" onclick="modifyPassword()"></td></tr>
+                </tfoot>
+            </table>
+        <!--</div>-->
+    </fieldset>
+
+
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

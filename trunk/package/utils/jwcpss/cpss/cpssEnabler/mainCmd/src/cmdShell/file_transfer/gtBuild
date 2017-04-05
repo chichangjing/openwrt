@@ -1,0 +1,22 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+SUBDIRS       = NONE
+ifneq (yes, $(CMD_FS))
+    C_EXCLUDE_FILE_LIST = ALL
+endif
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+	LIB_NAME = mainCmd.lib
+endif
+
+##################################################
+include $(PROJ_BASE)/gtTopMake

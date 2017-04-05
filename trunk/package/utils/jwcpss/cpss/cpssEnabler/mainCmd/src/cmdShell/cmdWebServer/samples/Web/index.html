@@ -1,0 +1,62 @@
+<html>
+<head>
+	<meta http-equiv="Set-Cookie" content="sample_cookie=sample%20value">
+</head>
+<body>
+	<img src="logo_back.png">
+	<p>Hello, this is index.html</p>
+
+	<hr>
+	<p>Script sample 1.
+	<br><a href="printenv.lua">printenv.lua</a>
+
+	<hr>Script sample 2.
+	<br><a href="printenv.lua?variable1=value2&var2=another%20value">printenv.lua?variable1=value2&amp;var2=another%20value</a>
+
+	<hr>Script sample 3.
+	<br>The form with method=get:
+	<p>
+	<form method="get" action="printenv.lua">
+		<br>text_var:<input type="text" name="text_var">
+		<br><input type="radio" name="option" value="opt1">Option 1
+		<br><input type="radio" name="option" value="opt2">Option 2
+		<br><input type="radio" name="option" value="opt3">Option 3
+		<br>Sample text:<textarea name="longtext"></textarea>
+		<br><input type="submit">
+	</form>
+
+	<hr>Script sample 4.
+	<br>The form with method=post:
+	<p>
+	<form method="post" action="printenv.lua">
+		<br>text_var:<input type="text" name="text_var">
+		<br><input type="radio" name="option" value="opt1">Option 1
+		<br><input type="radio" name="option" value="opt2">Option 2
+		<br><input type="radio" name="option" value="opt3">Option 3
+		<br>Sample text:<textarea name="longtext"></textarea>
+		<br><input type="submit">
+	</form>
+
+	<hr>Script sample 5.
+	<br>The form with method=post, enctype=multipart/form-data:
+	<p>
+	<form method="post" action="printenv.lua" enctype="multipart/form-data">
+		<br>text_var:<input type="text" name="text_var">
+		<br><input type="radio" name="option" value="opt1">Option 1
+		<br><input type="radio" name="option" value="opt2">Option 2
+		<br><input type="radio" name="option" value="opt3">Option 3
+		<br>Sample text:<textarea name="longtext"></textarea>
+		<br><input type="submit">
+	</form>
+
+	<hr>Script sample 6.
+	<br>The form with method=post, enctype=multipart/form-data:
+	<p>
+	<form method="post" action="printenv.lua" enctype="multipart/form-data">
+		<br>text_var:<input type="text" name="text_var">
+		<br><input type="file" name="samplefile">
+		<br><input type="submit">
+	</form>
+
+</body>
+</html>

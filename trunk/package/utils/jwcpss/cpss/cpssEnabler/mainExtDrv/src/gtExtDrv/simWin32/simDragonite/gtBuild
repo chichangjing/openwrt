@@ -1,0 +1,16 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH = 
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+ifneq (A1, $(DRAGONITE_TYPE))
+C_EXCLUDE_FILE_LIST = ALL
+endif
+
+##################################################
+include $(PROJ_BASE)/gtTopMake

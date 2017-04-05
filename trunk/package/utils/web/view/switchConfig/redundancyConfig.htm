@@ -1,0 +1,651 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+<%
+    local ubus = require "luci.ubus"
+    local portNum = ubus.getPortNum()
+    --ring拓扑获取
+    local getTopoId = luci.http.formvalue("getTopo")
+    if getTopoId then 
+        local chan = {"topo"}
+        local pa = string.format("ring%s",getTopoId)
+        local channel = {}
+        channel[1]={[pa] = chan}
+        local getTopoStatus = ubus.get_args("ring_config", "ring_config_get", channel, 1)
+ 
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(getTopoStatus)
+        
+        return
+    end
+    --ring拓扑设置
+    local topoJson = luci.http.formvalue("setTopo")
+    if topoJson then 
+        local setTopoJson = luci.json.decode(topoJson)
+        local pa = string.format("%s",setTopoJson.idx)
+        local setTopoSnd={[pa]={{["topo"] = setTopoJson.mode}}} 
+        local setTopoStatus = ubus.set_args("ring_config", "ring_config_set", setTopoSnd, 2)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setTopoStatus)
+        
+        return
+    end
+    --ring模式设置
+    local modeStatus = luci.http.formvalue("setMode")
+    if modeStatus then 
+        local modeArr = {["jrpp_status"] = modeStatus}
+        local setModeStatus = ubus.set_args("ring_config", "ring_config_set", modeArr, 2)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setModeStatus)
+        
+        return
+    end
+    --删除环命令
+    local cleIdx = luci.http.formvalue("clear")
+    if cleIdx then
+        local cleVal = luci.json.decode(cleIdx)
+        local idx = string.format("idx-%d",tonumber(cleVal.idx))
+        local clearStatus = ubus.clear_args("ring_config", "ring_config_clear", idx )
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(clearStatus)
+        
+        return
+    end
+
+    -- 收到设置ring应用处理 
+    local ringJson = luci.http.formvalue("setRing")
+    if ringJson then
+        local setRingJson = luci.json.decode(ringJson)
+        local pVal = string.format("idx-%s",setRingJson.idx)
+        local setRingSnd={[pVal]={{["ring_name"] = setRingJson.ring_name},{["primary_port"] =setRingJson.primary_port},{["secondary_port"] =setRingJson.secondary_port},{["priority"] =setRingJson.priority},{["admin"] = setRingJson.admin}}} 
+        local setRingStatus = ubus.set_args("ring_config","ring_config_set",setRingSnd,2)
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setRingStatus)
+
+        return
+    
+    end
+    -- 读取环网状态
+    
+    local chan = {"ring_name","primary_port","secondary_port","priority","admin"}
+    local channel = {}
+    local status ={}
+
+    local getModeStatus = ubus.get_args("ring_config", "ring_config_get", {"jrpp_status","ring_num"}, 2)
+    local modeVal = getModeStatus["ret"][1].jrpp_status
+    local numVal =  getModeStatus["ret"][2].ring_num
+    if (modeVal == "1") then 
+        if numVal ~=nil and tonumber(numVal) > 0  then
+            for i=1,tonumber(numVal) do
+                local pa = string.format("idx-%d",i)
+                channel[i]={[pa] = chan}
+            end
+            status = ubus.get_args("ring_config", "ring_config_get", channel, 1)
+        end
+    end
+
+
+%>
+<%+header%>
+<style type="text/css">
+    .input-group {
+        position: relative;
+        display: table;
+        border-collapse: separate;
+    }
+    .input-group-addon:first-child {
+        border-right: 0;
+    }
+    .input-group-addon {
+        padding: 6px 12px;
+        line-height: 1;
+        color: #555;
+        text-align: center;
+        background-color: #eee;
+        border: 1px solid #ccc;
+        white-space: nowrap;
+        vertical-align: middle;
+        display: table-cell;
+    }
+    .form-control {
+        width: 100%;
+        height: 34px;
+        line-height: 1.42857143;
+        max-width: 138px;
+    }
+</style>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">//<![CDATA[
+function addRing(){
+    $("#ring_id").focus();
+}
+function getTopo(){
+    var enRingValue = $("#ring_idx option:selected").text();
+
+    //判断操作行为
+    var radv = $('input[name="operation"]:checked').val();//获取是否使能
+    if(radv == 1){
+        XHR.get('<%=REQUEST_URI%>',{ "getTopo": enRingValue.substr(-1,1) },
+                function(x,rv)
+                {
+                    console.log(JSON.stringify(rv));
+                    if(rv.ret == "-1"){
+                        alert("<%:Configuration failed%>");
+                    }else{
+                        alert("<%:Succesfully configured%>");
+                        //empSel();
+                        //window.location.reload();
+                        //table显示及内容展示
+
+                        var num = rv[0]["ret"][0][enRingValue][0]["topo_num"];
+                        //alert(num);
+
+                        var tabObj = document.getElementById("topoTab");//获取添加数据的表格
+                        var rowNum = tabObj.rows.length;  //获取当前行数
+                        //alert(rowNum);
+                        for(k = 1; k<rowNum; k++){
+                            tabObj.deleteRow(k);
+                            rowNum=rowNum-1;
+                            k=k-1;
+                        }
+                        if(num > 0){
+                            for(n=1;n<=num;n++){
+
+                                var rowsNum = tabObj.rows.length;  //获取当前行数
+                                var myNewRow = tabObj.insertRow(rowsNum);//插入新行
+                                var newTdObj1=myNewRow.insertCell(0);
+                                newTdObj1.innerHTML=rv[0]["ret"][0][enRingValue][0][n]["NodeId"];
+                                var newTdObj2=myNewRow.insertCell(1);
+                                newTdObj2.innerHTML=rv[0]["ret"][0][enRingValue][0][n]["RingState"];
+                                if(rv[0]["ret"][0][enRingValue][0][n]["RingState"] == "Enabled"){
+                                    var newTdObj3=myNewRow.insertCell(2);
+                                    newTdObj3.innerHTML=rv[0]["ret"][0][enRingValue][0][n]["RingMode"];
+                                    var newTdObj4=myNewRow.insertCell(3);
+                                    newTdObj4.innerHTML=rv[0]["ret"][0][enRingValue][0][n]["Status"];
+                                    var newTdObj5=myNewRow.insertCell(4);
+                                    newTdObj5.innerHTML=rv[0]["ret"][0][enRingValue][0][n]["NodeRole"];
+                                    var newTdObj6=myNewRow.insertCell(5);
+                                    newTdObj6.innerHTML=rv[0]["ret"][0][enRingValue][0][n]["MasterId"];
+                                    var newTdObj7=myNewRow.insertCell(6);
+                                    newTdObj7.innerHTML=rv[0]["ret"][0][enRingValue][0][n]["PrimaryPortInfo"];
+                                    var newTdObj8=myNewRow.insertCell(7);
+                                    newTdObj8.innerHTML=rv[0]["ret"][0][enRingValue][0][n]["SecondPortInfo"];
+                                }
+
+                            }
+                        }
+                        $("#topoTab").show();
+                    }
+                }
+                );
+    }else if(radv == 2){
+        var tabObj = document.getElementById("topoTab");//获取添加数据的表格
+        var rowNum = tabObj.rows.length;  //获取当前行数
+        //alert(rowNum);
+        for(k = 1; k<rowNum; k++){
+            tabObj.deleteRow(k);
+            rowNum=rowNum-1;
+            k=k-1;
+        }
+        $("#topoTab").hide();  
+    }
+}
+function setTopo(){
+
+    var selt = $("#topo_idx").find("option:selected").text(); //获取sel选中的文字
+    //var selv = $("#topo_idx").val(); //获取sel选中的value
+
+    var radv = $('input[name="setoperation"]:checked').val();//获取是否使能
+
+    var a = JSON.parse("{\"idx\":\"\",\"mode\":\"\"}");
+    a.idx = selt;
+    a.mode = radv;
+    //console.log(JSON.stringify(a));
+    //return;
+    XHR.get('<%=REQUEST_URI%>',{"setTopo": JSON.stringify(a)}, 
+            function(x,rv) {
+                //        alert(JSON.stringify(rv));
+                if(rv.ret == "-1"){
+                    alert("<%:Configuration failed%>");
+                    return ;
+                }
+                else if(rv.ret == "0"){
+                    alert("<%:Succesfully configured%>");
+                    window.location.reload();
+                }
+            }
+           );
+}
+
+function setRing(){
+    var num = <%=portNum%>
+    //组成JSON格式
+    var a = JSON.parse("{\"idx\":\"\",\"ring_name\":\"\",\"primary_port\":\"\",\"secondary_port\":\"\",\"priority\":\"\",\"admin\":\"\"}");
+    //获得idx
+    a.idx = $("#ringTab tr").length;
+    a.ring_name = "ring" + $("#ring_id").val().replace(/\s/g,"");
+    var ringId = $.trim($("#ring_id").val());
+    if((ringId == 0) || isNaN(ringId)){
+        alert("<%:ring_id cannot be nul and number only%>");
+        return;
+    }
+    if((ringId < 1) || (ringId > 65535) ){
+        alert("<%:ring_id range 1~65535%>");
+        return;
+    }
+    
+    //判断是否重名
+    for(var r=1;r<a.idx;r++){
+        if(a.ring_name.toLowerCase()==$("#ringTab tr:eq("+r+") td:eq(1)").text()){
+            alert("<%:ring_name must unique%>");
+            return;
+        }
+    }
+    a.primary_port = $("#ring_primaryPort").val().replace(/\s/g,"");
+    if((Number(a.primary_port) < 1) || (Number(a.primary_port) > num) ){
+        alert("<%:main port setting out of range%>");
+        return;
+    }
+    a.secondary_port = $("#ring_secondaryPort").val().replace(/\s/g,"");
+    if((Number(a.secondary_port) < 1) || (Number(a.secondary_port) > num) ){
+        alert("<%:deputy port setting out of range%>");
+        return;
+    }
+    if(a.primary_port == a.secondary_port){
+        alert("<%:Primary and second port repeat%>");
+        return;
+    }
+
+    if(a.idx>1){
+        for(var r=1;r<a.idx;r++){
+            var priValue = Number($("#ringTab tr:eq("+r+") td:nth-child(3)").text().replace(/-/g,""));
+            var secValue = Number($("#ringTab tr:eq("+r+") td:nth-child(4)").text().replace(/-/g,""));
+            if((Number(a.primary_port.replace(/-/g,""))==priValue)||(Number(a.primary_port.replace(/-/g,""))==secValue)
+                    || Number((a.secondary_port.replace(/-/g,""))==priValue)|| Number((a.secondary_port.replace(/-/g,""))==secValue)){
+                alert("<%:port repeat, please reset%>");
+                $("#ring_primaryPort").focus();
+                return;
+            }
+        }
+    }
+
+    a.priority = $("#ring_priority").val();
+    a.admin = $("#ring_admin").val();
+ //   console.log(JSON.stringify(a));
+
+    XHR.get('<%=REQUEST_URI%>',{ "setRing": JSON.stringify(a)},
+            function(x,rv)
+            {
+//                alert(JSON.stringify(rv));
+                if(rv.ret == "-1"){
+                    alert("<%:Configuration failed%>");
+                }else if(rv.ret == "0"){
+                    alert("<%:Succesfully configured%>");
+                    empSel();
+                    window.location.reload();
+                }
+            }
+           );
+}
+//清空ring所配置选项
+function empSel(){
+    $("#ring_id").val(" "); //已填写input
+    $("#ring_primaryPort").val(" ");
+    $("#ring_secondaryPort").val(" ");
+    $("#ring_priority").val(1);
+    $("#ring_admin").val(2);
+}
+function delRing(){
+    var a = JSON.parse("{\"idx\":\"\"}");
+
+    var chkObj = document.getElementsByName("chkArr");
+    
+    var tabObj = document.getElementById("ringTab");
+    var rowsNum = tabObj.rows.length;
+
+    for(var k = 0; k < chkObj.length; k++){
+        if (chkObj[k].checked) {
+             a.idx = k+1;
+             XHR.get('<%=REQUEST_URI%>',{ "clear": JSON.stringify(a)},
+                     function(x,rv)
+                     {
+                         if(rv.ret == "-1"){
+                             alert("<%:delete failed%>");
+                             window.location.reload();
+                             return ;
+                         }
+
+                     }
+                    );
+             var del = $("#ring_idx>option[value='"+(k+1)+"']");
+             del.next().length == 0 ? $("#ring_idx")[0].selectedIndex = -1 : del.next()[0].selected = true;
+             del.remove();
+             var del2 = $("#topo_idx>option[value='"+(k+1)+"']");
+             del2.next().length == 0 ? $("#topo_idx")[0].selectedIndex = -1 : del2.next()[0].selected = true;
+             del2.remove();
+
+            tabObj.deleteRow(k+1);
+            k = -1;
+        };
+    }
+    //序号重新排列
+    var newObj=document.getElementById("ringTab");
+    var curRows = newObj.rows.length;  //获取当前行数
+    for(var n=0;n<(curRows-1);n++){
+        document.getElementsByName("idx")[n].value = n+1;
+    }
+    alert("删除成功");
+}
+function modRing(){
+    var cheObj = $("[name=chkArr]:checked");
+    if (cheObj.length==0) {
+        alert("<%:Please select a group to modify%>");
+        return;
+    }else if(cheObj.length>1){
+        alert("<%:Does not support batch change, please select a set to modify%>");
+        return;
+    }else{
+        if(confirm("<%:the existing configuration changes, can only be deleted after reconfiguration. Sure you want to continue to modify?%>")){
+            var n = cheObj.next().val();
+            var tdObj = $("#ringTab tr:eq("+n+")").find("td");
+
+
+            $("#ring_id").val( $(tdObj[1]).text().replace("ring"," ") );
+            $("#ring_primaryPort").val( $(tdObj[2]).text() );
+            $("#ring_secondaryPort").val( $(tdObj[3]).text() );
+            
+            var levelObj = ["LOW","MID","HIGH"];
+            for(i = 0; i<levelObj.length; i++){
+                if($(tdObj[4]).text() == levelObj[i]){
+                    $("#ring_priority").val(i+1);
+                }
+            }
+            var modeObj = ["<%:Enable%>","<%:Disable%>"];
+            for(i = 0; i<modeObj.length; i++){
+                if($(tdObj[5]).text() == modeObj[i]){
+                    $("#ring_admin").val(i+1 );
+                }
+            }
+
+            $("#ring_id").focus();
+            delRing();
+            console.log(tdObj[0])
+
+        }
+    }
+}
+
+$(document).ready(function(){
+    var modeObj = ["<%:Enable%>","<%:Disable%>"];
+    var levelObj = ["LOW","MID","HIGH"];
+    var mode_status = <%=modeVal%>;
+    document.getElementById("ringMode").selectedIndex = mode_status-1;
+    if(mode_status == "1"){
+        var ringRcv = <%=luci.json.encode(status)%>;
+        var num = <%=tonumber(numVal)%>;
+
+        var tabObj = document.getElementById("ringTab");//获取添加数据的表格
+    //    alert(JSON.stringify(ringRcv));
+
+        if(num > 0){
+            for(n=1;n<=num;n++){
+
+                var rowsNum = tabObj.rows.length;  //获取当前行数
+                var myNewRow = tabObj.insertRow(rowsNum);//插入新行
+                var newTdObj1=myNewRow.insertCell(0);
+                newTdObj1.innerHTML= "<input type='checkbox' name='chkArr' id="+ ('chkArr'+n) +" > \
+                                      <input type='text' name='idx' style='width:30px;text-align: center' readonly='true'  value='"+n+"' >";
+                var newTdObj2=myNewRow.insertCell(1);
+                newTdObj2.innerHTML=ringRcv[n-1]["ret"][0]["idx-"+n][0].ring_name;
+                var newTdObj3=myNewRow.insertCell(2);
+                newTdObj3.innerHTML= ringRcv[n-1]["ret"][0]["idx-"+n][1].primary_port;
+                var newTdObj4=myNewRow.insertCell(3);
+                newTdObj4.innerHTML=ringRcv[n-1]["ret"][0]["idx-"+n][2].secondary_port;
+                var newTdObj5=myNewRow.insertCell(4);
+                newTdObj5.innerHTML= levelObj[ringRcv[n-1]["ret"][0]["idx-"+n][3].priority-1];
+                var newTdObj6=myNewRow.insertCell(5);
+                newTdObj6.innerHTML= modeObj[ringRcv[n-1]["ret"][0]["idx-"+n][4].admin-1];
+                
+                //页面启动时在拓扑显示栏增加环ID
+                $("#ring_idx").append("<option value='"+(n+1)+"'>"+ringRcv[n-1]['ret'][0]['idx-'+n][0].ring_name+"</option>");
+                $("#ring_idx").val(n+1);
+                $("#topo_idx").append("<option value='"+(n+1)+"'>"+ringRcv[n-1]['ret'][0]['idx-'+n][0].ring_name+"</option>");
+                $("#topo_idx").val(n+1);
+            }
+        }
+        $("#topoTab").hide();  
+    }
+    else if(mode_status == "2"){
+        $("#ableConfig").hide();  
+    }
+
+    $("#ringMode").change(function(){
+        if (this.value == 1) {
+            if(confirm("<%:are you sure you want to switch configuration?%>")){
+                //异步提交数据
+                XHR.get('<%=REQUEST_URI%>',{"setMode": "1"}, 
+                        function(x,rv) {
+                            //        alert(JSON.stringify(rv));
+                            if(rv.ret == "-1"){
+                                alert("<%:switch failure%>");
+                                return ;
+                            }
+                            else if(rv.ret == "0"){
+                                alert("<%:successfully switch%>");
+                                $("#ableConfig").show();
+                                window.location.reload();
+                            }
+                        }
+                       );
+            }
+        }else{
+            if(confirm("<%:are you sure you want to switch configuration?%>")){
+                //异步提交数据
+                XHR.get('<%=REQUEST_URI%>',{"setMode": "2"}, 
+                        function(x,rv) {
+                            //  alert(JSON.stringify(rv));
+                            if(rv.ret == "-1"){
+                                alert("<%:switch failure%>");
+                                return ;
+                            }
+                            else if(rv.ret == "0"){
+                                alert("<%:successfully switch%>");
+                                $("#ableConfig").hide();
+                            }
+                        }
+                       );
+            }
+        }
+    });
+})
+
+</script>
+
+<div class="ring"  id = "ringconfig" >
+    <fieldset class="lldp-section">
+        <legend><%:Use ring%></legend>
+
+        <table>
+            <tr>
+                <th style="text-align:left"><%:Ring configuration mode :%>
+                    <select id="ringMode">
+                        <option value="1"><%:Enable%></option>
+                        <option value="2"><%:Disable%></option>
+                    </select>
+                </th>
+            </tr>
+        </table>
+
+    </fieldset>
+
+    <div id="ableConfig">
+        <fieldset>
+            <legend><%:Ring information display%></legend>
+                <table id="ringTab">
+                    <tr>
+                        <th><%:serial number%></th>
+                        <th><%:ring ID%></th>
+                        <th><%:main port%></th>
+                        <th><%:deputy port%></th>
+                        <th><%:priority%></th>
+                        <th><%:status%></th>
+                    </tr>
+                </table>
+
+                <div class="cbi-button-grow">
+                    <td><input type="button" name="ok" value="<%:Add%>" class="cbi-button cbi-button-add" onclick="addRing()"></td>
+                    <td><input type="button" name="ok" value="<%:Edit%>" class="cbi-button cbi-input-remove" onclick="modRing()"></td>
+                    <td><input type="submit" name="ok" value="<%:Delete%>" class="cbi-button cbi-button-remove" onclick="delRing()"></td>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend><%:Ring configuration%></legend>
+                <table class="info-section-table" id="">
+                     <tbody>
+                        <tr>
+                            <th>
+                                <%:ring ID%>
+                            </th>
+                            <td>
+                                <div class="input-group">
+                                    <div class="input-group-addon">ring</div>
+                                    <input type="text" class="form-control" id="ring_id" />
+                                </div>
+                            </td>
+                        </tr> 
+                        <tr>
+                            <th><%:main port%></th>
+                            <td>
+                                <input type="text" id="ring_primaryPort" value="">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><%:deputy port%></th>
+                            <td>
+                                <input type="text" id="ring_secondaryPort" value="">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><%:priority%></th>
+                            <td>
+                                <select id="ring_priority" style = "width:138px">
+                                    <option value="1"><%:LOW%></option>
+                                    <option value="2"><%:MID%></option>
+                                    <option value="3"><%:HIGH%></option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><%:status%></th>
+                            <td>
+                                <select id="ring_admin" style = "width:138px">
+                                    <option value="1"><%:Enable%></option>
+                                    <option value="2"><%:Disable%></option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2"><input type="button" class="cbi-button cbi-input-apply" name="ok" value="<%:Apply%>" onclick="setRing()"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </fieldset>
+            <fieldset>
+                <legend><%:环网拓扑显示%></legend>
+                <table class="tableThree">
+                    <thead >
+                        <tr>
+                            <th><%:ring ID%></th>
+                            <th><%:operation%></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="wrapper">
+                                    <select id="ring_idx" style="width:5rem"></select>
+                                </div>
+                            </td>
+                            <td>
+                                <input type="radio" name="operation" value="1" checked/>&nbsp;<%:显示%>&nbsp;&nbsp;&nbsp;
+                                <input type="radio" name="operation" value="2" />&nbsp;<%:隐藏%>&nbsp;&nbsp;&nbsp;
+                            </td>
+                            <td><input type="button" name="ok" value="<%:Apply%>" class="cbi-button cbi-input-apply" onclick="getTopo()"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br />
+                <br />
+                <table id="topoTab">
+                    <tr>
+                        <th><%:NodeId%></th>
+                        <th><%:RingState%></th>
+                        <th><%:RingMode%></th>
+                        <th><%:Status%></th>
+                        <th><%:NodeRole%></th>
+                        <th><%:MasterId%></th>
+                        <th><%:PrimaryPort[Stp*Neighber]%></th>
+                        <th><%:SecondPort[Stp*Neighber]%></th>
+                    </tr>
+                </table>
+            </fieldset>
+            <fieldset>
+                <legend><%:环网拓扑设置%></legend>
+                <table class="tableThree">
+                    <thead >
+                        <tr>
+                            <th><%:ring ID%></th>
+                            <th><%:operation%></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="wrapper">
+                                    <select id="topo_idx" style="width:5rem"></select>
+                                </div>
+                            </td>
+                            <td>
+                                <input type="radio" name="setoperation" value="1" checked/>&nbsp;<%:Enable%>&nbsp;&nbsp;&nbsp;
+                                <input type="radio" name="setoperation" value="0" />&nbsp;<%:Disable%>&nbsp;&nbsp;&nbsp;
+                            </td>
+                            <td><input type="button" name="ok" value="<%:Apply%>" class="cbi-button cbi-input-apply" onclick="setTopo()"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </fieldset>
+    </div>
+    
+
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

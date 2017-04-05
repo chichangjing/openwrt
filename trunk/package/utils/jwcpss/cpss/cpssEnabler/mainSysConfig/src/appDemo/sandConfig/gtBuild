@@ -1,0 +1,21 @@
+
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+
+ifeq (EXISTS, $(PM_FAMILY))
+  EXMXPM_FAMILY = EXIST
+  C_EXCLUDE_FILE_LIST = dune_stubs.c
+endif
+
+ifneq (DUNE, $(XBAR_VENDOR))
+  C_EXCLUDE_FILE_LIST = ALL
+endif
+ 
+LIB_NAME = appDemoFap20mConfig.lib
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake
+

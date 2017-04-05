@@ -1,0 +1,27 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+LUA_SRCPATH=$(CURDIR)/lua/lua-5.1/src
+export LUA_SRCPATH
+CMD_LUA=yes
+export CMD_LUA
+#CMD_LUA_CLI=yes
+#export CMD_LUA_CLI
+CMD_FS=yes
+export CMD_FS
+CMDFS_NIX=yes
+export CMDFS_NIX
+LUACLI_STANDALONE_BUILD=yes
+export LUACLI_STANDALONE_BUILD
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

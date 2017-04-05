@@ -1,0 +1,40 @@
+M       tools/build/toolkit/marvell_v7sftDefs.mk  一直做动态连结 
+M       tools/build/toolkit/marvell_v7sft.sh   修改工具链的名称
+M       tools/build/cpu/MSYS.sh                修改工具链的名称
+M       tools/build/os/Linux_build_lsp.sh      修改编译动作，不做kernel 代码的覆盖，只编译应用程序
+M       mainPpDrv/h/cpss/generic/cpssTypes.h   添加CHX_FAMILY
+M       cpssEnabler/mainExtDrv/src/gtExtDrv/genericLinuxDrv/genDrvRawSocketMvMux.c  修改对头文件的使用？？
+M       cpssEnabler/mainOs/src/gtStack/linux/osLinuxSocket.c                        屏蔽<arpa/inet.h>文件
+M       cpssEnabler/mainOs/src/gtOs/linux/kernelExt/ke_lkernelLib.c                 修改以适用openwrt的架构，不会堵塞调用进程
+M       cpssEnabler/mainOs/src/gtOs/linux/kernelExt/ke_ltaskLib.c                   使得编译能够通过
+M       cpssEnabler/mainOs/src/gtOs/linux/pthreads/lkernelLib.c                     修改以适用openwrt的架构，不会堵塞调用进程
+M       cpssEnabler/mainOs/src/gtOs/linux/pthreads/ltaskLib.c                       使得编译能够通过
+!       cpssEnabler/mainSysConfig/h/appDemo/obcpServer                              已经不需要
+!       cpssEnabler/mainSysConfig/src/appDemo/obcpServer                            已经不需要
+M       cpssEnabler/mainSysConfig/src/appDemo/boardConfig/appDemoBoardConfig.c      使得编译能够通过
+M       cpssEnabler/mainSysConfig/src/appDemo/boardConfig/gtRd_xCat_24GE_4HGS.c     不知道为什么屏蔽掉
+M       cpssEnabler/mainSysConfig/src/appDemo/boardConfig/dxFamilyBoards.c          屏蔽掉一些多余的板型
+M       cpssEnabler/mainSysConfig/src/appDemo/boardConfig/gtBuild                   屏蔽掉一些多余的板型，但由于相互牵扯，所以不能干净
+M       cpssEnabler/mainSysConfig/src/appDemo/confi/confi2.c                        使得编译能够通过
+M       cpssEnabler/mainSysConfig/src/appDemo/entryPoints/linux/main.c              程序入口，肯定需要修改
+M       cpssEnabler/mainSysConfig/src/appDemo/sysHwConfig/gtAppInit.c               程序入口，肯定需要修改
+M       cpssEnabler/mainSysConfig/src/appDemo/sysHwConfig/gtAppDemoDxSysConfig.c    增加了vlan1的绑定以及为了编译的通过
+M       cpssEnabler/mainSysConfig/src/appDemo/userExit/userEventHandler.c           使得编译能够通过
+M       sharedMemMakefile.mk                                                        目前主要屏蔽了mainGaltisWrapper
+M       Makefile                                                                    做一些屏蔽为主
+!       luaCLI_standalone/gtTopMake                                                 有gtTopMake的时候，会进行lua的编译
+M       luaCLI_standalone/src/app/cmdStreamSerial.c                                 为了让输出显示
+M       luaCLI_standalone/src/FS/gtBuild                                            为了使用文件系统的lua脚本
+M       luaCLI_standalone/src/FS/cmdFS_NIX.c                                        使得文件系统的lua脚本可以使用
+M       luaCLI_standalone/src/gtBuild                                               为了使用文件系统的lua脚本
+M       mainExtUtils/h/extUtils/FS/genFS.h                                          为了使用文件系统编译通过
+M       mainExtUtils/src/extUtils/osNetworkStack/osNetworkStack.c                   修改为以port为控制单位
+M       mainExtUtils/src/extUtils/osNetworkStack/prvOsNetworkStackLinux.c           修改为以port为控制单位
+M       mainExtUtils/src/extUtils/trafficEngine/tgfTrafficGenerator.c               对prvTgfDxChNetIfParamSet进行修改，以过滤某些mac                                 
+M       cpssCommon.mk                                                               去掉libcontrol.a / libkits.a的引用
+
+fixme:
+1.SWITCH_MAX_PORT 需要合理设置，与外部想结合，初步通过startengine来传入参数
+2.luaCLI_standalone 作为调试lua sample的手段，其的编译和目标libcpss的编译不能兼容，所以其需要额外操作，这个是否可以用编译选项来控制
+3.osNetworkStack 涉及到协议包的处理，需要进一步完善
+4.进程间消息传递的接口封装lib，以方便管理

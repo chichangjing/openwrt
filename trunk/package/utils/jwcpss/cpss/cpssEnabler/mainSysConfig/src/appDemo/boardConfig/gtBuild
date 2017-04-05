@@ -1,0 +1,165 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+
+######################
+## CPSS FAMILY TYPE ##
+######################
+ifeq (EXISTS, $(EX_FAMILY))
+  EXMX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(TG_FAMILY))
+  EXMX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(TD_FAMILY))
+  EXMX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(CHX_FAMILY))
+  DX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(SAL_FAMILY))
+  DX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(PM_FAMILY))
+  EXMXPM_FAMILY = EXIST
+endif
+ifeq (RHODES, $(FPGA_TYPE))
+  FPGA_FAMILY = EXIST
+endif
+
+### ----- CPSS (place new boards here):
+
+DX_BOARDS =                      \
+    dxFamilyBoards.c             \
+	gtRd_xCat_24GE_4HGS.c        \
+    gtDbDxBobkQsgmiiAutoNegTask.c\
+    gtDbDxBobcat2Utils.c         \
+    gtDbDxBobcat2PhyConfig.c     \
+    gtDbDxBobcat2.c              \
+    gtDbDxBobcat2Mappings.c      \
+    gtDbDxBobcat2Ap.c		\
+        
+        
+#   gtDbDx270_24G3XGConfig.c     \
+    gtDbDx285_24G4XGConfig.c     \
+    gtDbDx10610G.c               \
+    gtDbDx246_24G3XGConfig.c     \
+    gtRdDx246_24GConfig.c        \
+    gtRdDx270_48G2XGConfig.c     \
+    gtRd_DX3_48GE_4HGS.c         \
+    gtRd_xCat_24GE_4HGS.c        \
+    gtDbDxLion_ForMultiCoreFdbLookup.c \
+    gtDbDxLion2_ForMultiCoreFdbLookup.c \
+    gtDbDxLion48XG.c             \
+    gtDbDxLion2_96XG.c           \
+    gtLion2PortPizzaArbiterProfile_360MHz_4x10G_3x40G_30slices.c \
+    gtDbDxLion3_96XG.c           \
+    appDemoLion2TrunkWa.c        \
+    gtDbDxBobcat2_X6.c           \
+    gtDbDxBobcat2.c              \
+    gtDbDxBobcat2Ap.c		\
+    gtDbDxBobcat2PhyConfig.c     \
+    gtDbDxBobcat2Mappings.c      \
+    gtDbDxBobcat2Utils.c         \
+    gtDbDxBobcat2UtilsSimClock.c \
+    gtDbDxLion2_usefulStart.c    \
+    gtDbDxBobcat2_usefulStart.c  \
+    gtDbDxBobkCetus_usefulStart.c\
+    gtDbDxBobkUtils.c            \
+    gtDbDxBobkQsgmiiAutoNegTask.c\
+    gtDbDxLion2_X2_Bobcat2.c
+
+#### Dune with DX PP boards
+DUNE_DX_BOARDS =                 \
+    dxFamilyBoards.c             \
+    gtRd_DX3_48GE_4HGS.c         \
+    gtRdDx246_24GConfig.c        \
+    gtDbFx950_DX3_Config.c
+
+### next file lists the files for "cpssInitSystem" for ExMx (and also fpr ExMxPm)
+EXMX_BOARDS_FILE  =              \
+    exFamilyBoards.c
+
+EXMX_BOARDS  =                   \
+    gtDbFx910Ex120Config.c       \
+    gtDbEx126_12GsConfig.c       \
+    gtDbDX13xXGConfig.c          \
+    gtRdFx910Mx61048F4GsConfig.c \
+    gtRdEx120D0_24GConfig.c      \
+    gtDbEx106Ex108Config.c       \
+    gtDbFx910Mx615Config.c       \
+    gtDbFx910Fx9210Ex120Config.c
+
+FPGA_BOARDS  =                   \
+    gtDbRhodes_2_FX915.c \
+    noPpBoards.c
+
+EXMXPM_BOARDS  =                 \
+    gtDb98Ex240Config.c          \
+    gtDb98ExMxPm3Config.c
+
+EXMXPM_DX_VB_BOARDS  =           \
+    gtDb98Ex240_3Dx246Config.c   \
+    gtDb98Ex240_Lion48XGConfig.c \
+    gtDbDxLion48XG.c             \
+    gtRd_xCat_24GE_4HGS.c        \
+    dxChVbMuxConfig.c
+
+DUNE_EXMXPM_BOARDS =            \
+    gtDbFx950_Ex240_Config.c \
+    gtDb98Ex240Config.c \
+    gtDbFx9130_Config.c
+
+
+ifeq (EXIST, $(DX_FAMILY))
+    C_FILE_LIST = $(DX_BOARDS)
+endif
+
+ifeq (EXIST, $(EXMX_FAMILY))
+    C_FILE_LIST = $(EXMX_BOARDS) $(EXMX_BOARDS_FILE)
+endif
+
+
+ifeq (EXIST, $(EXMXPM_FAMILY))
+    C_FILE_LIST = $(EXMXPM_BOARDS) $(EXMX_BOARDS_FILE)
+    ifeq (EXIST, $(DX_FAMILY))
+        C_FILE_LIST += $(EXMXPM_DX_VB_BOARDS)
+    endif
+endif
+
+## for DUNE -- OVERRIDE ALL PREVIOUS SETTINGS !!!
+ifeq (DUNE, $(XBAR_VENDOR))
+ifeq (EXIST, $(DX_FAMILY))
+    C_FILE_LIST = $(DUNE_DX_BOARDS)
+endif
+ifeq (EXIST, $(EXMXPM_FAMILY))
+    C_FILE_LIST = $(DUNE_EXMXPM_BOARDS) $(EXMX_BOARDS_FILE)
+endif
+endif
+
+ifeq (YES, $(INCLUDE_UTF))
+  C_FILE_LIST += appDemoBoardConfig.c appDemoCfgMisc.c TgServerService.c
+else
+  C_FILE_LIST += appDemoBoardConfig.c appDemoCfgMisc.c
+endif 
+
+ifeq (EXIST, $(FPGA_FAMILY))
+ C_FILE_LIST += $(FPGA_BOARDS)
+endif
+
+ifeq (yes,$(CMD_LUA_CLI))
+    AD_CFLAGS += $(FD)CMD_LUA_CLI
+endif
+
+LIB_NAME = mainSysConfig.lib
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

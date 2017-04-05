@@ -1,0 +1,189 @@
+###########################################
+##                                       ##
+##    Top Make file for CPSS mainApp     ##
+##                                       ##
+###########################################
+
+PROJ_NAME = cpssEnabler
+
+include $(USER_BASE)/gtDefsTopMake.mk
+
+PROJECT_PATH =  $(OS_INCLUDE)       \
+                $(OS_PATH)          \
+                $(SYSCONFIG_PATH)   \
+                $(COMMON_PATH)      \
+                $(PP_DRV_PATH)      \
+                $(EXT_DRV_PATH)     \
+                $(EXT_MAC_PATH)     \
+                $(EXT_UTILS_PATH)   \
+                $(FA_DRV_PATH)      \
+                $(XBAR_DRV_PATH)    \
+                $(DUNE_DRV_PATH)    \
+                $(UTFTOOL_PATH)     \
+                $(CMD_PATH)         \
+                $(FPGA_PATH)        \
+                $(GALTIS_PATH)      \
+                $(FPGA_COMMON_PATH) \
+                $(UTFTRAFFIC_PATH)
+
+#add Dune path
+ifeq (DUNE,$(XBAR_VENDOR))
+PROJECT_PATH += $(DUNE_DRV_PATH)
+endif
+
+PROJECT_DEFS += ENV_MAINCMD
+
+ifeq (EXISTS, $(CHX_FAMILY))
+AD_CFLAGS += $(FD)CHX_FAMILY
+AD_CFLAGS += $(FD)CONFIG_DDR3
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/h$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/port/gop/h$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/port/gop/h/port$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/ddr/ddr3libv2/h/Driver$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/ddr/ddr3libv2/h/Driver/ddr3$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/ddr/ddr3libv2/h/Silicon$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/ddr/bap/h$(FIE)
+ifneq (i386, $(CPU))
+PROJECT_PATH += $(FIS)$(SW_ROOT)/cpssEnabler/mainSysConfig/src/appDemo/phy$(FIE)
+endif
+endif
+
+ifeq (EXISTS, $(PM_FAMILY))
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/h/cpss/generic/port/private/portHwConfig$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/h/cpss/generic/port/private/portHwConfig/port$(FIE)
+endif
+
+###############
+## DRAGONITE ##
+###############
+ifeq (A1, $(DRAGONITE_TYPE))
+ PROJECT_PATH += $(EXT_DRV_SIM_DRAGONITE_PATH)
+endif
+
+ifeq (workbench, $(TOOL_ENV))
+ AD_CFLAGS += $(FD)WORKBENCH_TOOL_ENV
+ PROJECT_PATH += $(WORKBENCH_TOOL_INCLUDE)
+endif
+
+ifeq (EXISTS,$(GALTIS_NO_APP_DEMO))
+  # compile mainCmd and take only stub for 'appDemo'
+  AD_CFLAGS += $(FD)GALTIS_NO_APP_DEMO
+endif
+
+ifeq (EXISTS,$(RTOS_ON_SIM))
+  PROJECT_PATH += $(SIMULATION_PATH)
+endif
+
+##############
+## CPSS PP  ##
+##############
+
+# check if need to use 'GM_USED'.
+#needed when 'force' image to use GM.
+#also needed for Puma2,3 where use always GM. (for simulation)
+ifeq (EXISTS, $(FORCE_GM_USE))
+  AD_CFLAGS += $(FD)GM_USED
+else
+  ifeq (EXISTS, $(PM_FAMILY))
+    ifeq (EXISTS, $(ASIC_SIMULATION))
+      AD_CFLAGS += $(FD)GM_USED
+    endif
+  endif
+endif
+
+##################################
+##      Double Word Flag        ##
+## Used for PUMA's LPM with PQ3 ##
+##################################
+ifeq ($(CPU), PPC85XX)
+ifeq (VXWORKS,$(OS_RUN))
+ifeq (EXISTS, $(PM_FAMILY))
+AD_CFLAGS += -DUSE_PUMA_LPM_DWORD
+endif
+endif
+endif
+
+##########
+## Fpga ##
+##########
+ifeq (RHODES, $(FPGA_TYPE))
+AD_CFLAGS += $(FD)IMPL_FPGA
+endif
+
+########################
+## CPSS MODULES FLAGS ##
+########################
+
+#L2
+AD_CFLAGS += $(FD)IMPL_BRIDGE $(FD)IMPL_MIRROR $(FD)IMPL_NETIF $(FD)IMPL_PCL $(FD)IMPL_PHY
+AD_CFLAGS += $(FD)IMPL_I2C $(FD)IMPL_POLICER $(FD)IMPL_PORT $(FD)IMPL_TRUNK $(FD)IMPL_TUNNEL $(FD)IMPL_TCAM
+
+#L3
+AD_CFLAGS += $(FD)IMPL_IP
+
+
+#################
+## DEBUG FLAGS ##
+#################
+ifdef PRESTERA_DEBUG
+CDEBUG = $(FD)PRESTERA_DEBUG
+endif
+
+ifeq (DEBUG_ON, $(CPSS_DEBUG))
+ifeq (DEBUG_ON, $(CPSS_DEBUG_VLAN))
+CDEBUG += $(FD)GT_VLAN_DEBUG
+endif
+ifeq (DEBUG_ON, $(CPSS_DEBUG_FDB))
+CDEBUG += $(FD)GT_MAC_DEBUG
+endif
+ifeq (DEBUG_ON, $(CPSS_DEBUG_TRUNK))
+CDEBUG += $(FD)GT_TRUNK_DEBUG
+endif
+ifeq (DEBUG_ON, $(CPSS_DEBUG_FDB_DUMP))
+CDEBUG += $(FD)GT_MAC_DEBUG_DUMP
+endif
+ifeq (DEBUG_ON, $(CPSS_DEBUG_IPV4))
+CDEBUG += $(FD)GT_DEBUG_IPV4
+endif
+ifeq (DEBUG_ON, $(CPSS_DEBUG_IPV6))
+CDEBUG += $(FD)GT_DEBUG_IPV6
+endif
+ifeq (DEBUG_ON, $(CPSS_DEBUG_PCL))
+CDEBUG += -DGT_DEBUG_PCL
+endif
+ifeq (DEBUG_ON, $(CPSS_DEBUG_TCM))
+CDEBUG += $(FD)GT_DEBUG_TCM
+endif
+endif
+
+
+##################
+## GALTIS FLAGS ##
+##################
+ifneq (EXCLUDE_LIB, $(EXCLUDE_GALTIS))
+  AD_CFLAGS += $(FD)IMPL_GALTIS
+endif
+
+
+include $(USER_BASE)/gtTargetsTopMake.mk
+
+############
+## CFLAGS ##
+############
+CFLAGS += $(CFLAGS1) $(CFLAGS2) $(CFLAGS_OPT) $(OS_DEFINE) $(CPU_FLAGS) $(LFLAGS) $(AD_CFLAGS) $(CDEBUG)
+
+#include $(USER_BASE)/gtTargetsTopMake.mk
+
+
+##
+## cpssEnabler compile/no compile
+##
+ifeq (linux_NO_CPSS_ENABLER,$(OS_RUN)_$(LINUX_CPSS_TARGET))
+full:
+else
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+full: lib
+else
+full: elf
+endif
+endif

@@ -1,0 +1,52 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+#Note Linux simulation uses regular init
+ifeq (win32, $(OS_RUN))
+    C_EXCLUDE_FILE_LIST = userInitCmdDb.c
+else
+    C_EXCLUDE_FILE_LIST = initDbUserExit.c
+endif
+
+ifneq (,$(wildcard $(USER_BASE)/cpssEnabler))
+C_EXCLUDE_FILE_LIST += cmdMultiTapi.c
+endif
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+	LIB_NAME = mainCmd.lib
+endif
+
+SUBDIRS = NONE
+
+##############################################################
+# LUA DEFS
+##############################################################
+
+# The following LUA options are supported:
+# ------------------------------------
+# Basic cmdLua:
+#   defines:            CMD_LUA_CLI
+#
+# Galtis Wrappers
+#   defines:            CMD_LUA_GALTIS
+#   file affected:
+#
+ifeq (yes,$(CMD_LUA_CLI))
+    AD_CFLAGS += $(FD)CMD_LUA_CLI
+    #AD_CFLAGS += $(FD)CMD_LUA_GALTIS
+    #INCLUDE_PATH += $(FIS)$(LUA_SRCPATH)$(FIE)
+endif
+ifeq (yes,$(CMD_FS))
+    AD_CFLAGS += $(FD)CMD_FS
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

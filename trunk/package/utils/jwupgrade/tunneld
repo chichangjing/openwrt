@@ -1,0 +1,45 @@
+
+config admin admin
+    option tunneld off
+
+config network network
+    option mode tcp_server
+    option tcpServerIp   192.168.9.57
+    option udpLocalPort  3720 
+    option udpRemoteIp   192.168.9.57 
+    option udpRemotePort 3720
+    option MulLocalPort  8001 
+    option MulRemoteIp   228.228.228.228
+    option MulRemotePort 8002
+
+config com com1
+    option status off
+    option mode RS232
+    option baudrate 115200
+    option bytesize 8
+    option parity   N
+    option stopbit  1
+
+config com com2
+    option status off
+    option mode RS232
+    option baudrate 115200
+    option bytesize 8
+    option parity   N
+    option stopbit  1
+
+config com com3
+    option status off
+    option mode RS232
+    option baudrate 115200
+    option bytesize 8
+    option parity   N
+    option stopbit  1
+
+config com com4
+    option status off
+    option mode RS232
+    option baudrate 115200
+    option bytesize 8
+    option parity   N
+    option stopbit  1

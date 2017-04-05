@@ -1,0 +1,555 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+
+<%
+    local ubus = require "luci.ubus"
+    local portNum = ubus.getPortNum()
+    
+    --获得设置老化时间应用
+    local timeJson = luci.http.formvalue("agingTime")
+    if timeJson then
+        local setTimeJson = luci.json.decode(timeJson)
+        local setTimeArr = {["aging_time"] = setTimeJson.aging_time}
+        
+        local setTimeStatus = ubus.set_args("fdb","fdb_set", setTimeArr, 2)
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setTimeStatus)
+
+        return
+    end
+
+    --获得设置成员端口应用
+    local portJson = luci.http.formvalue("setPort")
+    if portJson then
+        local setPortJson = luci.json.decode(portJson)
+        local pVal = string.format("port-%s",setPortJson.port)
+        local setPortArr = {[pVal]={{["status"] = setPortJson.status}}}
+        
+        local setPortStatus = ubus.set_args("fdb","fdb_set", setPortArr, 2)
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setPortStatus)
+
+        return
+    end
+
+    --获得设置安全地址应用
+    local fdbJson = luci.http.formvalue("setFdb")
+    if fdbJson then
+        local setFdbJson = luci.json.decode(fdbJson)
+        local pVal = string.format("idx-%s",setFdbJson.idx)
+        local setFdbArr = {[pVal]={{["port"] = setFdbJson.port},{["mac_address"] = setFdbJson.mac_address}}}
+        
+        local setFdbStatus = ubus.set_args("fdb","fdb_set", setFdbArr, 2)
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setFdbStatus)
+
+        return
+    end
+
+    --获得删除安全地址应用
+    local delJson = luci.http.formvalue("delRow")
+    if delJson then
+        local delRowJson = luci.json.decode(delJson)
+        local idxVal = string.format("idx-%s",delRowJson.idx)
+        
+        local delRowStatus = ubus.clear_args("fdb","fdb_clear",idxVal)
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(delRowStatus)
+
+        return
+    end
+
+    local typeStatus = ubus.getPortType(portNum)
+
+    --获得老化时间
+    local getTimeStatus = ubus.get_args("fdb","fdb_get",{"aging_time"}, 2)
+    local timeVal = getTimeStatus["ret"][1].aging_time
+
+    --获得成员端口
+    local portSnd = {}
+    for i=1,portNum do
+        local pa = string.format("port-%d",i)
+        portSnd[i]={[pa] = {"status"}}
+    end
+    local getPortStatus = ubus.get_args("fdb","fdb_get", portSnd, 1)
+
+    --获得安全端口列表
+    ----先获得num
+    local getNumStatus = ubus.get_args("fdb","fdb_get",{"entry_num"}, 2)
+    local numVal = getNumStatus["ret"][1].entry_num
+
+    ----再获得列表
+    local channel = {}
+    local chan = {"port","mac_address"}
+    local status ={}
+    if numVal ~=nil and tonumber(numVal) > 0  then
+        for i=1,tonumber(numVal) do
+            local pa = string.format("idx-%d",i)
+            channel[i]={[pa] = chan}
+        end
+        status = ubus.get_args("fdb", "fdb_get", channel, 1)
+    end
+
+%>
+
+
+
+<%+header%>
+<script type="text/javascript">
+    function isPositiveNum(s){//是否为正整数  
+        var re = /^[0-9]*[1-9][0-9]*$/ ;  
+        return re.test(s)  
+    } 
+    //mac地址的解析
+    function macFormCheck(mac){
+        var macs = new Array();
+        macs = mac.split("-");
+        if(macs.length != 6){
+            alert("<%:MAC address format is not correct,enter as xx-xx-xx-xx-xx-xx (xx for hexadecimal digits)!%>");
+            return false;
+        }
+        if((parseInt(macs[0],16) & 1) == 1){
+            alert("the two bit of the mac adress must be even");
+            return false;
+        }
+        for (var s=0; s<6; s++) {
+            var temp = parseInt(macs[s],16);
+            if(macs[s].length != 2)
+            {
+                alert("<%:MAC address format is not correct,enter as xx-xx-xx-xx-xx-xx (xx for hexadecimal digits)!%>");
+                return false; 
+            }
+            if(isNaN(temp))
+            {
+                alert("<%:MAC address format is not correct,enter as xx-xx-xx-xx-xx-xx (xx for hexadecimal digits)!%>");
+                return false;
+            }
+            if(temp < 0 || temp > 255){
+                alert("<%:MAC address format is not correct,enter as xx-xx-xx-xx-xx-xx (xx for hexadecimal digits)!%>");
+                return false;
+            }
+        }
+        return true;
+    }
+    //添加光标焦点
+    function addPort(the){
+        if($('#enable_port')[0].length){ //已有启用端口
+            $('#mac').focus();
+            return;
+        }
+        $('#port_id').attr("class","selfocus");
+        $(".tooltip").addClass("tooltipShow");
+    }
+    
+    //确认添加
+    function addRow(obj){
+        //在列表中增加新内容
+        var tabObj = document.getElementById("myTab");//获取添加数据的表格
+        // var rowsNum = tabObj.rows.length-1;  //获取当前行数
+
+        var myNewRow = tabObj.insertRow(obj.idx);//插入新行
+        myNewRow.insertCell(0).innerHTML = "<input type='checkbox' name='chkArr' />"+
+                                           "<input type='text' name='idx' readonly='true' style='width:30px' value=" + obj.idx + " />";
+        myNewRow.insertCell(1).innerHTML = obj.port;
+        myNewRow.insertCell(2).innerHTML = obj.mac_address; //$("#mac").val().replace(/\s/g,"")
+    }
+    //修改
+    function modPort(){
+        var cheObj = $("#myTab input:checked");
+        if(cheObj.length==0){
+            alert("<%:Please select a group to modify%>");
+            return;
+        }else if(cheObj.length>1){
+            alert("<%:Does not support batch change, please select a set to modify%>");
+            return;
+        }else{
+            if(confirm("<%:the existing configuration changes, can only be deleted after reconfiguration. Sure you want to continue to modify?%>"))
+            {
+                var port_num = cheObj.parent().next().text().replace(/[^0-9]/ig,"");
+                $("#enable_port").val(port_num);
+                $("#mac").val(cheObj.parent().next().next().text());
+                var truNum = cheObj.parent().next().next().next().children("[name=trustValue]").val();
+                $("#trustRole").val(truNum);
+                delRow();
+                $("#mac").focus();
+            }
+        }
+    }
+    //删除
+    function delRow(){
+        var a = JSON.parse("{\"idx\":\"\"}");
+        var chkObj=document.getElementsByName("chkArr");
+        var tabObj=document.getElementById("myTab");
+
+        var rowsNum = tabObj.rows.length;  //获取当前行数
+        var colsNum=tabObj.rows[0].cells.length;//获取行的列数
+
+        for(var k=0;k<chkObj.length;k++){
+            if(chkObj[k].checked){
+                a.idx = k+1;
+                //异步提交数据
+                XHR.get('<%=REQUEST_URI%>',{ "delRow": JSON.stringify(a)},
+                        function(x,rv)
+                        {
+                            if(rv.ret == "-1"){
+                                alert("<%:delete failed%>");
+                                window.location.reload();
+                                return;
+                            }
+                           // else{
+                           //     alert("删除成功");
+                           // }
+                        }
+                );
+                //页面删除行
+                tabObj.deleteRow(k+1);
+                k=-1;
+            }
+        }
+        //序号重新排列
+        var curRows = tabObj.rows.length;  //获取当前行数
+        for(var n=0;n<(curRows-2);n++){
+            document.getElementsByName("idx")[n].value = n+1;
+        }
+        alert("<%:delete success%>");
+    }
+
+    //设置老化时间
+    function setAgingTime(){
+        var a = JSON.parse("{\"aging_time\":\"\"}");
+        a.aging_time = $("#agingtime").val().replace(/\s/g,"");
+        if(!isPositiveNum(a.aging_time)){
+            alert("<%:请输入整数%>")
+            return
+        }
+
+        if(Number(a.aging_time)<15 || Number(a.aging_time) > 3600){
+            alert("<%:aging time should be set from 15 to 3600%>");
+            $('#agingtime').focus();
+            return;
+        }
+        //异步提交数据
+        XHR.get('<%=REQUEST_URI%>',{ "agingTime": JSON.stringify(a)},
+                function(x,rv)
+                {
+                    if(rv.ret == "-1"){
+                        alert("<%:Configuration failed%>");
+                        window.location.reload();
+                        return;
+                    }else{
+                        alert("<%:Succesfully configured%>");
+                    }
+                }
+               );
+
+    }
+    //设置成员端口
+    function setPort(){
+        $("#port_id").removeClass();//移除焦点
+        $(".tooltip").removeClass("tooltipShow");
+        
+        var selt = $("#port_id").find("option:selected").text(); //获取sel选中的文字
+        var selv = $("#port_id").val(); //获取sel选中的value
+
+        var radv = $('input[name="operation"]:checked').val();//获取是否使能
+        var len = $("#enable_port").find("option[value='"+selv+"']").length;     
+
+        var a = JSON.parse("{\"port\":\"\",\"status\":\"\"}");
+        a.port = selv;
+        a.status = radv;
+        console.log(JSON.stringify(a));
+        //异步提交数据
+        XHR.get('<%=REQUEST_URI%>',{ "setPort": JSON.stringify(a)},
+                function(x,rv)
+                {
+                    if(rv.ret == "-1"){
+                        alert("<%:Configuration failed%>");
+                        return;
+                    }else{
+                        if(radv == 1){ //使能
+                            if(len!= 0){
+                                alert("<%:this port is enabled,pleasr restart!%>");
+                                return;
+                            }
+                            $("#enable_port").append("<option value='"+selv+"'>"+selt+"</option>");
+                            $("#enable_port").val(selv);
+                            $('#mac').focus();
+                        }else{ //禁用
+                            if(len== 0){
+                                return;
+                            }
+                            var del = $("#enable_port>option[value='"+selv+"']");
+                            del.next().length == 0 ? $("#enable_port")[0].selectedIndex = -1 : del.next()[0].selected = true;
+                            del.remove();
+                        }
+                        alert("<%:Succesfully configured%>");
+                        window.location.reload();
+                    }
+                }
+                );   
+    }
+    //设置fdb参数
+    function setFdb(){
+        if(!$('#enable_port')[0].length){ //暂无启用端口
+            $('#port_id').attr("class","selfocus");
+            $(".tooltip").addClass("tooltipShow");
+            return;
+        }
+        //判断MAC地址
+        var rowsNum = $("#myTab tr").length;
+        var macValue = $("#mac").val().replace(/\s/g,"");
+        var enPortValue = $("#enable_port option:selected").text();
+        //alert(rowsNum);
+        if(!macFormCheck(macValue)){ //校验MAC
+            $('#mac').focus();
+            return;
+        }
+        
+        if(rowsNum>2){
+            for(var r=1;r<rowsNum;r++){
+                var cheValue = $("#myTab tr:eq("+r+") td:nth-child(3)").text().replace(/-/g,"");
+                var portValue = $("#myTab tr:eq("+r+") td:nth-child(2)").text().replace(/-/g,"");
+                if((macValue.replace(/-/g,"")==cheValue) && (enPortValue.replace(/-/g,"")==portValue)){
+                    alert("<%:mac address and port set error, please set again%>");
+                    $("#mac").focus();
+                    return;
+                }
+            }
+        }
+
+        var a = JSON.parse("{\"idx\":\"\",\"port\":\"\",\"mac_address\":\"\"}");
+        a.idx = $("#myTab tr").length-1;
+        a.port = $("#enable_port").val();
+        a.mac_address = macValue; 
+        console.log(JSON.stringify(a));
+        //异步提交数据
+        XHR.get('<%=REQUEST_URI%>',{ "setFdb": JSON.stringify(a)},
+                function(x,rv)
+                {
+                    if(rv.ret == "-1"){
+                        alert("<%:Configuration failed%>");
+                        window.location.reload();
+                        return;
+                    }else{
+                        alert("<%:Succesfully configured%>");
+                        var typeRcv = <%=luci.json.encode(typeStatus)%>;
+                        var portVal = a.port;
+                       // a.port = typeRcv[portVal-1].ret[0]["port-"+portVal][0].type == "4" ? "G"+(portVal):portVal;
+                        if(typeRcv[portVal-1].ret[0]["port-"+portVal][0].type == "4"){
+                            a.port = "G" + (portVal); 
+                        }
+                        else if(typeRcv[portVal-1].ret[0]["port-"+portVal][0].type == "2"){
+                            a.port = "F" + (portVal); 
+                        }
+                        else if(typeRcv[portVal-1].ret[0]["port-"+portVal][0].type == "5"){
+                            a.port = "C" + (portVal); 
+                        }
+                        else{
+                            a.port = (portVal);
+                        }
+                        addRow(a);
+                    }
+                }
+               );   
+    }
+
+    //页面显示
+    $(document).ready(function(){
+        $('#port_id').click(function(){
+            $(".tooltip").removeClass("tooltipShow");
+            this.removeAttribute("class");
+        });
+
+        var typeRcv = <%=luci.json.encode(typeStatus)%>;
+        setPortHTMLByName(typeRcv);
+        /*
+        // console.log(typeRcv)
+        $.each(typeRcv, function(i,val) {
+            var rcv = val.ret[0]["port-"+(i+1)];
+            if(rcv[0].type == "4"){
+                document.getElementById("port"+(i+1)).innerHTML = "G"+(i+1);
+            }
+            else if(rcv[0].type == "2"){
+                document.getElementById("port"+(i+1)).innerHTML = "F"+(i+1);
+            }
+        });
+        */
+
+        var time_status = '<%=timeVal%>';
+        $("#agingtime").val(time_status);
+        //启用端口列表
+        var port_status = <%=luci.json.encode(getPortStatus)%>;
+        for (var i = 0, len = port_status.length; i < len ; i++) {
+            var num = port_status[i].ret[0]["port-"+(i+1)][0].status;
+            if (num==1){
+                var n;
+                if(typeRcv[i].ret[0]["port-"+(i+1)][0].type == "4"){
+                    n = "G" + (i+1); 
+                }
+                else if(typeRcv[i].ret[0]["port-"+(i+1)][0].type == "2"){
+                    n = "F" + (i+1); 
+                }
+                else if(typeRcv[i].ret[0]["port-"+(i+1)][0].type == "5"){
+                    n = "C" + (i+1); 
+                }
+                else{
+                    n = (i + 1);
+                }
+                $("#enable_port").append("<option value='"+(i+1)+"'>"+n+"</option>");
+                $("#enable_port").val(i+1);
+            }else{continue};
+        }
+        //列表显示
+        var len = '<%=numVal%>';
+        if(len>0){
+            var rcv = <%=luci.json.encode(status)%>;
+            console.log(rcv);
+            for (var i = 0, len = rcv.length; i < len; i++) {
+                var obj = new Object();
+                //{idx: 1, port: "1", mac_address: "11-22-33-44-55-66"}
+                obj.idx = i+1;
+                var pval = rcv[i].ret[0]["idx-"+obj.idx][0].port;
+               
+                //obj.port = typeRcv[pval-1].ret[0]["port-"+pval][0].type == "4" ? "G"+(pval):pval;
+                if(typeRcv[pval-1].ret[0]["port-"+pval][0].type == "4"){
+                    obj.port = "G" + (pval); 
+                }
+                else if(typeRcv[pval-1].ret[0]["port-"+pval][0].type == "2"){
+                    obj.port = "F" + (pval); 
+                }
+                else if(typeRcv[pval-1].ret[0]["port-"+pval][0].type == "5"){
+                    obj.port = "C" + (pval); 
+                }
+                else{
+                    obj.port = (pval);
+                }
+                obj.mac_address = rcv[i].ret[0]["idx-"+obj.idx][1].mac_address;
+                addRow(obj);//添加行
+            };
+        }
+        $('#mac').focus();
+    });
+</script>
+
+<div class="container"  id = "macconfig" >
+
+    <fieldset class="mac-section"> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+        <legend><%:MAC address aging time%></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+        <table class = "miniTab">
+            <tr>
+                <th><%:MAC aging time%></th>
+                <td>
+                    <input type="text" name="agingtime" id="agingtime" style="width:10em" value="">
+                    <small>(15-3600 sec)</small>
+                </td>
+            </tr>
+            <tfoot>
+                <tr>
+                    <td colspan="2">
+                        <input type="button" name="ok" value="<%:Apply%>" class="cbi-button cbi-input-apply" onclick="setAgingTime()">
+                    </td>
+                </tr>
+            </tfoot>      
+        </table>
+    </fieldset>
+
+
+    <fieldset class="mac-section"> 
+        <legend><%:Port security address configuration%></legend>
+        <table class="tableThree">
+            <thead >
+                <tr>
+                    <th><%:Port%></th>
+                    <th><%:operation%></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <!--[if lt IE 9]>  <div class="lte8"> <![endif]-->
+                        <div class="wrapper">
+                            <select id="port_id" style="width:5rem">
+                                <%for i=1,portNum do%>
+                                <option value="<%=i%>" name ="port<%=i%>"id ="port<%=i%>"><%=i%></option>
+                                <%end%>
+                            </select>
+                            <div class="tooltip"><%:have no port enable, please enable first!%></div>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="radio" name="operation" value="1" checked/>&nbsp;<%:Enable%>&nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="operation" value="2" />&nbsp;<%:Disable%>&nbsp;&nbsp;&nbsp;
+                    </td>
+                    <td><input type="button" name="ok" value="<%:Apply%>" class="cbi-button cbi-input-apply" onclick="setPort()"></td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="tableThree">
+            <thead >
+                <tr>
+                    <th><%:Enable port%></th>
+                    <th><%:MAC-Address%></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <select id="enable_port" style="width:5rem"></select>
+                    </td>
+                    <td>
+                        <input type="text" name="mac" id="mac" maxlength="17"  value="">
+                    </td>
+                    <td>
+                        <input type="button" name="ok" value="<%:Apply%>" class="cbi-button cbi-input-apply" onclick="setFdb()">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </fieldset>
+    <fieldset class="mac-section">
+        <legend><%:Port security list%></legend>
+        <table id="myTab" class = "tableThree">
+            <thead>
+                <tr>
+                    <th><%:serial number%></th>
+                    <th><%:port number%></th>
+                    <th><%:MAC-Address%></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="3">
+                        <input type="button" name="ok" value="<%:Add%>" class="cbi-button cbi-button-add" onclick="addPort(this)">&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="button" name=ok value="<%:Edit%>" class="cbi-button cbi-input-remove" onclick="modPort()">&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="button" name="ok" value="<%:Delete%>" class="cbi-button cbi-button-remove" onclick="delRow()">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </fieldset>
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

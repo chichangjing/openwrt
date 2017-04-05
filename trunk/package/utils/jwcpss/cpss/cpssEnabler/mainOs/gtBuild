@@ -1,0 +1,21 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifeq (EXISTS,$(GALTIS_NO_APP_DEMO))
+    # compile mainCmd and take only stub for 'appDemo'
+    SUBDIRS      = NONE
+    C_EXCLUDE_FILE_LIST = ALL
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

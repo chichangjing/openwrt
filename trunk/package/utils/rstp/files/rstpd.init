@@ -1,0 +1,138 @@
+#!/bin/sh /etc/rc.common
+START=91
+
+USE_PROCD=1
+PROG="/usr/sbin/rstpd"
+CONFIGFILE="/var/run/rstpd.conf"
+PIDFILE=/var/run/rstpd.pid
+
+rstpd_checkpid() {
+	pid=
+	if [ -f "$1" ] ; then
+		local line p
+		read line < "$PIDFILE"
+		for p in $line ; do
+			[ -z "${p//[0-9]/}" -a -d "/proc/$p" ] && pid="$pid $p"
+		done
+		if [ -n "$pid" ]; then
+			return 0
+		fi
+		return 1 # "Program is dead and /var/run pid file exists"
+	fi
+	return 3 # "Program is not running"
+}
+
+rstpd_bridge_add() {
+	local cfg="$1"
+
+	config_get bridgeprio "$cfg" bridgeprio
+	[ -n "$bridgeprio" ] && echo "setbridgeprio $bridgeprio" >> $CONFIGFILE
+
+	config_get hello "$cfg" hello
+	[ -n "$hello" ] && echo "sethello $hello" >> $CONFIGFILE
+
+	config_get maxage "$cfg" maxage
+	[ -n "$maxage" ] && echo "setmaxage $maxage" >> $CONFIGFILE
+
+	config_get fdelay "$cfg" fdelay
+	[ -n "$fdelay" ] && echo "setfdelay $fdelay" >> $CONFIGFILE
+
+	echo >> $CONFIGFILE
+}
+
+rstpd_port_add() {
+	local cfg="$1"
+
+	config_get portid "$cfg" portid
+	[ -n "$portid" ] || return 0
+
+	echo "# Port-$portid" >> $CONFIGFILE
+
+	config_get portnonstp "$cfg" portnonstp
+	[ -n "$portnonstp" ] && echo "setportnonstp $portid $portnonstp" >> $CONFIGFILE
+
+	config_get portprio "$cfg" portprio
+	[ -n "$portprio" ] && echo "setportprio $portid $portprio" >> $CONFIGFILE
+
+	config_get portpathcost "$cfg" portpathcost
+	[ -n "$portpathcost" ] && echo "setportpathcost $portid $portpathcost" >> $CONFIGFILE
+
+	config_get portp2p "$cfg" portp2p
+	[ -n "$portp2p" ] && echo "setportp2p $portid $portp2p" >> $CONFIGFILE
+
+	config_get portedge "$cfg" portedge
+	[ -n "$portedge" ] && echo "setportedge $portid $portedge" >> $CONFIGFILE
+	
+	echo >> $CONFIGFILE
+}
+
+rstpd_admin_add() {
+	local cfg="$1"
+
+	config_get rstp "$cfg" rstp
+	[ -n "$rstp" ] || return 0
+
+	if [ "$rstp" != "on" ]; then
+		echo "rstp off" >> $CONFIGFILE
+		return
+	fi
+
+	echo "rstp on" >> $CONFIGFILE
+	echo >> $CONFIGFILE
+
+	echo "# =========================" >> $CONFIGFILE
+	echo "# Bridge configuration"      >> $CONFIGFILE
+	echo "# =========================" >> $CONFIGFILE
+	config_foreach rstpd_bridge_add bridge
+
+	echo "# =========================" >> $CONFIGFILE
+	echo "# Port configuration "       >> $CONFIGFILE
+	echo "# =========================" >> $CONFIGFILE
+	config_foreach rstpd_port_add port
+}
+
+start_service() {
+	local pid
+	
+	st=`uci get rstpd.admin.rstp`
+	if [ $st == "off" ]; then
+		echo "rstp config off"
+		return
+	fi
+
+	rstpd_checkpid $PIDFILE
+	if [ -n "$pid" ]; then
+		echo "Program is already running"
+		return
+	fi
+
+	[ -f "$CONFIGFILE" ] && rm -f "$CONFIGFILE"
+	rm -f $PIDFILE
+
+	procd_open_instance
+
+	echo "# Auto-generated from /etc/config/rstpd"   >> $CONFIGFILE
+	echo >> $CONFIGFILE
+	config_load rstpd
+	config_foreach rstpd_admin_add admin
+
+	procd_set_param command $PROG -v 3
+
+    /usr/sbin/jssdk_sh multicast mgmt-frame set 01-80-c2-00-00-00 enable
+
+	procd_close_instance 
+}
+
+stop_service() {
+	local pid
+
+    /usr/sbin/jssdk_sh multicast mgmt-frame set 01-80-c2-00-00-00 disable
+
+	rstpd_checkpid $PIDFILE
+	if [ -n "$pid" ]; then
+		kill -KILL $pid
+		rm -f $PIDFILE
+		[ -f "$CONFIGFILE" ] && rm -f "$CONFIGFILE"
+		echo "pid $pid is killed"
+	fi
+}

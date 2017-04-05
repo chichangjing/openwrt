@@ -1,0 +1,69 @@
+# make.defs - common variable definitions
+#
+# modification history
+# --------------------
+# 04-12-02,mj	created
+#
+SHELL=/bin/sh -e
+
+#CC_ARCH_SPEC=  -march=i386 -mcpu=i686
+
+SW_ROOT = $(DSDT_USER_BASE)
+SRC_BASE_PATH = $(SW_ROOT)/src
+QD_INCLUDE_PATH = $(SW_ROOT)/Include/h
+
+LIB_DIR = $(SW_ROOT)/Library
+OBJDIR = $(DSDT_PROJ_NAME)_obj
+
+ifeq ($(CC),)
+CC      =cc
+LD      =ld
+endif
+
+MAKE    =make
+CD      =pwd
+RM      =rm -f
+ECHO    =echo
+
+DEPENDENCIES= makedeps
+
+#CFLAGS = $(CFLAGS1) $(CFLAGS2) $(INCLUDE_PATH) $(CDEBUG_DEFINES)
+CFLAGS = -DLINUX $(CFLAGS1) $(CFLAGS2) $(INCLUDE_PATH) $(CDEBUG_DEFINES)
+
+CFLAGS1 = $(CC_ARCH_SPEC) $(DEBUG_TYPE)
+CFLAGS2 = $(CC_OPTIM) $(CC_COMPILER) $(CC_WARNINGS_ALL)
+
+CC_OPTIM = $(CC_OPTIM_TARGET)
+CC_OPTIM_DRIVER	= -O
+CC_OPTIM_TARGET	= -O2
+CC_COMPILER = -ansi #-nostdinc
+CC_WARNINGS_ALL	= -Wall -Wcast-align -Wchar-subscripts -Wcomment -Wdeprecated-declarations -Wdisabled-optimization -Wdiv-by-zero -Wendif-labels -Wformat -Wformat-extra-args -Wformat-y2k -Wimplicit -Wimplicit-function-declaration -Wimplicit-int -Wimport -Winvalid-pch -Wmain -Wmissing-braces -Wmissing-declarations -Wmissing-format-attribute -Wmissing-noreturn -Wmultichar -Wnested-externs -Wnonnull -Wparentheses -Wpointer-arith -Wreturn-type -Wsequence-point -Wshadow -Wsign-compare -Wstrict-aliasing -Wstrict-prototypes -Wswitch -Wswitch-default -Wtrigraphs -Wuninitialized -Wunknown-pragmas -Wunused -Wunused-function -Wunused-label -Wunused-value -Wunused-variable -Wwrite-strings -Wno-pointer-sign -Wno-error=unreachable-code -Wfloat-equal -Wcast-qual -Winline -Wformat-security -Wformat-nonliteral -Wno-error=cast-align -Wunused-parameter -Wmissing-prototypes  
+
+LDFLAGS =  -r -X -N #-nostdlib
+ARFLAGS = crus
+
+ifeq ($(DSDT_APP),YES)
+CFLAGS += -DDBG_APP
+endif
+
+ifeq ($(RELEASE),NO)
+CDEBUG_DEFINES=-DDEBUG=1 -DDEBUG_QD
+CC_COMPILER = -ansi 
+LDFLAGS = -r -X -N
+else
+CDEBUG_DEFINES=
+endif
+
+INCLUDE_PATH = -I. \
+               -I$(QD_INCLUDE_PATH)/driver \
+               -I$(QD_INCLUDE_PATH)/msApi \
+               -I$(QD_INCLUDE_PATH)/platform \
+               -I$(SW_ROOT)/Include
+ifeq ($(DSDT_USE_MAD),TRUE)
+MAD_INCLUDE_PATH = $(SW_ROOT)/../phy/Include
+INCLUDE_PATH += -I$(MAD_INCLUDE_PATH) 
+INCLUDE_PATH += -I$(MAD_INCLUDE_PATH)/h/driver 
+INCLUDE_PATH += -I$(MAD_INCLUDE_PATH)/h/madApi 
+INCLUDE_PATH += -I$(MAD_INCLUDE_PATH)/h/platform 
+endif
+

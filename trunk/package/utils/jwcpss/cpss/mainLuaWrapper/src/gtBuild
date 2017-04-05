@@ -1,0 +1,36 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+
+ifeq (yes,$(CMD_LUA_CLI))
+  SUBDIRS      =
+
+  ifeq (EXISTS, $(CHX_FAMILY))
+      SUBDIRS      += dxCh
+  endif
+  ifeq (EXISTS, $(PM_FAMILY))
+      SUBDIRS      += exMxPm
+  endif
+
+  ifeq (EXISTS, $(ASIC_SIMULATION))
+      SUBDIRS      += simulation
+  endif
+
+  SUBDIRS      += cpssCommon generic tgf
+
+else
+  SUBDIRS = NONE
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

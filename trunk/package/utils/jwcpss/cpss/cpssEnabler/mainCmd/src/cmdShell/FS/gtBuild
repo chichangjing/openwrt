@@ -1,0 +1,86 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+ifeq (yes.yes,$(CMD_FS).$(CMDFS_NIX))
+  # $CMD_FS == yes && $CMDFS_NIX == yes
+  # CMDFS based on linux/freebsd file system
+  SUBDIRS = NONE
+  C_FILE_LIST = cmdFS_NIX.c
+else
+C_EXCLUDE_FILE_LIST = cmdFS_NIX.c cmdFS_VIRT.c
+
+ifeq (yes, $(CMD_FS))
+    C_FILE_LIST = cmdFS_RAM.c
+    C_FILE_LIST += $(wildcard zlib/*.c)
+else
+    C_EXCLUDE_FILE_LIST = ALL
+endif
+
+ifneq (yes,$(LUACLI_STANDALONE_BUILD))
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+    LIB_NAME = mainCmd.lib
+endif
+endif
+
+ifeq (yes,$(CMD_LUA_CLI))
+   #_W := $(warning "USER_BASE=$(USER_BASE)")
+   RAM_DATA_CPSS = $(subst \,/,$(USER_BASE))/mainLuaWrapper/data
+   RAM_DATA ?= $(RAM_DATA_CPSS)
+   ifeq (EXISTSEXISTS, $(CHX_FAMILY)$(PM_FAMILY))
+      # skip PM + CHX 
+   else
+      ifeq (EXISTS, $(CHX_FAMILY))
+         RAM_DATA_SUBDIR ?= dxCh
+         XML_RAM_DATA_SUBDIR = dxCh_xml
+         RAM_DATA_INCFILE = $(RAM_DATA)/dxCh/cmdFS_RAM_embed_files.inc
+         RAM_DATA_INCDEF = CMDFS_RAM_DX_EMBEDDED_DATA
+      endif
+      ifeq (EXISTS, $(PM_FAMILY))
+         RAM_DATA_SUBDIR = exMxPm
+         RAM_DATA_INCFILE = $(RAM_DATA)/exMxPm/cmdFS_RAM_embed_files_pm.inc
+         RAM_DATA_INCDEF = CMDFS_RAM_PM_EMBEDDED_DATA
+      endif
+   endif
+
+   ifneq (,$(RAM_DATA_SUBDIR))
+      # valid family, check for .c or .inc data
+      ifneq (,$(wildcard $(RAM_DATA)/$(RAM_DATA_SUBDIR)/cmdFS_RAM_embed_files*.c))
+         # Compile .c files from mainLuaWrapper/data/dxCh
+         AD_CFLAGS += $(FD)CMDFS_RAM_EMBEDDED_DATA_EXT
+         C_FILE_LIST += $(wildcard $(RAM_DATA)/$(RAM_DATA_SUBDIR)/cmdFS_RAM_embed_files*.c)
+         INCLUDE_PATH += $(FIS)$(CURDIR)$(FIE)
+         ifneq (,$(wildcard $(RAM_DATA)/$(RAM_DATA_SUBDIR)/cmdFS_RAM_lua_cli_examples*.c))
+            ifneq (yes, $(NO_LUACLI_EXAMPLES))
+              C_FILE_LIST += $(wildcard $(RAM_DATA)/$(RAM_DATA_SUBDIR)/cmdFS_RAM_lua_cli_examples*.c)
+              AD_CFLAGS += $(FD)CMDFS_RAM_EMBEDDED_DATA_EXT_EXAMPLES
+            endif
+         endif
+         ifneq (,$(wildcard $(RAM_DATA)/$(XML_RAM_DATA_SUBDIR)/cpssAPI_xml*.c))
+            C_FILE_LIST += $(wildcard $(RAM_DATA)/$(XML_RAM_DATA_SUBDIR)/cpssAPI_xml*.c)
+            AD_CFLAGS += $(FD)CMDFS_RAM_EMBEDDED_DATA_EXT_XML
+         else
+            ifneq (,$(wildcard $(RAM_DATA_CPSS)/$(XML_RAM_DATA_SUBDIR)/cpssAPI_xml*.c))
+               C_FILE_LIST += $(wildcard $(RAM_DATA_CPSS)/$(XML_RAM_DATA_SUBDIR)/cpssAPI_xml*.c)
+               AD_CFLAGS += $(FD)CMDFS_RAM_EMBEDDED_DATA_EXT_XML
+            endif
+         endif
+      else
+         ifneq (,$(wildcard $(RAM_DATA_INCFILE)))
+            # Include file from mainLuaWrapper/data/dxCh
+            AD_CFLAGS += $(FD)$(RAM_DATA_INCDEF)
+            INCLUDE_PATH += $(FIS)$(RAM_DATA)/$(RAM_DATA_SUBDIR)$(FIE)
+         endif
+      endif
+   endif  
+endif
+endif
+
+##################################################
+include $(PROJ_BASE)/gtTopMake

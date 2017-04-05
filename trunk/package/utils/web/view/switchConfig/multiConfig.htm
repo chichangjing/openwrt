@@ -1,0 +1,465 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+<%
+    require "luci.http"
+    local ubus = require "luci.ubus"
+    local portNum = ubus.getPortNum()
+    local modeStatusVal = luci.http.formvalue("setMode")
+    if modeStatusVal then 
+        local mode1 = {["enable_status"] = modeStatusVal}
+        local mode1Status = ubus.set_args("mcast_config", "mcast_config_set", mode1, 2)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(mode1Status)
+        
+        return
+    end
+    local cleIdx = luci.http.formvalue("clear")
+    if cleIdx then
+        local cleVal = luci.json.decode(cleIdx)
+        local idx = string.format("idx-%d",tonumber(cleVal.idx))
+        local clearStatus = ubus.clear_args("mcast_config", "mcast_config_clear", idx )
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(clearStatus)
+        
+        return
+    end
+
+    
+    local rcvJson = luci.http.formvalue("param")
+    if rcvJson then
+        local setJson = luci.json.decode(rcvJson)
+
+        local setStatus = {}
+        local snd = {}
+
+        if (tonumber(setJson.group_num) > 0) then
+            for i=1, tonumber(setJson.group_num) do
+                pVal = string.format("idx-%d",i)
+                snd[i]={[pVal]={{["mac_address"] = setJson.data[i].mac_address},{["group_members"] =setJson.data[i].group_members}}} 
+            end
+            setStatus = ubus.set_args("mcast_config", "mcast_config_set", snd, 1)
+
+        end
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setStatus)
+
+        return
+    end
+    
+    local typeStatus = ubus.getPortType(portNum)
+    
+    local chan = {"mac_address","group_members"}
+    local channel = {}
+    local status ={}
+
+    local modeStatus = ubus.get_args("mcast_config", "mcast_config_get", {"enable_status","group_num"}, 2)
+    local modeVal = modeStatus["ret"][1].enable_status
+    local numVal =  modeStatus["ret"][2].group_num
+    if (modeVal == "1") then 
+        if numVal ~=nil and tonumber(numVal) > 0  then
+            for i=1,tonumber(numVal) do
+                local pa = string.format("idx-%d",i)
+                channel[i]={[pa] = chan}
+            end
+            status = ubus.get_args("mcast_config", "mcast_config_get", channel, 1)
+        end
+    end
+%>
+
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">//<![CDATA[
+//字节串 字节数
+var OCTET_NUM = Math.ceil(<%=portNum%>/8);
+
+//对数值高低换位
+function shift_fun(len,data)
+{
+    var i;
+    var tmp = 0;
+
+    for(i=0;i<len;i++)
+    { 
+        tmp=((data>>i)&0x01)|tmp; 
+        if(i<len-1) 
+            tmp=tmp<<1; 
+    } 
+    return tmp;  
+} 
+//mac地址的解析
+function macFormCheck(mac){
+    var macs = new Array();
+    macs = mac.split("-");
+    if(macs.length != 6){
+        alert("<%:MAC address format is not correct,enter as xx-xx-xx-xx-xx-xx (xx for hexadecimal digits)!%>");
+        return false;
+    }
+    if((parseInt(macs[0],16) & 1) != 1){
+        alert("<%:the two bit of the mac adress must be odd%>");
+        return false;
+    }
+    for (var s=0; s<6; s++) {
+        var temp = parseInt(macs[s],16);
+        if(macs[s].length != 2)
+        {
+            alert("<%:MAC address format is not correct,enter as xx-xx-xx-xx-xx-xx (xx for hexadecimal digits)!%>");
+            return false; 
+        }
+        if(isNaN(temp))
+        {
+            alert("<%:MAC address format is not correct,enter as xx-xx-xx-xx-xx-xx (xx for hexadecimal digits)!%>");
+            return false;  
+        }
+        if(temp < 0 || temp > 255){
+            alert("<%:MAC address format is not correct,enter as xx-xx-xx-xx-xx-xx (xx for hexadecimal digits)!%>");
+            return false;  
+        }
+    }
+    
+    var val1 = parseInt(macs[0],16); 
+    var val2 = parseInt(macs[1],16); 
+    var val3 = parseInt(macs[2],16); 
+    var val4 = parseInt(macs[3],16); 
+    var val5 = parseInt(macs[4],16); 
+    var val6 = parseInt(macs[5],16); 
+    if((val1 == parseInt('0d',16)) &&(val2 == parseInt('a4',16)) &&(val3 == parseInt('2a',16)) &&(val4 == parseInt('00',16)) 
+            &&(val5 == parseInt('00',16)) &&(val6 == parseInt('05',16)) ){
+        alert(mac +"<%:Protocol Multicast address，cannot be set%>");
+       return;
+    }
+    if((val1 == parseInt('01',16)) &&(val2 == parseInt('00',16)) &&(val3 == parseInt('5e',16)) &&(val4 == parseInt('64',16)) 
+            &&(val5 == parseInt('e4',16)) &&(val6 == parseInt('e4',16)) ){
+        alert(mac +"<%:Protocol Multicast address，cannot be set%>");
+       return;
+    }
+    if((val1 == parseInt('01',16)) &&(val2 == parseInt('80',16)) &&(val3 == parseInt('c2',16)) &&(val4 == parseInt('00',16)) 
+            &&(val5 == parseInt('00',16)) ){
+        if((val6 >= parseInt('00',16)) && val6 <= parseInt('2f',16) ){
+            alert(mac +"<%:Reserve address，cannot be set%>");
+            return;
+        }
+    }
+    
+    return true;
+}
+
+
+//json格式传往后台
+function truJson(btn){
+
+    var a = JSON.parse("{\"enable_status\":\"\",\"group_num\":\"\",\"data\":[]}"); 
+
+    var modeVal = document.getElementById("adminMode").value;
+    a.enable_status = modeVal;
+
+    var tabObj=document.getElementById("myTab");
+    var rowsNum = tabObj.rows.length;  //获取当前行数
+    var colsNum=tabObj.rows[0].cells.length;//获取行的列数
+    var numVal = rowsNum-1; //获得组数
+    a.group_num = numVal.toString();
+    if(rowsNum > 1){//
+        for (var i = 1; i < rowsNum; i++) { //每行 从第二行开始因为第一行是表格的标题
+            var para = new Object();//这里一定要new新的对象，要不然保存的都是一样的数据；都是最后一行的数据
+            para.mac_address = document.getElementsByName("mac")[i-1].value.replace(/\s/g,"");
+            if(!macFormCheck(para.mac_address)){ //校验MAC
+                document.getElementsByName("mac")[i-1].focus();
+                return;
+            }
+            var memVal = 0;
+            for(var j=2;j<(colsNum);j++){
+                if(document.getElementsByName("port"+j)[i-1].checked == true){
+                    memVal |=  1<<(j-2);
+                }
+            }
+            //alert(memVal);
+            var data = shift_fun(OCTET_NUM * 8,memVal);
+            var sda = new Array();
+            for(var n = 0; n < OCTET_NUM - 1; n++){
+                sda[n] = parseInt((data / (256 * (OCTET_NUM - 1 - n))) % 256).toString(16);
+            }
+            sda[OCTET_NUM -1] = (data % 256).toString(16);
+            para.group_members = sda.join("-");
+            a.data.push(para); 
+        }
+    }else{
+        alert("<%:Add first%>");
+        return;
+    }
+    //alert(JSON.stringify(a));
+
+ //异步提交数据
+    XHR.get('<%=REQUEST_URI%>',{"param": JSON.stringify(a)},
+            function(x,rv) {
+                var flag = 0;
+                for(var i = 0; i < rv.length; i++){
+                    if(rv[i].ret == "-1"){
+                        flag = 1;
+                        alert("<%:NO.%>"+(i+1)+"<%:configuration failure%>");
+                        window.location.reload();
+                        return ;
+                    }
+                }
+                if(flag == 0){
+                    alert("<%:Succesfully configured%>");
+                }
+        }
+    );
+
+}
+
+
+
+//窗口表格增加一行
+function addNewRow(){
+    var tabObj=document.getElementById("myTab");//获取添加数据的表格
+    var rowsNum = tabObj.rows.length;  //获取当前行数
+    var colsNum=tabObj.rows[rowsNum-1].cells.length;//获取行的列数
+
+    var myNewRow = tabObj.insertRow(rowsNum);//插入新行
+    var newTdObj1=myNewRow.insertCell(0);
+    newTdObj1.innerHTML="<input type='checkbox' name='chkArr' id='chkArr'"+rowsNum+" ><input type='text' name='idx' style='width:40px;text-align: center' readonly='true'  value='"+rowsNum+"' >";
+    var newTdObj1=myNewRow.insertCell(1);
+    newTdObj1.innerHTML="<input type='text' name='mac' maxlength='17' id='group"+rowsNum+"value='' >";
+    for(var i=2;i<(colsNum);i++){
+        var newTdObj2=myNewRow.insertCell(i);
+        newTdObj2.innerHTML="<input type='checkbox' name='port"+i+"' id='nodecode"+rowsNum+""+i+" onclick='ck(this);' >";
+    }
+}
+//窗口表格删除一行
+function removeRow(){
+    var chkObj=document.getElementsByName("chkArr");
+    var tabObj=document.getElementById("myTab");
+    var a = JSON.parse("{\"idx\":\"\"}"); //{"idx":""}
+
+    var rowsNum = tabObj.rows.length;  //获取当前行数
+    var colsNum=tabObj.rows[rowsNum-1].cells.length;//获取行的列数
+
+    for(var k=0;k<chkObj.length;k++){
+        if(chkObj[k].checked){
+            //下发ubus 删除该组信息
+            a.idx = k+1;
+            //异步提交数据
+            XHR.get('<%=REQUEST_URI%>',{ "clear": JSON.stringify(a)},
+                    function(x,rv)
+                    {
+                        for(var i = 0; i < rv.length; i++){
+                            if(rv[i].ret == "-1"){
+                                alert("<%:NO.%>"+(i+1)+"<%:configuration failure%>");
+                                window.location.reload();
+                                return ;
+                            }
+                        }
+                    }
+                   );
+
+            //页面删除行
+            tabObj.deleteRow(k+1);
+            k=-1;
+        }
+    }
+    //序号重新排列
+    var newObj=document.getElementById("myTab");
+    var curRows = newObj.rows.length;  //获取当前行数
+    for(var n=0;n<(curRows-1);n++){
+        document.getElementsByName("idx")[n].value = n+1;
+    }
+    alert("<%:delete success%>");
+
+}
+function modeChange(){ //管理模式
+    var val = document.getElementById("adminMode").value;
+    if(val == "1"){
+        if(confirm("<%:are you sure you want to switch configuration?%>")){
+            //向ubus发送禁止命令
+            XHR.get('<%=REQUEST_URI%>',{ "setMode" : "1"},
+                    function(x,rv)
+                    {
+                        if(rv.ret == "-1"){
+                            alert("<%:switch failure%>");
+                            return ;
+                        }else{
+                            alert("<%:successfully switch%>");
+                            document.getElementById("multi-section").style.display="block";
+                            // 使按键可用
+                            //           modeSelect();
+                            window.location.reload();
+                        }
+                    }
+            );
+
+        }
+    }
+    else if(val == "2"){
+        if(confirm("<%:are you sure you want to switch configuration?%>")){
+            document.getElementById("multi-section").style.display="none";
+            //按键不可用
+       //     modeSelect();
+            //删除页面上所有组播
+            var tabObj=document.getElementById("myTab");
+            var rowsNum = tabObj.rows.length;  //获取当前行数
+            for (k=1;k<rowsNum;k++) {
+                tabObj.deleteRow(k);
+                rowsNum=rowsNum-1;
+                k=k-1;
+            }
+            //向ubus发送禁止命令
+            XHR.get('<%=REQUEST_URI%>',{ "setMode" : "2"},
+                    function(x,rv)
+                    {
+                        if(rv.ret == "-1"){
+                            alert("<%:switch failure%>");
+                            window.location.reload();
+                        }else{
+                            alert("<%:successfully switch%>");
+                        }
+                    }
+            );
+        }
+    } 
+}
+
+function selectMember(mac,member){
+    var macVal = mac;
+    var memberVal = member;
+    var tabObj=document.getElementById("myTab");
+    var rowsNum = tabObj.rows.length;  //获取当前行数
+    var colsNum=tabObj.rows[rowsNum-1].cells.length;//获取行的列数
+    document.getElementsByName("mac")[rowsNum-2].value = macVal;
+
+
+    var ss = memberVal.split("-");//将字符串按某个字符切割成若干个字符串，并以数组形式返回
+    //  alert(ss);
+    var aa = 0;
+    if(OCTET_NUM > 1){
+        for(var n = 0; n < OCTET_NUM -1; n++){//避免最后一个字节乘0处理
+            aa += parseInt(ss[n],16)*256*(OCTET_NUM-1-n);
+        }
+        aa += parseInt(ss[OCTET_NUM-1],16);
+    }else{
+        aa = parseInt(ss[OCTET_NUM-1],16);
+    }
+    var data = shift_fun(OCTET_NUM * 8, aa);
+    for(j=2;j<colsNum;j++){            
+        if(((data >> (j-2)) & 1) == 1){
+            document.getElementsByName("port"+j)[rowsNum-2].checked = true;
+        }
+    }
+}
+//模式选择隐藏
+function modeSelect(){
+    var val = document.getElementById("adminMode").value;
+    var obj = document.getElementsByName("ok");
+    for(i=0;i<obj.length;i++){
+        obj[i].disabled = val=="1"? false:true;
+    }
+}
+
+function display(){
+    //显示端口名称
+    var typeRcv = <%=luci.json.encode(typeStatus)%>;
+    setPortHTMLById(typeRcv);
+    /*
+    $.each(typeRcv, function(i,val) {
+        var rcv = val.ret[0]["port-"+(i+1)];
+        if(rcv[0].type == "4"){
+            document.getElementById("port"+(i+1)).innerHTML = "G"+(i+1);
+        }
+        else if(rcv[0].type == "2"){
+            document.getElementById("port"+(i+1)).innerHTML = "F"+(i+1);
+        }
+    });*/
+    //显示mode_select的值
+    var m = document.getElementById("adminMode");
+    var mode_val = '<%=modeVal%>';
+    mode_val==1?(m.selectedIndex = 0,document.getElementById("multi-section").style.display="block"):m.selectedIndex = 1;
+    if(mode_val == "1"){
+        var rcv = <%=luci.json.encode(status)%>;
+        //    alert(JSON.stringify(rcv[1]["ret"][0]["idx-2"][1]));
+        var chan_val = '<%=numVal%>';
+        if(Number(chan_val) > 0){
+            for(n=1;n<=Number(chan_val);n++){
+                addNewRow();
+                selectMember(rcv[n-1]["ret"][0]["idx-"+n][0].mac_address, rcv[n-1]["ret"][0]["idx-"+n][1].group_members);
+            }
+        }
+    }
+//    modeSelect();
+}
+
+window.onload=display;//不要括号
+
+//]]></script>
+
+<div class="multi"  id = "multiconfig" >
+    <h3 class="h3"><%:Static multicast configuration%></h3>
+
+    <fieldset class="multi-section"> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+        <legend><%:Use static multicast%></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+
+        <table class = "multi-section-node">
+            <tr>
+                <th style="text-align:left;">
+                    <%:management mode :%>&nbsp; &nbsp; &nbsp;
+                    <select id = "adminMode" onchange="modeChange()">
+                        <option value = "1"><%:Enable%></option>
+                        <option value = "2"><%:Disable%></option>
+                    </select>
+                </th>
+            </tr> 
+        </table>
+    </fieldset>
+
+    <fieldset id="multi-section" style="display: none"> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+        <legend><%:Static multicast address configuration%></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+
+        <!-- <div class = "multi-section-node"> -->
+            <table class = "multi-section-table" id = "myTab" >
+                <tr>
+                    <th style="text-align:center;"><%:serial number%></th>
+                    <th style="text-align:center;"><%:MAC-Address%></th>
+                    <% for i=1, portNum do%>
+                    <th style="text-align:center;" id = "port<%=i%>" ><%=i%></th>
+                    <% end %>
+                </tr>
+            </table>
+            <div class="cbi-button-grow">
+                <input type=button name=ok align="center" value="<%:Add%>" class="cbi-button cbi-button-add" onclick="addNewRow()">
+                &nbsp; &nbsp; &nbsp;
+                <input type=button name=ok align="center" value="<%:Delete%>" class="cbi-button cbi-button-remove" onclick="removeRow()">
+                &nbsp; &nbsp; &nbsp;
+                <input type=button name=ok align="center" value="<%:Apply%>" class="cbi-button cbi-input-apply" onclick="return truJson(this)">
+            </div>
+        <!-- </div> -->
+    
+    </fieldset>
+
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

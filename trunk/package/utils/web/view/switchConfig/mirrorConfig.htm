@@ -1,0 +1,246 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+
+
+
+<%
+    local ubus = require "luci.ubus"
+    local portNum = ubus.getPortNum()
+    -- 收到设置mirror应用处理 
+    local mirrorJson = luci.http.formvalue("setMirr")
+    if mirrorJson then
+        local setMirrorJson = luci.json.decode(mirrorJson)
+
+        
+        local setDesPort={["destination_port"] = setMirrorJson.destPort} 
+        local setDesStatus = ubus.set_args("port_mirror","port_mirror_set",setDesPort,2)
+
+        local setMirrorSnd = {}
+    
+        for i=1, portNum do
+            pVal = string.format("port-%d",i)
+            setMirrorSnd[i]={[pVal]={{["mode"] = setMirrorJson.data[i].status}}} 
+        end
+
+        local setMirrorStatus = ubus.set_args("port_mirror","port_mirror_set",setMirrorSnd,1)
+        local rv = {
+            dest = setDesStatus,
+            source = setMirrorStatus
+        }
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(rv)
+
+        return
+
+    end
+ 
+    local typeStatus = ubus.getPortType(portNum)
+
+    local desStatus = ubus.get_args("port_mirror", "port_mirror_get", {"destination_port"},2)
+
+    local desPort = desStatus["ret"][1].destination_port
+ 
+
+    local para = {"mode"}
+    local snd = {}
+    for i=1,portNum do
+        local pa = string.format("port-%d",i)
+        snd[i]={[pa] = para}
+    end
+
+    local getStatus = ubus.get_args("port_mirror", "port_mirror_get", snd, 1)
+%>
+
+<%+header%>
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">
+    //设置镜像模式的应用
+    function setMirr(){
+        var a = JSON.parse("{\"destPort\":\"\",\"data\":[]}");
+        a.destPort = $("#desport").val();
+        //获得列表数值
+        $("[type=checkbox]").each(function(){
+            var para = new Object();
+            if(this.checked){
+                var n = this.name.replace(/[^0-9]/ig,"");
+                para.status = $("[name=mode"+n+"]:checked").val();
+            }else{
+                para.status = this.value;
+            }
+            a.data.push(para);
+        });
+//       alert(JSON.stringify(a));
+        //异步提交数据
+        XHR.get('<%=REQUEST_URI%>', {"setMirr": JSON.stringify(a)},
+                function(x,rv) {
+                    //alert(JSON.stringify(rv['source']));
+                    var flag = 0;
+                    if(rv['dest']['ret'] == "-1"){
+                        flag = 1;
+                        alert("<%:port of destination configuration failed%>");
+                        window.location.reload();
+                        return;
+                    }
+                    for(var i = 0; i < rv['source'].length; i++){
+                        if(rv['source'][i].ret == "-1"){
+                            flag = 1;
+                            alert("<%:Port%>"+(i+1)+"<%:Configuration failed%>");
+                            window.location.reload();
+                            return ;
+                        }
+                    }
+                    if(flag == 0){
+                        alert("<%:Succesfully configured%>");
+                    }
+
+                }
+        );
+    }
+    $(document).ready(function(){
+        var typeRcv = <%=luci.json.encode(typeStatus)%>;
+        setPortHTMLByName(typeRcv);
+        $("#desport").on("change",function(){
+            if(this.value==0){
+                $("[name^=mod]").each(function(){
+                    this.disabled=true;
+                    this.checked=false;
+                })
+            }else{
+                $("[name=mode"+this.value+"]:radio").each(function(){
+                    this.checked = false;
+                    this.disabled=true;
+                });
+                $("[type=checkbox]").each(function(){
+                    this.disabled=false;
+                });
+                var chek= $("[name=mod"+this.value+"]:checkbox")[0];
+                chek.checked = false;
+                chek.disabled = true;
+            }
+        });
+        $("#desport").change();
+        $("#demo").on("click","input[type=checkbox]", function(){
+            var mname = this.name.replace(/[^0-9]/ig,"");
+            var mObj = $("[name=mode"+mname+"]");
+            var me = this;
+
+            mObj.each(function(i){
+                this.disabled = !me.checked;
+                if(me.checked){
+                    (this.value==1) && (this.checked=true);
+                }else{
+                    this.checked = false;
+                }
+            });
+        });
+        var portDes = <%=desPort%>;
+        console.log(portDes)
+        $("#desport").val(portDes);
+        if (portDes==0) {
+            return;
+        }
+        // change(portDes);
+
+//        alert(JSON.stringify(typeRcv));
+        var rcv = <%=luci.json.encode(getStatus)%>;
+        // console.log(rcv)
+        for(var i=0;i<rcv.length;i++){
+            var mode = rcv[i].ret[0]["port-"+(i+1)][0].mode;
+            if (mode!=4) {
+                $("[name=mod"+(i+1)+"]")[0].checked=true;
+                $("[name=mod"+(i+1)+"]")[0].disabled=false;
+                $("[name=mode"+(i+1)+"]").each(function(){
+                    this.disabled = false;
+                });
+                $("[name=mode"+(i+1)+"][value='"+mode+"']")[0].checked=true;
+            }
+        }  
+        $("#desport").change(); 
+    });
+</script>
+<style>
+    #demo tr th:first-child,#demo tr td:first-child{
+        text-align: right;
+        padding-right: 8em;;
+    }
+    #demo tr th:last-child,#demo tr td:last-child{
+        text-align: left;
+        padding-left: 4em;
+    }
+    .choose-title{
+        font-weight: bold;
+        margin-bottom: .5rem;
+    }
+</style>
+<div class="mirror"  id = "mirrorconfig" >
+    <h3 class="h3"><%:Port mirror configuration%></h3>
+    <div class = "cbi-map-descr"><%:Port mirror function means that switch can tansmit or receive data frames and the same copy from one port to another%></div>
+    <fieldset class="vlan-section"> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+        <!--<div>-->
+            <div class="choose-title">
+                <span><%:Port of destination :%></span>
+                <select id="desport" name="desport">
+                    <option value="0" ><%:Disable%></option>
+                    <%for i=1,portNum do%>
+                    <option  value="<%=i%>" name = "port<%=i%>" ><%=i%></option>
+                    <%end%>
+                </select>
+            </div>
+            <table id = "demo">
+                <tr>
+                    <th><%:Port%></th>
+                    <th><%:status%></th>
+                    <th><%:Port mirror mode%></th>
+                </tr>
+                <%for i=1,portNum do%>
+                <tr>
+                    <td name = "port<%=i%>"><%=i%></td>
+                    <td>
+                        <input type="checkbox" name="mod<%=i%>" value="4"/>
+                    </td>
+                    <td>
+                        <input type="radio" name="mode<%=i%>" value="1" />&nbsp;tx&nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="mode<%=i%>" value="2" />&nbsp;rx&nbsp;&nbsp;&nbsp;
+                        <input type="radio" name="mode<%=i%>" value="3" />&nbsp;rx&tx
+                    </td>
+                </tr>
+                <%end%>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="text-align: center;padding-left:0em;padding-right:0em">
+                            <input type="hidden" name="device" value="10" />
+                            <input type="button" class="cbi-button cbi-input-apply" name="ok" align="center" value="<%:Apply%>" onclick="setMirr()">
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        <!--</div>-->
+    </fieldset>
+</div>
+
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

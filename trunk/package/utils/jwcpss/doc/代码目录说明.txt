@@ -1,0 +1,81 @@
+./common  包含了为其他目录以及平台使用的公共函数
+	h
+		cpss
+			driver
+				interrupts                   //managing and configuring the event queues structure for Event Driven mode
+
+	 		extServices                          //外部驱动，系统函数对应的函数指针，因为系统不同这些都会改变
+				extDrv
+				os
+  				private
+				trace
+			generic                              //通用函数，事件管理，打印以及版本
+				events
+				log
+				version 
+		cpssCommon                                   //cpss使用中通用的函数 
+			private 
+			**.h		
+	src
+
+./mainExtUtils	                                             //额外utils的使用，暂时理解为封装过的一些特殊流程处理
+	h
+	src
+		extUtils
+			auEventHandler
+			cpssEnabler
+			IOStream
+			iterators
+			luaCLI
+			osNetworkStack
+			rxEventHandler
+			tgf
+			trafficEngine
+	
+./mainPpDrv                                                  //核心配置函数实现
+
+./tools                                                      //编译脚本的存放地方
+
+./mainGaltisWrapper                                          //galtis适配层代码
+./mainLuaWrapper					     //Lua适配层代码
+
+./luaCLI_standalone					     //luaCLI单独应用实现，似乎在CPSS_ENABLER SHLIB NOGALTIS下会被编译出来？
+
+./mainTmDrv                                                  //对TM 整形的代码驱动实现，现在不知道其具体用途？
+
+*.mk                                                         //编译相关的规则和动作定义脚本
+
+./cpssEnabler                                                //appDemo的实现代码
+	mainCmd
+		h
+		src
+			cmdShell                             //lua的cmd消息处理？
+				
+	mainExtDrv
+		h
+		src
+			gtExtDrv                             //额外驱动的参考实现，具体用到哪个目录里？                      
+	mainExtMac                                           //外置phy的参考实现，。。。。具体用到哪个目录里？
+	mainOs                                               //系统对应的一些调用
+		h
+ 		src
+			gtOs
+				linux                        //包含common里需要赋值的函数指针 *
+				sharedMemory                 //so加载的函数封装等了
+					testClients          //对so的应用举例！！！
+			gtStack                              //同上*
+			gtUtil                               //同上*
+	mainSysConfig
+		h
+		src
+			appDemo
+				boardConfig                  //板卡配置
+				confi                        //?
+				dragonite                    //?
+				entryPoints                  //入口函数
+				oam                          //oam的实现调用
+				phy                          //似乎没用
+                                sandConfig                   //?
+				sysHwConfig                  //公共配置
+				userExit                     //事件处理				
+				utils                        //工具函数

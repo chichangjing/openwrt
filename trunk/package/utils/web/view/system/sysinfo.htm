@@ -1,0 +1,146 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+
+<%
+    local ubus = require "luci.ubus"
+     -- 收到设置sys应用处理 
+    local sysJson = luci.http.formvalue("setSys")
+    if sysJson then
+        local setJson = luci.json.decode(sysJson)
+        local setSysSnd = {{["sys_name"] = setJson.sys_name},{["sys_location"] = setJson.sys_location}}
+        
+        local setSysStatus = ubus.set_args("sysinfo", "sysinfo_set",setSysSnd, 1)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setSysStatus)
+
+        return
+    
+    end
+
+    local getStatus = ubus.get_args("sysinfo", "sysinfo_get", {"model_name","unique_id","description","sys_name","sys_location","sys_uptime","hardware_version","bootloader_version","software_version","mac_addr" }, 2)
+%>
+
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">
+
+function setSys(){
+    var a = JSON.parse("{\"sys_name\":\"\",\"sys_location\":\"\"}"); 
+    //将表格中内容转化为json格式
+        a.sys_name = document.getElementById("sys_name").value;
+        a.sys_location = document.getElementById("sys_location").value ;
+    
+    //异步提交数据
+    XHR.get('<%=REQUEST_URI%>',{"setSys": JSON.stringify(a)}, 
+            function(x,rv) {
+                var flag = 0;
+                for(var i = 0; i < rv.length; i++){
+                    if(rv[i].ret == "-1"){
+                        flag = 1;
+                        alert('<%:NO.%>'+(i+1)+'<%:configuration failure%>');
+                        return ;
+                    }
+                }
+                if(flag == 0){
+                    alert("<%:Succesfully configured%>");
+                }
+            }
+           );
+}
+
+function display(){
+    var rcv = <%=luci.json.encode(getStatus)%>;
+ //   alert(JSON.stringify(rcv));
+    document.getElementById("model_name").innerHTML = rcv["ret"][0].model_name == '-1' ? 'undefined' : rcv["ret"][0].model_name;
+    document.getElementById("unique_id").innerHTML = rcv["ret"][1].unique_id;
+    document.getElementById("description").innerHTML = rcv["ret"][2].description;
+    document.getElementById("sys_name").value = rcv["ret"][3].sys_name;
+    document.getElementById("sys_location").value = rcv["ret"][4].sys_location;
+    var s = rcv["ret"][5].sys_uptime;
+    document.getElementById("uptime").innerHTML = String.format('%t', s.substring(0,s.length-2));
+    document.getElementById("hardware_version").innerHTML = rcv["ret"][6].hardware_version == '-1' ? 'undefined' : rcv["ret"][6].hardware_version;
+    document.getElementById("software_version").innerHTML = rcv["ret"][8].software_version;
+    document.getElementById("mac_addr").innerHTML = rcv["ret"][9].mac_addr;
+}
+
+window.onload=display;
+</script>
+
+<div class="sysinfo"  id = "sysinfoconfig" >
+    <fieldset class=""> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+        <legend><%:Device basic information%></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+
+        <!--<div class = "sysinfo-section-node">-->
+        <table class = "info-section-table">
+            <tr>
+                <th><%:Device model :%></th>
+                <td id = "model_name" ></td>
+            </tr>
+            <tr>
+                <th><%:The only code  :%></th>
+                <td id = "unique_id" ></td>
+            </tr>
+            <tr>
+                <th><%:Device description  :%></th>
+                <td id = "description"></td>
+            </tr>
+            <tr>
+                <th><%:Device name  :%></th>
+                <td><input type="text" name="sysname" id = "sys_name"   value = "" /></td>
+            </tr>
+            <tr>
+                <th><%:Device location  :%></th>
+                <td><input type="text" name="local"  id = "sys_location" value = "" /></td>
+            </tr>
+            <tr>
+                <th><%:Hardware version  :%></th>
+                <td id = "hardware_version"  ></td>
+            </tr>
+            <tr>
+                <th><%:Software version  :%></th>
+                <td id = "software_version"  ></td>
+            </tr>
+            <tr>
+                <th><%:MAC address  :%></th>
+                <td id = "mac_addr"></td>
+            </tr>
+            <tr>
+                <th><%:operation time  :%></th>
+                <td id = "uptime" ></td>
+            </tr>
+            <tfoot>
+                <tr>
+                    <td colspan="2"><input type="button" class="cbi-button cbi-input-apply" name="ok" align="center" value="<%:Apply%>" style="width:100px;" onclick="setSys()"></td>
+                </tr>
+            </tfoot>
+        </table>
+        <!--</div>-->
+    </fieldset>
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

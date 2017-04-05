@@ -1,0 +1,36 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH = 
+#C_FILE_LIST  =
+#SUBDIRS      =
+C_EXCLUDE_FILE_LIST =
+ifeq (win32, $(OS_RUN))
+  ifeq (SX_FAMILY, $(PRESTERA_FAMILY))
+	C_EXCLUDE_FILE_LIST = win32SmiHwCtrl.c
+  else
+  ifeq (SX_FAMILY, $(SECOND_FAMILY))
+	C_EXCLUDE_FILE_LIST = win32SmiHwCtrl.c
+  else 
+	C_EXCLUDE_FILE_LIST =  win32SohoSmiHwCtrl.c
+  endif
+  endif
+endif
+
+ifeq (1, $(LINUX_SIM))
+    C_EXCLUDE_FILE_LIST = win32SohoSmiHwCtrl.c
+endif
+
+ifneq (A1, $(DRAGONITE_TYPE))
+C_EXCLUDE_FILE_LIST += win32DragoniteBsp.c win32DragoniteDrv.c
+endif
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+	LIB_NAME = mainExtDrv.lib
+endif
+
+##################################################
+include $(PROJ_BASE)/gtTopMake

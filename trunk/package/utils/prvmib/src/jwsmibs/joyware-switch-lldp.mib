@@ -1,0 +1,47 @@
+-- ============================================================================
+-- MibName   : JWS-LLDP-MIB
+-- FileName  : joyware-switch-lldp.mib
+-- ============================================================================
+JWS-LLDP-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, Gauge32,
+        Counter32, TimeTicks                                        FROM SNMPv2-SMI
+        DisplayString, MacAddress, TruthValue, TimeStamp            FROM SNMPv2-TC
+        jwSwitch                                                    FROM JOYWARE-SMI
+        JwsEnableValue                                              FROM JWS-TC;
+
+jwsLldpMib MODULE-IDENTITY
+    LAST-UPDATED    "201603011200Z"
+    ORGANIZATION    "Joyware Electronic Technology Co.,Ltd"
+    CONTACT-INFO    "Postal: BlockA,Chang TorchHotel,No.259 Wensan Road,Hangzhou,Zhejiang 310012 China
+                     E-mail: jw-snmp@joyware.com
+                        Tel: 800-8571264 "
+    DESCRIPTION     "This MIB module defines MIB objects which provide LLDP
+                     configurable information about the Joyware switch devices."
+    -- revision history
+    REVISION        "201603011200Z"
+    DESCRIPTION     "Initial revision."
+
+    REVISION        "201603221200Z"
+    DESCRIPTION     "v1.4. Removed oid:
+                        jwsLldpLocSysData,
+                        jwsLldpRemSysData,
+                        jwsLldpStatistics"
+    ::= { jwSwitch 11 }
+
+jwsLldpConfiguration      OBJECT IDENTIFIER ::= { jwsLldpMib 1 }
+
+-- ****************************************************************************
+--                  jwsLldpConfiguration
+-- ****************************************************************************
+jwsLldpAdminStatus OBJECT-TYPE
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The global administratively mode of the local LLDP agent."
+    ::= { jwsLldpConfiguration 1 }
+
+END
+
+

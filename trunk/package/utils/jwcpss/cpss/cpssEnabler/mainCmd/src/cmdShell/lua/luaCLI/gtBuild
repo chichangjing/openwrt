@@ -1,0 +1,25 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+SUBDIRS      = NONE
+#C_EXCLUDE_FILE_LIST =
+
+INCLUDE_PATH += $(FIS)$(LUA_SRCPATH)$(FIE)
+
+C_FILE_LIST = cmdLuaCLI.c
+
+ifneq (yes,$(LUACLI_STANDALONE_BUILD))
+  C_FILE_LIST += cmdLuaConfigFile.c
+endif
+
+#SUBDIRS      = sample
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

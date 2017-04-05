@@ -1,0 +1,372 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+-%>
+
+<%
+    local ubus = require "luci.ubus"
+    local portNum = ubus.getPortNum()
+
+    local setVal = luci.http.formvalue("set")
+    if setVal then    
+        local setJson = luci.json.decode(setVal)
+        local portVal = string.format("port-%s",setJson.port)
+        local setSnd = {[portVal] = {}} 
+        local tbl = setSnd[portVal]
+        tbl[#tbl +1] = {["ingress_bucket0_enable"] = setJson.bucket0_enable}
+        if setJson.bucket0_enable == "1" then
+            tbl[#tbl +1] = {["ingress_bucket0_type_mask"] = setJson.bucket0_type}
+            tbl[#tbl +1] = {["ingress_bucket0_rate"] = setJson.bucket0_rate}
+        end
+        tbl[#tbl +1] = {["ingress_bucket1_enable"] = setJson.bucket1_enable}
+        if setJson.bucket1_enable == "1" then
+            tbl[#tbl +1] = {["ingress_bucket1_type_mask"] = setJson.bucket1_type}
+            tbl[#tbl +1] = {["ingress_bucket1_rate"] = setJson.bucket1_rate}
+        end
+        tbl[#tbl +1] = {["ingress_bucket2_enable"] = setJson.bucket2_enable}
+        if setJson.bucket2_enable == "1" then
+            tbl[#tbl +1] = {["ingress_bucket2_type_mask"] = setJson.bucket2_type}
+            tbl[#tbl +1] = {["ingress_bucket2_rate"] = setJson.bucket2_rate}
+        end
+        tbl[#tbl +1] = {["ingress_bucket3_enable"] = setJson.bucket3_enable}
+        if setJson.bucket3_enable == "1" then
+            tbl[#tbl +1] = {["ingress_bucket3_type_mask"] = setJson.bucket3_type}
+            tbl[#tbl +1] = {["ingress_bucket3_rate"] = setJson.bucket3_rate}
+        end
+        tbl[#tbl +1] = {["ingress_bucket4_enable"] = setJson.bucket4_enable}
+        if setJson.bucket4_enable == "1" then
+            tbl[#tbl +1] = {["ingress_bucket4_type_mask"] = setJson.bucket4_type}
+            tbl[#tbl +1] = {["ingress_bucket4_rate"] = setJson.bucket4_rate}
+        end
+        tbl[#tbl +1] = {["egress_rate_enable"] = setJson.egress_enable}
+        if setJson.egress_enable == "1" then
+            tbl[#tbl +1] = {["egress_rate"] = setJson.egress_rate}
+        end
+
+        local setStatus = ubus.set_args("rate_limit", "rate_limit_set", setSnd, 2)
+
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setStatus)
+
+        return
+    end
+
+    local typeStatus = ubus.getPortType(portNum)
+
+    local para = {"ingress_bucket0_enable","ingress_bucket0_type_mask","ingress_bucket0_rate",
+                 "ingress_bucket1_enable","ingress_bucket1_type_mask","ingress_bucket1_rate",
+                 "ingress_bucket2_enable","ingress_bucket2_type_mask","ingress_bucket2_rate",
+                 "ingress_bucket3_enable","ingress_bucket3_type_mask","ingress_bucket3_rate",
+                 "ingress_bucket4_enable","ingress_bucket4_type_mask","ingress_bucket4_rate",
+                 "egress_rate_enable","egress_rate"}
+    local snd = {}
+    for i=1,portNum do
+        local pa = string.format("port-%d",i)
+        snd[i]={[pa] = para}
+    end
+
+    local status = ubus.get_args("rate_limit", "rate_limit_get", snd, 1)
+%>
+
+<%+header%>
+
+<script type="text/javascript">
+    function isPositiveNum(s){//是否为正整数  
+        var re = /^[0-9]*[1-9][0-9]*$/ ;  
+        return re.test(s)  
+    }
+    $(document).ready(function(){
+       //显示端口名称
+        var typeRcv = <%=luci.json.encode(typeStatus)%>;
+        setPortHTMLByName(typeRcv);
+        /*
+        $.each(typeRcv, function(i,val) {
+            var rcv = val.ret[0]["port-"+(i+1)];
+            if(rcv[0].type == "4"){
+                document.getElementById("port"+(i+1)).innerHTML = "G"+(i+1);
+            }
+            else if(rcv[0].type == "2"){
+                document.getElementById("port"+(i+1)).innerHTML = "F"+(i+1);
+            }
+        });*/ 
+        //绑定报文类型同端口不可选
+        $("[name^=type]").click(function(){
+            var obj = this;
+            $("[name="+obj.name+"]").each(function(){
+                var row = $(this).parent().attr("data-sign").replace("type","") ;
+                if ($("#ingMode"+row).val()==1) {
+                    this.disabled = obj.checked;
+                };
+            })
+            obj.disabled = false;
+        }); 
+        //绑定入口使能
+        $("[name^=ingMode]").click(function(){
+            var ingName = this.name.replace("ingMode","");
+            if (this.value==1) {
+                $("#ingRate"+ingName)[0].disabled = false;
+                $("[data-sign = type"+ingName+"]").find("input[type=checkbox]").each(function(){
+                        if(!$("[name="+this.name+"]:checked").length){
+                            this.disabled = false;
+                        }     
+                    })
+            }else{
+                $("#ingRate"+ingName)[0].disabled = true;
+                $("[data-sign = type"+ingName+"]").find("input[type=checkbox]").each(function(){
+                        if (this.checked) {
+                            $("[name="+this.name+"]").each(function(){
+                                var row = $(this).parent().attr("data-sign").replace("type","") ;
+                                if ($("#ingMode"+row).val()==1) {
+                                    this.disabled=false;
+                                }; 
+                            })
+                        };
+                        this.disabled = true;
+                        this.checked = false;
+                    })
+            };
+        });  
+        //绑定出口使能 
+        $("[name^=egrmode]").click(function(){
+            var ingName = this.name.replace("egrmode","");
+            $("#egRate"+ingName)[0].disabled = this.value==1?false:true;
+        }); 
+        
+        //绑定应用
+        $("[name=ok]").click(function(i){
+            var a = JSON.parse("{\"port\":\"\",\"bucket0_type\":\"\",\"bucket1_type\":\"\",\"bucket2_type\":\"\",\"bucket3_type\":\"\",\"bucket4_type\":\"\",\"bucket0_enable\":\"\",\"bucket1_enable\":\"\",\"bucket2_enable\":\"\",\"bucket3_enable\":\"\",\"bucket4_enable\":\"\",\"bucket0_rate\":\"\",\"bucket1_rate\":\"\",\"bucket2_rate\":\"\",\"bucket3_rate\":\"\",\"bucket4_rate\":\"\",\"egress_enable\":\"\",\"egress_rate\":\"\"}");
+            a.port = this.id.replace("apply","");
+            
+            for (var i = 0; i < 5; i++) {
+                var typeVal = 0;
+                $("[data-sign=type"+a.port+"_"+i+"]").find("input[type=checkbox]").each(function(j){
+                    if(this.checked == true){ typeVal |= 1 << j; } 
+                });
+                a["bucket"+i+"_type"] = typeVal.toString();
+
+                a["bucket"+i+"_enable"] = $("#ingMode"+a.port+"_"+i).val();
+
+                if(a["bucket"+i+"_enable"]==1){
+                    var ingrate = $("#ingRate"+a.port+"_"+i).val().replace(/\s/g,"");
+                    if(!isPositiveNum(ingrate)){
+                        alert("<%:入口限速需要输入整数%>")
+                        return
+                    }
+                    //alert(JSON.stringify(typeRcv));
+                    var rcv = typeRcv[Number(a.port)-1].ret[0]["port-"+a.port];
+                    //alert(JSON.stringify(rcv));
+                    //return;
+                    if((rcv[0].type == "1") ||(rcv[0].type == "2")){
+                        if((Number(ingrate) <64) || (Number(ingrate) >100000)){
+                            alert("<%:values of speed limit input rate need to be in between 64 and 100000%>");
+                            return;
+                        }
+                    }else{
+                        if((Number(ingrate) <64) || (Number(ingrate) >1000000)){
+                            //alert("<%:values of speed limit input rate need to be in between 64 and 100000000%>");
+                            alert("<%:入口限速范围在64～1000000Kbps之间%>");
+                            return;
+                        }  
+                    }
+                    a["bucket"+i+"_rate"] = ingrate;
+                }else{
+                    a["bucket"+i+"_rate"] = "0";
+                }
+            };
+
+            a["egress_enable"] = $("#egrMode"+a.port).val();
+            if(a["egress_enable"]==1){
+                var egrate = $("#egRate"+a.port).val().replace(/\s/g,"");
+                if(!isPositiveNum(egrate)){
+                    alert("<%:出口限速需要输入整数%>")
+                        return
+                }
+                var rcv = typeRcv[Number(a.port)-1].ret[0]["port-"+a.port];
+                if((rcv[0].type == "1") ||(rcv[0].type == "2")){
+                    if((Number(egrate) <64) || (Number(egrate) >100000)){
+                        alert("<%:values of speed limit output rate need to be in between 64 and 100000%>");
+                        return;
+                    }
+                }else{
+                    if((Number(egrate) <64) || (Number(egrate) >1000000)){
+                        //alert("<%:values of speed limit input rate need to be in between 64 and 100000000%>");
+                        alert("<%:出口限速范围在64～1000000Kbps之间%>");
+                        return;
+                    }  
+                }
+                a["egress_rate"] = egrate;
+            }else{
+                a["egress_rate"] = "0";
+            }
+
+   //         alert(JSON.stringify(a));
+            XHR.get('<%=REQUEST_URI%>',{ "set" : JSON.stringify(a)},
+                function(x,rv)
+                {
+                    if(rv.ret == "-1"){
+                        alert("<%:Configuration failed%>");
+                        window.location.reload();
+                    }else{
+                        alert("<%:Succesfully configured%>");
+                    }
+                }
+            );
+        }) 
+        
+        var BUCKETS = 5;
+        var rcv = <%=luci.json.encode(status)%>;
+  //      console.log(rcv)
+        for (var i = 0; i < rcv.length; i++) {
+            // console.log(rcv[i].ret[0]["port-"+(i+1)])
+
+            for (var n = 0; n < BUCKETS; n++) {
+                var ingresAble = rcv[i].ret[0]["port-"+(i+1)][n*3]["ingress_bucket"+n+"_enable"];
+                $("#ingMode"+(i+1)+"_"+n).each(function(){
+                    this.value = ingresAble;
+                    this.click();
+                });
+
+                var TypeVal = rcv[i].ret[0]["port-"+(i+1)][1+n*3]["ingress_bucket"+n+"_type_mask"];
+                if (ingresAble == 1 && TypeVal != 0) {
+                    $("[data-sign = type"+(i+1)+"_"+n+"]").find("input[type=checkbox]").each(function(x){
+                        if(((TypeVal>>x) & 1) == 1){
+                       //     alert("123");
+                            if(!this.checked){
+                                this.click();
+                            }
+                        }
+                    })
+                    
+                };
+                $("#ingRate"+(i+1)+"_"+n).val(rcv[i].ret[0]["port-"+(i+1)][2+n*3]["ingress_bucket"+n+"_rate"]);
+            };
+            $("#egrMode"+(i+1)).each(function(){
+                this.value = rcv[i].ret[0]["port-"+(i+1)][15].egress_rate_enable;
+                this.click();
+            })
+            $("#egRate"+(i+1)).val(rcv[i].ret[0]["port-"+(i+1)][16].egress_rate); 
+        };
+        for(var i = 0; i< <%=portNum%>; i++){
+        // $("#ingMode"+(i+1)+"_"+0).disabled = false;
+            document.getElementById("ingMode"+(i+1)+"_"+0).disabled = true;
+            document.getElementsByName("type"+(i+1)+"_uuf")[0].disabled = true;
+            document.getElementsByName("type"+(i+1)+"_umf")[0].disabled = true;
+            document.getElementsByName("type"+(i+1)+"_bf")[0].disabled = true;
+            document.getElementsByName("type"+(i+1)+"_mf")[0].disabled = true;
+            document.getElementsByName("type"+(i+1)+"_uf")[0].disabled = true;
+            document.getElementById("ingRate"+(i+1)+"_"+0).disabled = true;
+        }
+    })
+</script>
+<style type="text/css">
+
+</style>
+<div class="ratelimit"  id = "ratelimitconfig" >
+    <h3 class="h3"><%:Port speed limit configuration list%></h3>
+    <p class="cbi-map-descr">
+        <%:UUF:Unknown Unicast File%>&nbsp;&nbsp;&nbsp;<%:UMF:Unknown Multicast File%>&nbsp;&nbsp;&nbsp;<%:BF:Broadcast File%>&nbsp;&nbsp;&nbsp;<%:MF:Multicast File%>&nbsp;&nbsp;&nbsp;<%:UF:Unicast File%>
+    </p>
+
+    <fieldset class="ratelimit-section"> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+        <legend></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+        
+            <table class ="ratelimit-section-table">
+                <tr>
+                    <th><%:Port  %></th>
+                    <th><%:Bucket%></th>
+                    <th><%:entrance%></td>
+                    <th><%:Message type%></th>
+                    <th><%:Entrance-speed limited(64~100000)%></td>
+                    <th><%:exit mode%></td>
+                    <th><%:exit-speed limitd(64~100000)%></td>
+                    <th><%:operation%></td>
+                </tr>
+        <%for i=1,portNum do %>
+                <% if i%2 == 1 then%>
+                <tr style="background:#fff">
+                <% else %>
+                <tr style="background:#f9f9f9">
+                <% end %>    
+                    <td rowspan="5" name = "port<%=i%>" id = "port<%=i%>"><%=i%></td>
+                    <td><%:0%></td>
+                    <td>
+                        <select id="ingMode<%=i%>_0" name="ingMode<%=i%>_0"  >
+                            <option value="1"><%:Enable%></option>
+                            <option value="2"><%:Disable%></option>
+                        </select>
+                    </td>
+                    <td data-sign="type<%=i%>_0">
+                        <input type="checkbox" name= "type<%=i%>_uuf" ><%:UUF%>
+                        <input type="checkbox" name= "type<%=i%>_umf" ><%:UMF%>
+                        <input type="checkbox" name= "type<%=i%>_bf" ><%:BF%>
+                        <input type="checkbox" name= "type<%=i%>_mf" ><%:MF%>
+                        <input type="checkbox" name= "type<%=i%>_uf" ><%:UF%> 
+                    </td>
+                    <td>
+                        <input type="text" name="ingRate<%=i%>_0" id ="ingRate<%=i%>_0" style="width:100px;" >&nbsp;Kbps
+                    </td>
+                    <td rowspan="5">
+                        <select id="egrMode<%=i%>" name="egrmode<%=i%>">
+                            <option value="1"><%:Enable%></option>
+                            <option value="2"><%:Disable%></option>
+                        </select>
+                    </td>
+                    <td rowspan="5">
+                        <input type="text" name="egress_rate<%=i%>" id ="egRate<%=i%>" style="width:100px;" >&nbsp;Kbps
+                    </td>
+                    <td rowspan="5">
+                        <input type="button" name="ok" value="<%:Apply%>" class="cbi-button cbi-input-apply" id="apply<%=i%>">
+                    </td>
+                </tr>
+            <% for j=1,4 do%>
+                <% if i%2 == 1 then%>
+                <tr style="background:#fff">
+                <% else %>
+                <tr style="background:#f9f9f9">
+                <% end %>    
+                    <td><%=j%></td>
+                    <td>
+                        <select id="ingMode<%=i%>_<%=j%>" name="ingMode<%=i%>_<%=j%>">
+                            <option value="1"><%:Enable%></option>
+                            <option value="2"><%:Disable%></option>
+                        </select>
+                    </td>
+                    <td data-sign="type<%=i%>_<%=j%>">
+                        <input type="checkbox" name= "type<%=i%>_uuf" ><%:UUF%>
+                        <input type="checkbox" name= "type<%=i%>_umf" ><%:UMF%>
+                        <input type="checkbox" name= "type<%=i%>_bf" ><%:BF%>
+                        <input type="checkbox" name= "type<%=i%>_mf" ><%:MF%>
+                        <input type="checkbox" name= "type<%=i%>_uf" ><%:UF%>
+                    </td>
+                    <td>
+                        <input type="text" name="ingRate<%=i%>_<%=j%>" id ="ingRate<%=i%>_<%=j%>" align="center" style="width:100px;" >&nbsp;Kbps
+                    </td>
+                </tr>
+            <% end %>
+        <%end%>
+            </table>
+    </fieldset>
+</div> 
+
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

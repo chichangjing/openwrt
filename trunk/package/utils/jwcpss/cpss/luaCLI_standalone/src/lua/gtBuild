@@ -1,0 +1,34 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifneq (yes,$(LUACLI_STANDALONE_BUILD))
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+	LIB_NAME = luaCLI.lib
+endif
+endif
+
+
+SUBDIRS = NONE
+
+ifeq (yes, $(CMD_LUA))
+  INCLUDE_PATH += $(LUA_SRC_PATH)
+  ifneq (yes,$(LUACLI_STANDALONE_BUILD))
+    C_FILE_LIST = cmdLuaConfigFile.c
+  endif
+  ifeq (yes, $(CMD_LUA_CLI))
+    C_FILE_LIST += cmdLuaCLI.c
+  endif
+else
+  C_FILE_LIST = NONE
+endif
+
+##################################################
+include $(PROJ_BASE)/gtTopMake

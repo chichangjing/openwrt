@@ -1,0 +1,29 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+
+######################
+## CPSS FAMILY TYPE ##
+######################
+ifeq (EXISTS, $(CHX_FAMILY))
+  DX_FAMILY = EXIST
+endif
+
+ifneq (EXIST, $(DX_FAMILY))
+    C_EXCLUDE_FILE_LIST = ALL
+endif
+
+AD_CFLAGS += $(FD)C_LINKAGE=1
+
+LIB_NAME = mainSysConfig.lib
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

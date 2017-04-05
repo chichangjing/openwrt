@@ -1,0 +1,23 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH  = $(FIS)$(SW_ROOT)/simulation/h$(FIE)
+#C_FILE_LIST  =
+#SUBDIRS      =
+ifeq (win32, $(OS_RUN))
+  ifeq (SX_FAMILY, $(PRESTERA_FAMILY))
+        C_EXCLUDE_FILE_LIST = rtosSimSmiHwCtrl.c
+  else
+  ifeq (SX_FAMILY, $(SECOND_FAMILY))
+        C_EXCLUDE_FILE_LIST = rtosSimSmiHwCtrl.c
+  endif
+  endif
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

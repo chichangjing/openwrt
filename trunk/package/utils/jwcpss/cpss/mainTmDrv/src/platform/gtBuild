@@ -1,0 +1,15 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =  core platform
+#C_EXCLUDE_FILE_LIST =
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

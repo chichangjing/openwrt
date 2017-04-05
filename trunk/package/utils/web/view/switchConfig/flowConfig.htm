@@ -1,0 +1,256 @@
+<%#
+ Copyright 2008 Steven Barth <steven@midlink.org>
+ Copyright 2008-2011 Jo-Philipp Wich <jow@openwrt.org>
+ Licensed to the public under the Apache License 2.0.
+-%>
+
+<%
+local ubus = require "luci.ubus"
+local portNum = ubus.getPortNum()
+local typeStatus = ubus.getPortType(portNum)
+
+local set = tonumber(luci.http.formvalue("clear"))
+if set ~=nil and set > 0 then
+    local clr = {["clear"]= luci.http.formvalue("clear")}
+    local clrStatus = ubus.set_args("eth_stats", "eth_stats_set", clr, 2)
+    luci.http.prepare_content("application/json")
+    luci.http.write_json(clrStatus)
+
+    return
+
+end
+
+local para ={"rx_bytes","rx_unicast_packets","rx_broadcast_packets","rx_multicast_packets","rx_pause_packets","tx_bytes","tx_unicast_packets","tx_broadcast_packets","tx_multicast_packets","tx_pause_packets","clear_select"}
+local snd = {}
+for i=1,portNum do
+    local pa = string.format("port-%d",i)
+    snd[i]={[pa] = para}
+end
+
+local getStatus = ubus.get_args("eth_stats", "eth_stats_get", snd, 1)
+
+
+if luci.http.formvalue("status") == "1" then
+
+    luci.http.prepare_content("application/json")
+    luci.http.write_json(getStatus)
+
+    return
+end
+
+-%>
+
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">
+
+
+	XHR.poll(10, '<%=REQUEST_URI%>', { status: 1 },
+		function(x, info)
+		{
+    //        alert(JSON.stringify(info.member[3]["ret"][0]["port-4"]));
+            var rxbtObj = new Array();　//创建一个数组
+            var rxupObj = new Array();　//创建一个数组
+            var rxbpObj = new Array();　//创建一个数组
+            var rxmpObj = new Array();　//创建一个数组
+            var rxppObj = new Array();　//创建一个数组
+            var txbtObj = new Array();　//创建一个数组
+            var txupObj = new Array();　//创建一个数组
+            var txbpObj = new Array();　//创建一个数组
+            var txmpObj = new Array();　//创建一个数组
+            var txppObj = new Array();　//创建一个数组
+            var clearObj = new Array();　//创建一个数组
+            for(j=1;j<=<%=portNum%>;j++){
+                 rxbtObj[j] = info[j-1]["ret"][0]["port-"+j][0].rx_bytes;
+                 rxupObj[j] = info[j-1]["ret"][0]["port-"+j][1].rx_unicast_packets;
+                 rxbpObj[j] = info[j-1]["ret"][0]["port-"+j][2].rx_broadcast_packets;
+                 rxmpObj[j] = info[j-1]["ret"][0]["port-"+j][3].rx_multicast_packets;
+                 rxppObj[j] = info[j-1]["ret"][0]["port-"+j][4].rx_pause_packets;
+                 txbtObj[j] = info[j-1]["ret"][0]["port-"+j][5].tx_bytes;
+                 txupObj[j] = info[j-1]["ret"][0]["port-"+j][6].tx_unicast_packets;
+                 txbpObj[j] = info[j-1]["ret"][0]["port-"+j][7].tx_broadcast_packets;
+                 txmpObj[j] = info[j-1]["ret"][0]["port-"+j][8].tx_multicast_packets;
+                 txppObj[j] = info[j-1]["ret"][0]["port-"+j][9].tx_pause_packets;
+                 clearObj[j] = info[j-1]["ret"][0]["port-"+j][10].clear_select;
+            }
+
+            for (i=1;i<=<%=portNum%>;i++){
+                document.getElementById("rx_byte_"+i).innerHTML = rxbtObj[i];
+                document.getElementById("rx_up_"+i).innerHTML = rxupObj[i];
+                document.getElementById("rx_bp_"+i).innerHTML = rxbpObj[i];
+                document.getElementById("rx_mp_"+i).innerHTML = rxmpObj[i];
+                document.getElementById("rx_pp_"+i).innerHTML = rxppObj[i];
+                document.getElementById("tx_byte_"+i).innerHTML = txbtObj[i];
+                document.getElementById("tx_up_"+i).innerHTML = txupObj[i];
+                document.getElementById("tx_bp_"+i).innerHTML = txbpObj[i];
+                document.getElementById("tx_mp_"+i).innerHTML = txmpObj[i];
+                document.getElementById("tx_pp_"+i).innerHTML = txppObj[i];
+                if(clearObj[i] == 1){
+                    document.getElementById("clear_"+i).checked = 1;
+                }
+                else if(clearObj[i] == 2){
+                    document.getElementById("clear_"+i).checked = 0;
+                }
+            }
+		}
+	);
+
+    function clear_btn(btn)
+    {
+        var chkObj=document.getElementsByName("chkPort");
+        var val = 0;
+        for(i=0;i<chkObj.length;i++){
+            if(chkObj[i].checked){
+                val |= 1<<(i+1);
+            }
+        };
+    //    alert(val); 
+        XHR.get('<%=REQUEST_URI%>',{ clear: val },
+            function(x,rv)
+            {                
+                for (var m=1;m<=chkObj.length;m++){
+                    if(chkObj[m-1].checked){
+                        document.getElementById("rx_byte_"+m).innerHTML = 0;
+                        document.getElementById("rx_up_"+m).innerHTML = 0;
+                        document.getElementById("rx_bp_"+m).innerHTML = 0;
+                        document.getElementById("rx_mp_"+m).innerHTML = 0;
+                        document.getElementById("rx_pp_"+m).innerHTML = 0;
+                        document.getElementById("tx_byte_"+m).innerHTML = 0;
+                        document.getElementById("tx_up_"+m).innerHTML = 0;
+                        document.getElementById("tx_bp_"+m).innerHTML = 0;
+                        document.getElementById("tx_mp_"+m).innerHTML = 0;
+                        document.getElementById("tx_pp_"+m).innerHTML = 0;
+                    }
+                }
+                window.location.reload();
+            }
+        );
+
+        return false;
+    }
+    function selectAll(form) {
+        var checklist = document.getElementsByName ("chkPort");
+        if(document.getElementById("checkAll").checked)
+        {
+            for(var i=0;i<checklist.length;i++)
+            {
+                checklist[i].checked = 1;
+            }
+        }else{
+            for(var j=0;j<checklist.length;j++)
+            {
+                checklist[j].checked = 0;
+            }
+        }
+    }
+$(document).ready(function(){
+    var typeRcv = <%=luci.json.encode(typeStatus)%>;
+    setPortHTMLByName(typeRcv);
+    /*
+        $.each(typeRcv, function(i,val) {
+            var rcv = val.ret[0]["port-"+(i+1)];
+            if(rcv[0].type == "4"){
+                 document.getElementById("port"+(i+1)).innerHTML = "G"+(i+1);
+            }
+            else if(rcv[0].type == "2"){
+                 document.getElementById("port"+(i+1)).innerHTML = "F"+(i+1);
+            }
+    });*/
+    var rcv = <%=luci.json.encode(getStatus)%>;
+            var rxbtObj = new Array();　//创建一个数组
+            var rxupObj = new Array();　//创建一个数组
+            var rxbpObj = new Array();　//创建一个数组
+            var rxmpObj = new Array();　//创建一个数组
+            var rxppObj = new Array();　//创建一个数组
+            var txbtObj = new Array();　//创建一个数组
+            var txupObj = new Array();　//创建一个数组
+            var txbpObj = new Array();　//创建一个数组
+            var txmpObj = new Array();　//创建一个数组
+            var txppObj = new Array();　//创建一个数组
+            var clearObj = new Array();　//创建一个数组
+            for(j=1;j<=<%=portNum%>;j++){
+                 rxbtObj[j] = rcv[j-1]["ret"][0]["port-"+j][0].rx_bytes;
+                 rxupObj[j] = rcv[j-1]["ret"][0]["port-"+j][1].rx_unicast_packets;
+                 rxbpObj[j] = rcv[j-1]["ret"][0]["port-"+j][2].rx_broadcast_packets;
+                 rxmpObj[j] = rcv[j-1]["ret"][0]["port-"+j][3].rx_multicast_packets;
+                 rxppObj[j] = rcv[j-1]["ret"][0]["port-"+j][4].rx_pause_packets;
+                 txbtObj[j] = rcv[j-1]["ret"][0]["port-"+j][5].tx_bytes;
+                 txupObj[j] = rcv[j-1]["ret"][0]["port-"+j][6].tx_unicast_packets;
+                 txbpObj[j] = rcv[j-1]["ret"][0]["port-"+j][7].tx_broadcast_packets;
+                 txmpObj[j] = rcv[j-1]["ret"][0]["port-"+j][8].tx_multicast_packets;
+                 txppObj[j] = rcv[j-1]["ret"][0]["port-"+j][9].tx_pause_packets;
+                 clearObj[j] = rcv[j-1]["ret"][0]["port-"+j][10].clear_select;
+            }
+
+            for (i=1;i<=<%=portNum%>;i++){
+                document.getElementById("rx_byte_"+i).innerHTML = rxbtObj[i];
+                document.getElementById("rx_up_"+i).innerHTML = rxupObj[i];
+                document.getElementById("rx_bp_"+i).innerHTML = rxbpObj[i];
+                document.getElementById("rx_mp_"+i).innerHTML = rxmpObj[i];
+                document.getElementById("rx_pp_"+i).innerHTML = rxppObj[i];
+                document.getElementById("tx_byte_"+i).innerHTML = txbtObj[i];
+                document.getElementById("tx_up_"+i).innerHTML = txupObj[i];
+                document.getElementById("tx_bp_"+i).innerHTML = txbpObj[i];
+                document.getElementById("tx_mp_"+i).innerHTML = txmpObj[i];
+                document.getElementById("tx_pp_"+i).innerHTML = txppObj[i];
+                clearObj[i] == 1 ? document.getElementById("clear_"+i).checked = 1 : document.getElementById("clear_"+i).checked = 0;
+            }
+});
+    
+</script>
+
+<div class=""  id = "flowconfig" >
+    <fieldset class=""> 
+        <legend><%:Flow statistics display%></legend>
+
+        <table class = "">
+            <tr>
+                <th>
+                    <input type="checkbox" name="chkAll" id = "checkAll" onclick="return selectAll(this)"><%:ALL%>
+                </th>
+                <th><%:Port%></th>
+                <th><%:byte input%></th>
+                <th><%:unicast input%></th>
+                <th><%:broadcast input%></th>
+                <th><%:multicast input%></th>
+                <th><%:pause input%></th>
+                <th><%:byte output%></th>
+                <th><%:unicast output%></th>
+                <th><%:broadcast output%></th>
+                <th><%:multicast output%></th>
+                <th><%:pause output%></th>
+            </tr>
+            <%
+                for i=1,portNum  do
+            %>
+
+            <tr>
+                <td><input type="checkbox" name="chkPort" id = "clear_<%=i%>"></td>
+                <td name = "port<%=i%>" id = "port<%=i%>"><%=i%></td>
+                <td id = "rx_byte_<%=i%>"><%: 0 %></td>
+                <td id = "rx_up_<%=i%>"><%: 0 %></td>
+                <td id = "rx_bp_<%=i%>"><%: 0 %></td>
+                <td id = "rx_mp_<%=i%>"><%: 0 %></td>
+                <td id = "rx_pp_<%=i%>"><%: 0 %></td>
+                <td id = "tx_byte_<%=i%>"><%: 0 %></td>
+                <td id = "tx_up_<%=i%>"><%: 0 %></td>
+                <td id = "tx_bp_<%=i%>"><%: 0 %></td>
+                <td id = "tx_mp_<%=i%>"><%: 0 %></td>
+                <td id = "tx_pp_<%=i%>"><%: 0 %></td>
+            </tr>
+            <%
+                end
+            %>
+            <tfoot>
+                <tr>
+                    <td colspan="12"><input class="cbi-button cbi-input-apply" type="button" name="clear" value="<%:clearing%>" onclick="return clear_btn(this)"></td>
+                </tr>
+            </tfoot>
+        </table>
+
+    </fieldset>
+
+</div>
+
+<%+footer%>

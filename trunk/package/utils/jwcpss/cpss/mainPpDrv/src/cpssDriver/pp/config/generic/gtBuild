@@ -1,0 +1,17 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+LIB_NAME = cpssDrvPpConfigGeneric.lib
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

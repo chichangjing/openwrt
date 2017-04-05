@@ -1,0 +1,60 @@
+###########################################
+##                                       ##
+##    Top Make file for CPSS drivers     ##
+##                                       ##
+###########################################
+
+PROJ_NAME = mainExtUtils
+
+include $(USER_BASE)/gtDefsTopMake.mk 
+
+
+PROJECT_PATH =  $(BASE_PATH)     \
+        $(PP_DRV_PATH)   \
+        $(XBAR_DRV_PATH) \
+        $(FA_DRV_PATH)   \
+        $(COMMON_PATH) \
+        $(SYSCONFIG_PATH)  \
+        $(EXT_DRV_PATH)    \
+        $(OS_PATH)         \
+        $(EXT_UTILS_PATH)  \
+        $(OS_INCLUDE)
+
+
+# check if need to use 'GM_USED'.
+#needed when 'force' image to use GM.
+#also needed for Puma2,3 where use always GM. (for simulation)
+ifeq (EXISTS, $(FORCE_GM_USE))
+  AD_CFLAGS += $(FD)GM_USED
+else
+  ifeq (EXISTS, $(PM_FAMILY))
+    ifeq (EXISTS, $(ASIC_SIMULATION))
+      AD_CFLAGS += $(FD)GM_USED
+    endif
+  endif
+endif
+
+##################
+## GALTIS FLAGS ##
+##################
+ifneq (EXCLUDE_LIB, $(EXCLUDE_GALTIS))
+  AD_CFLAGS += $(FD)IMPL_GALTIS
+endif
+		
+#################
+## DEBUG FLAGS ##
+#################
+ifdef PRESTERA_DEBUG
+CDEBUG = $(FD)PRESTERA_DEBUG
+endif
+
+############
+## CFLAGS ##
+############
+CFLAGS += $(CFLAGS1) $(CFLAGS2) $(CFLAGS_OPT) $(OS_DEFINE) $(CPU_FLAGS) $(LFLAGS) $(AD_CFLAGS) $(CDEBUG)
+
+include $(USER_BASE)/gtTargetsTopMake.mk 
+
+
+full: elf
+

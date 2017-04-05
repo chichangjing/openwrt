@@ -1,0 +1,34 @@
+
+
+###
+###  add include path and file list
+###
+
+ifeq (VIPS, $(HOME_ENV))
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+
+##################################################
+##################################################
+
+PRESTERA_COMMON_DIR = $(subst \,/,$(SW_ROOT))
+include $(PRESTERA_COMMON_DIR)/mainLabServices/gtBuild
+
+else
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+C_EXCLUDE_FILE_LIST = SerdesRxOptMilos4If.c
+
+LIB_NAME = cpssGenDiagOptDevIf.lib
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake 
+
+endif

@@ -1,0 +1,155 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+<%
+    local ubus = require "luci.ubus"
+    -- 收到设置snmp应用处理 
+    local snmpJson = luci.http.formvalue("setSnmp")
+    if snmpJson then
+        local setJson = luci.json.decode(snmpJson)
+        local setSnmpSnd = {}
+        
+        if setJson.status == "2" then
+            setSnmpSnd = {{["status"] = setJson.status}}
+        elseif setJson.status == "1"then
+            setSnmpSnd = {{["status"] = setJson.status},{["readonly_name"] = setJson.readonly_name},{["readwrite_name"] = setJson.readwrite_name},{["port"] = setJson.port}}
+        end
+        
+        local setSnmpStatus = ubus.set_args("snmp", "snmp_set", setSnmpSnd, 1)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setSnmpStatus)
+
+        return
+    
+    end
+
+    local getStatus = ubus.get_args("snmp", "snmp_get", {"status","readonly_name","readwrite_name","port" }, 2)
+
+%>
+<%+header%>
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">
+
+function setSnmp(){
+    var a =JSON.parse("{\"status\":\"\",\"readonly_name\":\"\",\"readwrite_name\":\"\",\"port\":\"\"}"); 
+    //将表格中内容转化为json格式
+    a.status  = document.getElementsByName("status")[0].checked == true?"1":"2";
+    a.readonly_name = document.getElementById("readonly_name").value ;
+    var rolen = a.readonly_name.length;
+    if((rolen < 3) || (rolen > 16)){
+        alert("<%:readonly set beyond the scope of group name%>");
+        return;
+    }
+    a.readwrite_name = document.getElementById("readwrite_name").value ;
+    var rwlen = a.readwrite_name.length;
+    if((rwlen < 3) || (rwlen > 16)){
+        alert("<%:readwrite set beyond the scope of group name%>");
+        return;
+    }
+    a.port = document.getElementById("port").value;
+    if(a.status == "1"){
+        if((Number(a.port) <1) || (Number(a.port) >65535)){
+            alert("<%:Required port need between 1 to 65535%>");
+            return;
+        } 
+    }
+    //异步提交数据
+    XHR.get('<%=REQUEST_URI%>',{"setSnmp": JSON.stringify(a)}, 
+            function(x,rv) {
+                var flag = 0;
+                for(var i = 0; i < rv.length; i++){
+                    if(rv[i].ret == "-1"){
+                        flag = 1;
+                        alert("<%:NO.%>"+(i+1)+"<%:configuration failure%>");
+                        return ;
+                    }
+                }
+                if(flag == 0){
+                    alert("<%:Succesfully configured%>");
+                }
+            }
+           );
+}
+function snmpAble(e){
+    //IE没有e.target，有e.srcElement
+    var target = e.target||e.srcElement;
+    if(target.nodeName=="TD"){return;}
+    document.getElementById("readonly_name").disabled = document.getElementById("readwrite_name").disabled = document.getElementById("port").disabled = (target.value == 1? false : true);
+}
+function display(){
+    var rcv = <%=luci.json.encode(getStatus)%>;
+//    alert(JSON.stringify(rcv));
+    rcv["ret"][0].status == "1" ? document.getElementsByName("status")[0].click(): document.getElementsByName("status")[1].click();
+    document.getElementById("readonly_name").value  = rcv["ret"][1].readonly_name;
+    document.getElementById("readwrite_name").value  = rcv["ret"][2].readwrite_name;
+    document.getElementById("port").value  = rcv["ret"][3].port;
+
+}
+window.onload=display;
+
+</script>
+
+
+<div class=""  id = "snmpconfig" >
+<!--    <h2 class="h3"><%:SNMP配置%></h2>
+    <div class = "cbi-map-descr">
+        <%:SNMP是使用TCP/IP协议族对网络中设备进行管理的一个框架。管理员利用SNMP功能可以查询设备信息、修改设备参数值、监控设备状态、发现网络故障等%>
+    </div>
+-->
+    <fieldset class="">
+        <legend><%:Configuration access permissions%></legend>
+
+        <table class = "info-section-table">
+            <tr>
+                <th><%:SNMP status%></th>
+                <td onclick="snmpAble(event)">
+                    <input type="radio" name="status" value="1" checked = "true" /><%:Enable%>&nbsp;&nbsp;&nbsp;
+                    <input type="radio" name="status" value="2" />&nbsp;<%:Disable%>&nbsp;&nbsp;&nbsp;
+                </td>
+            </tr>
+            <tr>
+                <th><%:Read group name only%></th>
+                <td><input name="" id = "readonly_name" type="text" value="public"/><small>(3-16)</small></td>
+            </tr>
+            <tr style="background-color: #fff;">
+                <th><%:read/write group name%></th>
+                <td><input name="" id = "readwrite_name" type="text" value="private"/><small>(3-16)</small></td>
+            </tr>
+            <tr>
+                <th><%:Request port%></th>
+                <td><input name="" id = "port" type="text" value="161"/><small>(1-65535)</small></td>
+            </tr>
+            <tfoot>
+                <tr>
+                    <td colspan="2"><input class="cbi-button cbi-input-apply" type="button" name="ok" align="center" value="<%:Apply%>" onclick="setSnmp()"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </fieldset>
+
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

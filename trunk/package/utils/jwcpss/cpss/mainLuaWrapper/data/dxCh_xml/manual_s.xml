@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CpssFunctionPrototypes>
+ <Structures>
+  <!-- string as input -->
+  <Structure name="GT_U64">
+   <Member array="2" class="int" name="l" type="GT_U32"/>
+  </Structure>
+  <Structure name="GT_ETHERADDR" special="string"/>
+  <Structure name="GT_IPADDR" special="string"/>
+  <Structure name="GT_IPV6ADDR" special="string"/>
+
+  <!-- unions which refer to extra key -->
+  <Structure name="CPSS_DXCH_PCL_RULE_FORMAT_UNT" special="UNT" keyType="CPSS_DXCH_PCL_RULE_FORMAT_TYPE_ENT">
+    <Member class="struct" name="ruleStdNotIp" type="CPSS_DXCH_PCL_RULE_FORMAT_STD_NOT_IP_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_STD_NOT_IP_E"/>
+    <Member class="struct" name="ruleStdIpL2Qos" type="CPSS_DXCH_PCL_RULE_FORMAT_STD_IP_L2_QOS_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_STD_IP_L2_QOS_E"/>
+    <Member class="struct" name="ruleStdIpv4L4" type="CPSS_DXCH_PCL_RULE_FORMAT_STD_IPV4_L4_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_STD_IPV4_L4_E"/>
+    <Member class="struct" name="ruleStdIpv6Dip" type="CPSS_DXCH_PCL_RULE_FORMAT_STD_IPV6_DIP_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_STD_IPV6_DIP_E"/>
+    <Member class="struct" name="ruleIngrStdUdb" type="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_STANDARD_UDB_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_STD_UDB_E"/>
+    <Member class="struct" name="ruleExtNotIpv6" type="CPSS_DXCH_PCL_RULE_FORMAT_EXT_NOT_IPV6_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_EXT_NOT_IPV6_E"/>
+    <Member class="struct" name="ruleExtIpv6L2" type="CPSS_DXCH_PCL_RULE_FORMAT_EXT_IPV6_L2_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_EXT_IPV6_L2_E"/>
+    <Member class="struct" name="ruleExtIpv6L4" type="CPSS_DXCH_PCL_RULE_FORMAT_EXT_IPV6_L4_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_EXT_IPV6_L4_E"/>
+    <Member class="struct" name="ruleIngrExtUdb" type="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_EXTENDED_UDB_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_EXT_UDB_E"/>
+    <Member class="struct" name="ruleEgrStdNotIp" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_STD_NOT_IP_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_STD_NOT_IP_E"/>
+    <Member class="struct" name="ruleEgrStdIpL2Qos" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_STD_IP_L2_QOS_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_STD_IP_L2_QOS_E"/>
+    <Member class="struct" name="ruleEgrStdIpv4L4" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_STD_IPV4_L4_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_STD_IPV4_L4_E"/>
+    <Member class="struct" name="ruleEgrExtNotIpv6" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_EXT_NOT_IPV6_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_EXT_NOT_IPV6_E"/>
+    <Member class="struct" name="ruleEgrExtIpv6L2" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_EXT_IPV6_L2_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_EXT_IPV6_L2_E"/>
+    <Member class="struct" name="ruleEgrExtIpv6L4" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_EXT_IPV6_L4_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_EXT_IPV6_L4_E"/>
+    <Member class="struct" name="ruleStdIpv4RoutedAclQos" type="CPSS_DXCH_PCL_RULE_FORMAT_STD_IPV4_ROUTED_ACL_QOS_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_STD_IPV4_ROUTED_ACL_QOS_E"/>
+    <Member class="struct" name="ruleExtIpv4PortVlanQos" type="CPSS_DXCH_PCL_RULE_FORMAT_EXT_IPV4_PORT_VLAN_QOS_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_EXT_IPV4_PORT_VLAN_QOS_E"/>
+    <Member class="struct" name="ruleUltraIpv6PortVlanQos" type="CPSS_DXCH_PCL_RULE_FORMAT_ULTRA_IPV6_PORT_VLAN_QOS_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_ULTRA_IPV6_PORT_VLAN_QOS_E"/>
+    <Member class="struct" name="ruleUltraIpv6RoutedAclQos" type="CPSS_DXCH_PCL_RULE_FORMAT_ULTRA_IPV6_ROUTED_ACL_QOS_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_ULTRA_IPV6_ROUTED_ACL_QOS_E"/>
+    <Member class="struct" name="ruleEgrExtIpv4RaclVacl" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_EXT_IPV4_RACL_VACL_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_EXT_IPV4_RACL_VACL_E"/>
+    <Member class="struct" name="ruleEgrUltraIpv6RaclVacl" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_ULTRA_IPV6_RACL_VACL_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_ULTRA_IPV6_RACL_VACL_E"/>
+    <Member class="struct" name="ruleIngrUdbOnly" type="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_UDB_ONLY_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_UDB_10_E"/>
+    <Member class="struct" name="ruleIngrUdbOnly" type="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_UDB_ONLY_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_UDB_20_E"/>
+    <Member class="struct" name="ruleIngrUdbOnly" type="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_UDB_ONLY_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_UDB_30_E"/>
+    <Member class="struct" name="ruleIngrUdbOnly" type="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_UDB_ONLY_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_UDB_40_E"/>
+    <Member class="struct" name="ruleIngrUdbOnly" type="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_UDB_ONLY_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_UDB_50_E"/>
+    <Member class="struct" name="ruleIngrUdbOnly" type="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_UDB_ONLY_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_INGRESS_UDB_60_E"/>
+    <Member class="struct" name="ruleEgrUdbOnly" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_UDB_ONLY_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_UDB_10_E"/>
+    <Member class="struct" name="ruleEgrUdbOnly" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_UDB_ONLY_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_UDB_20_E"/>
+    <Member class="struct" name="ruleEgrUdbOnly" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_UDB_ONLY_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_UDB_30_E"/>
+    <Member class="struct" name="ruleEgrUdbOnly" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_UDB_ONLY_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_UDB_40_E"/>
+    <Member class="struct" name="ruleEgrUdbOnly" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_UDB_ONLY_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_UDB_50_E"/>
+    <Member class="struct" name="ruleEgrUdbOnly" type="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_UDB_ONLY_STC"
+       key="CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_UDB_60_E"/>
+  </Structure>
+  <Structure name="CPSS_DXCH_TTI_ACTION_UNT" special="UNT" keyType="CPSS_DXCH_TTI_ACTION_TYPE_ENT">
+    <Member class="struct" name="type1" type="CPSS_DXCH_TTI_ACTION_STC"
+       key="CPSS_DXCH_TTI_ACTION_TYPE1_ENT"/>
+    <Member class="struct" name="type2" type="CPSS_DXCH_TTI_ACTION_2_STC"
+       key="CPSS_DXCH_TTI_ACTION_TYPE2_ENT"/>
+  </Structure>
+  <Structure name="CPSS_DXCH_TTI_RULE_UNT" special="UNT" keyType="CPSS_DXCH_TTI_RULE_TYPE_ENT">
+    <Member class="struct" name="ipv4" type="CPSS_DXCH_TTI_IPV4_RULE_STC"
+       key="CPSS_DXCH_TTI_RULE_IPV4_E"/>
+    <Member class="struct" name="eth" type="CPSS_DXCH_TTI_ETH_RULE_STC"
+       key="CPSS_DXCH_TTI_RULE_ETH_E"/>
+    <Member class="struct" name="mim" type="CPSS_DXCH_TTI_MIM_RULE_STC"
+       key="CPSS_DXCH_TTI_RULE_MIM_E"/>
+<!--
+    <Member class="struct" name="trill" type="CPSS_DXCH_TTI_TRILL_RULE_STC"
+       key=""/>
+-->
+    <Member class="struct" name="mpls" type="CPSS_DXCH_TTI_MPLS_RULE_STC"
+       key="CPSS_DXCH_TTI_RULE_MPLS_E"/>
+    <Member array="10" class="int" name="udbArray" type="GT_U8"
+       key="CPSS_DXCH_TTI_RULE_UDB_10_E"/>
+    <Member array="20" class="int" name="udbArray" type="GT_U8"
+       key="CPSS_DXCH_TTI_RULE_UDB_20_E"/>
+    <Member array="30" class="int" name="udbArray" type="GT_U8"
+       key="CPSS_DXCH_TTI_RULE_UDB_30_E"/>
+  </Structure>
+  <Structure name="CPSS_DXCH_TUNNEL_START_CONFIG_UNT" special="UNT" keyType="CPSS_TUNNEL_TYPE_ENT">
+    <Member class="struct" name="ipv4Cfg" type="CPSS_DXCH_TUNNEL_START_IPV4_CONFIG_STC"
+       key="CPSS_TUNNEL_X_OVER_IPV4_E"/>
+    <Member class="struct" name="ipv4Cfg" type="CPSS_DXCH_TUNNEL_START_IPV4_CONFIG_STC"
+       key="CPSS_TUNNEL_X_OVER_GRE_IPV4_E"/>
+<!--TODO
+    <Member class="struct" name="ipv6Cfg" type="CPSS_DXCH_TUNNEL_START_IPV6_CONFIG_STC"
+       key=""/>
+-->
+    <Member class="struct" name="mplsCfg" type="CPSS_DXCH_TUNNEL_START_MPLS_CONFIG_STC"
+       key="CPSS_TUNNEL_X_OVER_MPLS_E"/>
+    <Member class="struct" name="mimCfg" type="CPSS_DXCH_TUNNEL_START_MIM_CONFIG_STC"
+       key="CPSS_TUNNEL_MAC_IN_MAC_E"/>
+    <Member class="struct" name="trillCfg" type="CPSS_DXCH_TUNNEL_START_TRILL_CONFIG_STC"
+       key="CPSS_TUNNEL_TRILL_E"/>
+  </Structure>
+
+  <Structure name="CPSS_DXCH_IP_NAT_ENTRY_UNT" special="UNT" keyType="CPSS_IP_NAT_TYPE_ENT">
+      <Member class="struct" name="nat44Entry" type="CPSS_DXCH_IP_NAT44_ENTRY_STC"
+       key="CPSS_IP_NAT_TYPE_NAT44_E"/>
+      <Member class="struct" name="nat66Entry" type="CPSS_DXCH_IP_NAT66_ENTRY_STC"
+       key="CPSS_IP_NAT_TYPE_NAT66_E"/>
+  </Structure>
+
+  <!-- unusable structures -->
+  <Structure name="CPSS_DXCH_PP_PHASE1_INIT_INFO_STC" special="unused"/>
+  <Structure name="CPSS_DXCH_PP_PHASE2_INIT_INFO_STC" special="unused"/>
+  <Structure name="CPSS_RX_BUF_INFO_STC" special="unused"/>
+  <Structure name="CPSS_NET_IF_CFG_STC" special="unused"/>
+  <Structure name="CPSS_DXCH_NETIF_MII_INIT_STC" special="unused"/>
+  <Structure name="CPSS_DRV_HW_ACCESS_OBJ_STC" special="unused"/>
+  <Structure name="CPSS_AUQ_CFG_STC" special="unused"/>
+  <Structure name="CPSS_DXCH_CFG_HW_ACCESS_OBJ_STC" special="unused"/>
+  <Structure name="CPSS_DXCH_NET_TX_PARAMS_STC" special="unused"/>
+
+ </Structures>
+</CpssFunctionPrototypes>

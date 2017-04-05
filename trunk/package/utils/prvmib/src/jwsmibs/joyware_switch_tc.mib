@@ -1,0 +1,457 @@
+-- ============================================================================
+-- MibName   : JOYWARE-SMI
+-- FileName  : joyware-smi.mib
+-- Purpose   : Joyware Enterprise Structure of Management Information
+-- ============================================================================
+JWS-TC DEFINITIONS ::= BEGIN
+    IMPORTS
+        TEXTUAL-CONVENTION
+                            FROM SNMPv2-TC;
+
+-- definition of textual conventions
+
+JwsModelIdValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:"
+    STATUS  current
+    DESCRIPTION
+        "An OCTET-STRING For unique identifier."
+    SYNTAX  OCTET STRING (SIZE (4..8))
+
+JwsEnableValue ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Represents a flag which is either enabled or disabled."
+    SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+            }
+
+JwsDot1dState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Represents the controller port spanning tree state."
+    SYNTAX  INTEGER {
+            disabled(1),
+            blocked(2),
+            listening(3),
+            learning(4),
+            forwarding(5)
+            }
+
+JwsOperState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Represents Operational state of an interface."
+    SYNTAX  INTEGER {
+            up(1),
+            down(2),
+            testing(3)
+            }
+
+JwsPhysicalMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Port physical speed mode."
+    SYNTAX  INTEGER {
+            auto-negotiate(1),
+            half-10(2),
+            full-10(3),
+            half-100(4),
+            full-100(5),
+            full-1000(6),
+            half-1000(7)
+            }
+
+JwsPhysicalState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Port actual physical speed status."
+    SYNTAX  INTEGER {
+            invalid(1),
+            half-10(2),
+            full-10(3),
+            half-100(4),
+            full-100(5),
+            full-1000(6),
+            half-1000(7)
+            }
+
+JwsPortType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Port Type."
+    SYNTAX  INTEGER {
+            fe(1),
+            fx(2),
+            ge(3),
+            gx(4),
+            sdi_in(32),
+            sdi_out(33),
+            opt_in(34),
+            opt_out(35)
+            }
+
+JwsRateLimitTypeMask ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention represents a bit mask representing
+         the rate limiting bucket type mask .
+
+            Unknown Unicast Frame     (1)
+            Unknown Multicast Frame   (2)
+            Broadcast Frame           (3)
+            Multicast Frame           (4)
+            Unicast Frame             (5)"
+
+    SYNTAX  BITS {
+            unkown-unicast(0),
+            unkown-multicast(1),
+            broadcast(2),
+            multicast(3),
+            unicast(4)
+            }
+
+JwsPortList ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+       "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1',
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX  OCTET STRING
+
+JwsVlanID ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS  current
+    DESCRIPTION
+       "A value used to index per-VLAN tables: values of 0 and
+        4095 are not permitted.  If the value is between 1 and
+        4094 inclusive, it represents an IEEE 802.1Q VLAN-ID with
+        global scope within a given bridged domain (see VlanId
+        textual convention).  If the value is greater than 4095,
+        then it represents a VLAN with scope local to the
+        particular agent, i.e., one without a global VLAN-ID
+        assigned to it.  Such VLANs are outside the scope of
+        IEEE 802.1Q, but it is convenient to be able to manage them
+        in the same way using this MIB."
+    SYNTAX  Unsigned32
+
+JwsLldpChassisIdSubtype ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+            "This TC describes the source of a chassis identifier.
+
+            The enumeration 'chassisComponent(1)' represents a chassis
+            identifier based on the value of entPhysicalAlias object
+            (defined in IETF RFC 2737) for a chassis component (i.e.,
+            an entPhysicalClass value of 'chassis(3)').
+
+            The enumeration 'interfaceAlias(2)' represents a chassis
+            identifier based on the value of ifAlias object (defined in
+            IETF RFC 2863) for an interface on the containing chassis.
+
+            The enumeration 'portComponent(3)' represents a chassis
+            identifier based on the value of entPhysicalAlias object
+            (defined in IETF RFC 2737) for a port or backplane
+            component (i.e., entPhysicalClass value of 'port(10)' or
+            'backplane(4)'), within the containing chassis.
+
+            The enumeration 'macAddress(4)' represents a chassis
+            identifier based on the value of a unicast source address
+            (encoded in network byte order and IEEE 802.3 canonical bit
+            order), of a port on the containing chassis as defined in
+            IEEE Std 802-2001.
+
+            The enumeration 'networkAddress(5)' represents a chassis
+            identifier based on a network address, associated with
+            a particular chassis.  The encoded address is actually
+            composed of two fields.  The first field is a single octet,
+            representing the IANA AddressFamilyNumbers value for the
+            specific address type, and the second field is the network
+            address value.
+
+            The enumeration 'interfaceName(6)' represents a chassis
+            identifier based on the value of ifName object (defined in
+            IETF RFC 2863) for an interface on the containing chassis.
+
+            The enumeration 'local(7)' represents a chassis identifier
+            based on a locally defined value."
+    SYNTAX  INTEGER {
+            chassisComponent(1),
+            interfaceAlias(2),
+            portComponent(3),
+            macAddress(4),
+            networkAddress(5),
+            interfaceName(6),
+            local(7)
+            }
+
+JwsLldpChassisId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "This TC describes the format of a chassis identifier string.
+            Objects of this type are always used with an associated
+            LldpChassisIdSubtype object, which identifies the format of
+            the particular LldpChassisId object instance.
+
+            If the associated LldpChassisIdSubtype object has a value of
+            'chassisComponent(1)', then the octet string identifies
+            a particular instance of the entPhysicalAlias object
+            (defined in IETF RFC 2737) for a chassis component (i.e.,
+            an entPhysicalClass value of 'chassis(3)').
+
+            If the associated LldpChassisIdSubtype object has a value
+            of 'interfaceAlias(2)', then the octet string identifies
+            a particular instance of the ifAlias object (defined in
+            IETF RFC 2863) for an interface on the containing chassis.
+            If the particular ifAlias object does not contain any values,
+            another chassis identifier type should be used.
+
+            If the associated LldpChassisIdSubtype object has a value
+            of 'portComponent(3)', then the octet string identifies a
+            particular instance of the entPhysicalAlias object (defined
+            in IETF RFC 2737) for a port or backplane component within
+            the containing chassis.
+
+            If the associated LldpChassisIdSubtype object has a value of
+            'macAddress(4)', then this string identifies a particular
+            unicast source address (encoded in network byte order and
+            IEEE 802.3 canonical bit order), of a port on the containing
+            chassis as defined in IEEE Std 802-2001.
+
+            If the associated LldpChassisIdSubtype object has a value of
+            'networkAddress(5)', then this string identifies a particular
+            network address, encoded in network byte order, associated
+            with one or more ports on the containing chassis.  The first
+            octet contains the IANA Address Family Numbers enumeration
+            value for the specific address type, and octets 2 through
+            N contain the network address value in network byte order.
+
+            If the associated LldpChassisIdSubtype object has a value
+            of 'interfaceName(6)', then the octet string identifies
+            a particular instance of the ifName object (defined in
+            IETF RFC 2863) for an interface on the containing chassis.
+            If the particular ifName object does not contain any values,
+            another chassis identifier type should be used.
+
+            If the associated LldpChassisIdSubtype object has a value of
+            'local(7)', then this string identifies a locally assigned
+            Chassis ID."
+    SYNTAX  OCTET STRING (SIZE (1..255))
+
+JwsLldpPortIdSubtype ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "This TC describes the source of a particular type of port
+            identifier used in the LLDP MIB.
+
+            The enumeration 'interfaceAlias(1)' represents a port
+            identifier based on the ifAlias MIB object, defined in IETF
+            RFC 2863.
+
+            The enumeration 'portComponent(2)' represents a port
+            identifier based on the value of entPhysicalAlias (defined in
+            IETF RFC 2737) for a port component (i.e., entPhysicalClass
+            value of 'port(10)'), within the containing chassis.
+
+            The enumeration 'macAddress(3)' represents a port identifier
+            based on a unicast source address (encoded in network
+            byte order and IEEE 802.3 canonical bit order), which has
+            been detected by the agent and associated with a particular
+            port (IEEE Std 802-2001).
+
+            The enumeration 'networkAddress(4)' represents a port
+            identifier based on a network address, detected by the agent
+            and associated with a particular port.
+
+            The enumeration 'interfaceName(5)' represents a port
+            identifier based on the ifName MIB object, defined in IETF
+            RFC 2863.
+
+            The enumeration 'agentCircuitId(6)' represents a port
+            identifier based on the agent-local identifier of the circuit
+            (defined in RFC 3046), detected by the agent and associated
+            with a particular port.
+
+            The enumeration 'local(7)' represents a port identifier
+            based on a value locally assigned."
+
+    SYNTAX  INTEGER {
+            interfaceAlias(1),
+            portComponent(2),
+            macAddress(3),
+            networkAddress(4),
+            interfaceName(5),
+            agentCircuitId(6),
+            local(7)
+            }
+
+JwsLldpPortId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "This TC describes the format of a port identifier string.
+            Objects of this type are always used with an associated
+            LldpPortIdSubtype object, which identifies the format of the
+            particular LldpPortId object instance.
+
+            If the associated LldpPortIdSubtype object has a value of
+            'interfaceAlias(1)', then the octet string identifies a
+            particular instance of the ifAlias object (defined in IETF
+            RFC 2863).  If the particular ifAlias object does not contain
+            any values, another port identifier type should be used.
+
+            If the associated LldpPortIdSubtype object has a value of
+            'portComponent(2)', then the octet string identifies a
+            particular instance of the entPhysicalAlias object (defined
+            in IETF RFC 2737) for a port or backplane component.
+
+            If the associated LldpPortIdSubtype object has a value of
+            'macAddress(3)', then this string identifies a particular
+            unicast source address (encoded in network byte order
+            and IEEE 802.3 canonical bit order) associated with the port
+            (IEEE Std 802-2001).
+
+            If the associated LldpPortIdSubtype object has a value of
+            'networkAddress(4)', then this string identifies a network
+            address associated with the port.  The first octet contains
+            the IANA AddressFamilyNumbers enumeration value for the
+            specific address type, and octets 2 through N contain the
+            networkAddress address value in network byte order.
+
+            If the associated LldpPortIdSubtype object has a value of
+            'interfaceName(5)', then the octet string identifies a
+            particular instance of the ifName object (defined in IETF
+            RFC 2863).  If the particular ifName object does not contain
+            any values, another port identifier type should be used.
+
+            If the associated LldpPortIdSubtype object has a value of
+            'agentCircuitId(6)', then this string identifies a agent-local
+            identifier of the circuit (defined in RFC 3046).
+
+            If the associated LldpPortIdSubtype object has a value of
+            'local(7)', then this string identifies a locally
+            assigned port ID."
+    SYNTAX  OCTET STRING (SIZE (1..255))
+
+JwsLldpManAddrIfSubtype ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "This TC describes the basis of a particular type of
+            interface associated with the management address.
+
+            The enumeration 'unknown(1)' represents the case where the
+            interface is not known.
+
+            The enumeration 'ifIndex(2)' represents interface identifier
+            based on the ifIndex MIB object.
+
+            The enumeration 'systemPortNumber(3)' represents interface
+            identifier based on the system port numbering convention."
+    REFERENCE
+            "IEEE 802.1AB-2005 9.5.9.5"
+
+    SYNTAX  INTEGER {
+            unknown(1),
+            ifIndex(2),
+            systemPortNumber(3)
+            }
+
+JwsLldpManAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "The value of a management address associated with the LLDP
+            agent that may be used to reach higher layer entities to
+            assist discovery by network management.
+
+            It should be noted that appropriate security credentials,
+            such as SNMP engineId, may be required to access the LLDP
+            agent using a management address.  These necessary credentials
+            should be known by the network management and the objects
+            associated with the credentials are not included in the
+            LLDP agent."
+    SYNTAX  OCTET STRING (SIZE (1..31))
+
+JwsLldpSystemCapabilitiesMap ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "This TC describes the system capabilities.
+
+            The bit 'other(0)' indicates that the system has capabilities
+            other than those listed below.
+
+            The bit 'repeater(1)' indicates that the system has repeater
+            capability.
+
+            The bit 'bridge(2)' indicates that the system has bridge
+            capability.
+
+            The bit 'wlanAccessPoint(3)' indicates that the system has
+            WLAN access point capability.
+
+            The bit 'router(4)' indicates that the system has router
+            capability.
+
+            The bit 'telephone(5)' indicates that the system has telephone
+            capability.
+
+            The bit 'docsisCableDevice(6)' indicates that the system has
+            DOCSIS Cable Device capability (IETF RFC 2669 & 2670).
+
+            The bit 'stationOnly(7)' indicates that the system has only
+            station capability and nothing else."
+    SYNTAX  BITS {
+            other(0),
+            repeater(1),
+            bridge(2),
+            wlanAccessPoint(3),
+            router(4),
+            telephone(5),
+            docsisCableDevice(6),
+            stationOnly(7)
+            }
+
+JwsLldpPortNumber ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS  current
+    DESCRIPTION
+            "Each port contained in the chassis (that is known to the
+            LLDP agent) is uniquely identified by a port number.
+
+            A port number has no mandatory relationship to an
+            InterfaceIndex object (of the interfaces MIB, IETF RFC 2863).
+            If the LLDP agent is a IEEE 802.1D, IEEE 802.1Q bridge, the
+            LldpPortNumber will have the same value as the dot1dBasePort
+            object (defined in IETF RFC 1493) associated corresponding
+            bridge port.  If the system hosting LLDP agent is not an
+            IEEE 802.1D or an IEEE 802.1Q bridge, the LldpPortNumber
+            will have the same value as the corresponding interface's
+            InterfaceIndex object.
+
+            Port numbers should be in the range of 1 and 4096 since a
+            particular port is also represented by the corresponding
+            port number bit in LldpPortList."
+    SYNTAX  Integer32(1..4096)
+
+JwsLldpPortList ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+            "Each octet within this value specifies a set of eight ports,
+            with the first octet specifying ports 1 through 8, the second
+            octet specifying ports 9 through 16, etc.  Within each octet,
+            the most significant bit represents the lowest numbered port,
+            and the least significant bit represents the highest numbered
+            port.  Thus, each port of the system is represented by a
+            single bit within the value of this object.  If that bit has
+            a value of '1' then that port is included in the set of ports;
+            the port is not included if its bit has a value of '0'."
+    REFERENCE
+            "IETF RFC 2674 section 5"
+    SYNTAX  OCTET STRING(SIZE(0..512))
+
+END

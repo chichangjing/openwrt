@@ -1,0 +1,498 @@
+<html>
+<head>
+    <style type="text/css">
+        .param { 
+            font-weight: bold;
+            color: darkblue;
+        }
+        .env { 
+            font-family: monospace;
+            font-weight: bold;
+            color: darkblue;
+        }
+        .section { padding-left: 2em; }
+        .exampleold { 
+            padding-left: 2em;
+            font-family: monospace;
+            white-space: pre;
+            color: darkblue;
+        }
+        pre.exampleold { margin: 0px; }
+        .examplenew { 
+            padding-left: 2em;
+            font-family: monospace;
+            white-space: pre;
+            color: green
+        }
+        pre.examplenew { margin: 0px; }
+    </style>
+    <title>Build.sh user manual</title>
+</head>
+<body>
+
+<h2>Content</h2>
+<div class="section">
+    <dl>
+        <dt><a href="#introduction">Introduction</a></dt>
+        <dt><a href="#usage">Usage</a></dt>
+            <dd><dl>
+                <dt><a href="#synopsys">Synopsys</a></dt>
+                <dt><a href="#parameters">Parameters</a></dt>
+                <dt><a href="#options">Options</a></dt>
+                <dt><a href="#examples">Examples</a></dt>
+                    <dd><dl>
+                        <dt><a href="#exwin32marvellcpssdev">Working in Marvell win32
+                            development environment (for users who used
+                            <tt>Build_vxWorks_dev.bat</tt> script)</a></dt>
+                        <dt><a href="#exwin32">win32 environment</a></dt>
+                        <dt><a href="#exlinuxsim">Build linux simulation</a></dt>
+                        <dt><a href="#exlinux">Build linux black mode</a></dt>
+                        <dt><a href="#exfreebsd">Build FreeBSD black mode</a></dt>
+                    </dl></dd>
+            </dl></dd>
+        <dt><a href="#details">Details</a></dt>
+            <dd><dl>
+                <dt><a href="#productdetails">Product details</a></dt>
+                <dt><a href="#targetvxworks">vxWorks details</a></dt>
+                <dt><a href="#targetlinux">Linux (embedded) details</a></dt>
+                <dt><a href="#targetfreebsd">FreeBSD (embedded) details</a></dt>
+                <dt><a href="#marvelldevcpss">Marvell development environment</a></dt>
+            </dl></dd>
+        <dt><a href=""></a></dt>
+        <dt><a href=""></a></dt>
+        <dt><a href=""></a></dt>
+        <dt><a href=""></a></dt>
+        <dt><a href=""></a></dt>
+        <dt><a href=""></a></dt>
+        <dt><a href=""></a></dt>
+    </dl>  
+
+</div>
+
+<a name="introduction"><h2>Introduction</h2>
+<div class="section">
+<h3>Preface</h3>
+<div class="section">
+    <p>The current PSS/CPSS projects are build with many scripts
+    For example there is 13 scripts in CPSS and 14 in PSS which
+    do mostly the same.</p>
+
+    <p>As a consequence many changes require to be done across most
+    of these files. For example adding a new CPU require 15-20
+    files to be changed</p>
+
+
+    <p>Also no one can be sure that the product configuration is the
+    same when product is build for different OSes<p>
+
+</div>
+</div>
+
+<a name="usage"><h2>Usage</h2>
+<div class="section">
+<a name="synopsys"><h3>Synopsys</h3>
+<div class="section">
+    <tt>
+        <a href="#shell" class="param">SHELL</a>
+        <b>Build.sh</b>
+        <a href="#options" class="param">[options]</a>
+
+        <a href="#hostos" class="param">HostOS</a>
+        <a href="#targetcpu" class="param">TargetCPU</a>        
+        <a href="#targetos" class="param">TargetOS</a>
+        
+        <a href="#ppfamily" class="param">PPfamily</a>
+        <a href="#pptype" class="param">PPtype</a>
+        <a href="#product" class="param">Product</a>
+        
+        <a href="#comproot" class="param">CompRoot</a>
+        <a href="#imagepath" class="param">ImagePath</a>
+    </tt>
+
+    <p>The <a name="shell"><span class="param">SHELL</span> is is shell interpreter.
+    Can be BASH or ZSH
+</div>
+
+<a name="parameters"><h3>Parameters</h3>
+<div class="section">
+    <dl>
+        <dt><a name="hostos"><span class="param">HostOS</span></dt>
+                <dd>is OS where this shell is running.
+                <br>The following values are currently supported:
+                <ul>
+                  <li>Linux
+                  <li>FreeBSD
+                  <li>win32
+                  <li><a href="#marvelldevcpss">win32_marvell_cpss_dev</a>
+                </ul>
+                </dd>
+        <dt><a name="targetcpu"><span class="param">TargetCPU</span></dt>
+                <dd>is CPU type where application will run.
+                <br>The following values are currently supported:
+                <br><i>i386, ARM5181, PPC603, PPC85XX, XCAT, XCAT_BE,
+                         ARM78100,</i> ...
+                <p>The complete list of supported CPUs can be found in
+                tools/build/cpu/ directory. Just remove .sh suffix
+                from file names
+                </dd>
+        <dt><a name="targetos"><span class="param">TargetOS</span></dt>
+                <dd>is the OS type where application will run.
+                <br>The following values are currently supported:
+                <ul>
+                  <li><a href="#targetlinux">Linux</a>
+                  <li><a href="#targetlinuxwm">LinuxWM</a>
+                        Linux White Mode
+                  <li><a href="#targetfreebsd">FreeBSD</a>
+                  <li><a href="#targetfreebsdwm">FreeBSDWM</a>
+                        FreeBSD White Mode
+                  <li><a href="#targetwin32">win32</a>
+                  <li><a href="#targetvxworks">vxWorks</a>
+                </ul>
+                </dd>
+
+        <dt><a name="ppfamily"><span class="param">PPfamily</span></dt>
+                <dd>is a Packet Processor family. Usually this depends
+                on <a href="#product">product</a>
+                <br>An example for PPfamily parameter:
+                <br><i>DX, EX, DX_CHX, EXMXPM, EX_DX_ALL,</i> ...
+                </dd>
+        <dt><a name="pptype"><span class="param">PPtype</span></dt>
+                <dd>is the type of packet processor.
+                <br>The following values are currently supported:
+                <ul>
+                  <li>HW - hardware PP
+                  <li>BM - black mode - synonym for HW
+                  <li>simulaton
+                  <li>GM - Golden mode - currently synonym for simulation
+                </ul>
+                </dd>
+        <dt><a name="product"><span class="param">Product</span></dt>
+                <dd>is a product type.
+                <br>The following values are currently supported:
+                <br><i>PSS, POC, CPSS_ENABLER, CPSS_LIB, BROKER,</i> ...
+                <p>The complete list of supported CPUs can be found in
+                tools/build/product/ directory. Just remove .sh suffix
+                from file names
+                </dd>
+
+        <dt><a name="comproot"><span class="param">CompRoot</span></dt>
+                <dd>a compilation root directory. All objects/libraries
+                will be built here
+                </dd>
+        <dt><a name="imagepath"><span class="param">ImagePath</span></dt>
+                <dd>an image path. After bootable image complete it will
+                be copied to this directory
+                </dd>
+    </dl>
+
+</div>
+<hr>
+
+
+<a name="options"><h3>Options</h3>
+<div class="section">
+    <dl>
+        <dt class="param">-T&nbsp;toolkit</dt>
+                <dd>Choose toolkit which will be used for build
+                <br>Toolkit is <i>vc, workbench26, tornado, gnu, eldk,
+                gnueabi,fbsd,</i>...
+                <br>see $tool_build/toolkit/${toolkit_name}.sh for details
+
+                <p>If toolkit is not specifies then default toolkit choosen
+                by TargetOS+TargetCPU
+                </dd>
+        <dt class="param">-b&nbsp;bus</dt>
+                <dd>override management bus.
+                <p>Default management bus is CPU specific
+                </dd>
+        <dt class="param">-x&nbsp;xbar</dt>
+                <dd>Set Xbar type
+                <p>Default <i>NONE</i>
+                </dd>
+        <dt class="param">-u&nbsp;<i>UTF_YES|UTF_NO</i></dt>
+                <dd>Include UTF.
+                <p>Default is <i>UTF_YES</i>
+                </dd>
+        <dt class="param">-C</dt>
+                <dd>Do build in current directory only.
+                <p>To use this option a short user script like this one will be created
+                <pre class="examplenew">
+#!/bin/bash
+# <b>bld_cpss_sim</b>
+export CPSS_PATH=/home/serg/tmp/Marvell/cpss
+$CPSS_PATH/Build.sh <b>-C</b> \
+    -u UTF_YES \
+    Linux i386 LinuxWM \
+    DX simulation CPSS_ENABLER \
+    /home/serg/tmp/Marvell/objs -
+                </pre>
+                <p>Put this script in your bin directory
+				<p>Run this script with no option to build whole project
+				<p>Add <b>-C</b> parameter to build in current directory only:
+                <pre class="examplenew">
+cd /home/serg/tmp/Marvell/cpss
+cd cpssEnabler/mainCmd/src/cmdShell/shell
+vi cmdMain.c
+<b>bld_cpss_sim -C</b>
+vi cmdConsole.c
+<b>bld_cpss_sim -C</b>
+                </pre>
+                <p>In both cases make will walk into
+                <b>cpssEnabler/mainCmd/src/cmdShell/shell</b>
+                directory and it ssubdirs only
+                <p>This option should also work in Win32 using simple .bat file
+                </dd>    
+        <dt class="param">-D&nbsp;<i>DEV|ENVBASE|CUST</i></dt>
+                <dd>
+                    <b>DEV</b> Run in developer mode - spawn an interactive shell 
+                        after finishing of all steps (BSP copy, compile and link)<br>
+                    <b>ENVBASE</b> spawn an interactive
+                        shell after all environment set and host OS depended
+                        preparation actions is done<br>
+                    <b>CUST</b> spawn an interactive shell 
+                        after finishing compile and link
+                    <br>
+                    Note: the 20081215_partial_build patch propose a better solution
+                    to compile in specific directory only
+                </dd>
+        <dt class="param">-q</dt>
+                <dd>Run script silently - only warning and error
+                messages will be visible 
+                </dd>
+    </dl>
+
+
+</div>
+<hr>
+
+<a name="examples"><h3>Examples</h3>
+<div class="section">
+    <a name="exwin32marvellcpssdev">
+    <h4>Working in Marvell win32 development environment (for users who used 
+    <tt>Build_vxWorks_dev.bat</tt> script):</h4>
+    <div class="exampleold">Build_vxWorks_dev.bat PPC85XX EXMXPM</div>
+    will be mapped to
+    <div class="examplenew">tools\bin\zsh Build.sh <a href="#marvelldevcpss">win32_marvell_cpss_dev</a> PPC85XX <a href="#targetvxworks">vxWorks</a> EXMXPM HW CPSS_ENABLER - -</div>
+    The same but RTOS_ON_SIM:
+    <div class="examplenew">tools\bin\zsh Build.sh <a href="#marvelldevcpss">win32_marvell_cpss_dev</a> PPC85XX <a href="#targetvxworks">vxWorks</a> EXMXPM <b>simulation</b> CPSS_ENABLER - -</div>
+    Build BROKER for win32:
+    <div class="examplenew">tools\bin\zsh Build.sh <a href="#marvelldevcpss">win32_marvell_cpss_dev</a> i386 <a href="#targetwin32">win32</a> NONE <b>simulation</b> BROKER - -</div>
+
+
+    <a name="exwin32">
+    <h4>win32 environment:</h4>
+    <pre class="exampleold">
+X:
+cd \cpss\SW\prestera
+set DRIVE=X:
+call envBase VC EX_ALL
+set PROJ_BSP_DIR=X:\cpss\SW\prestera
+set LINUX_CPSS_TARGET=CPSS_ENABLER
+set COMPILATION_ROOT=X:\cpss\objs\Ex_sim
+gmake -f MakefileWin.mak
+    </pre>
+    will be mapped to
+    <pre class="examplenew">
+set <a href="#productdetails">CPSS_PATH</a>=X:\cpss\SW\prestera
+tools\bin\zsh Build.sh win32 i386 win32 EX_ALL simulation CPSS_ENABLER X:\cpss\objs\Ex_sim -
+    </pre>
+    <p>Build PSS POC vxWorks image:
+    <pre class="exampleold">
+set DRIVE=X:
+set PSS_USER_BASE=%DRIVE%\pss\SW\prestera
+
+%DRIVE%
+cd %PSS_USER_BASE%
+
+call envBase ARM5181 EX CPSS
+
+set NO_CPSS_WRAPPERS=EXISTS
+
+call torVars
+set COMPILATION_ROOT=X:\pss\Objs\poc_Ex_tg_arm
+set PROJ_BSP_DIR=X:\Bsp\config\db_88f5181_prpmc\swControllers\VxBsp
+
+@rem compile
+gmake -f presteraTopMake full
+
+@rem link
+make -C %PROJ_BSP_DIR% vxWorks.st
+    </pre>
+    will be mapped to
+    <pre class="examplenew">
+set <a href="#productdetails">PSS_PATH</a>=X:\pss\SW\prestera
+set <a href="#targetvxworks">BSP_CONFIG_DIR</a>=X:\Bsp\config
+tools\bin\zsh Build.sh win32 ARM5181 <a href="#targetvxworks">vxWorks</a> EX HW POC X:\pss\Objs\poc_Ex_tg_arm -
+    </pre>
+
+
+    <a name="exlinuxsim">
+    <h4>Build linux simulation</h4>
+    <pre class="exampleold">
+cd $CPSS
+./Build_Linux_Cpss_appDemoSim.sh \
+    $CPSS \
+    DX \
+    $OBJS
+    </pre>
+    will be mapped to
+    <pre class="examplenew">
+export <a href="#productdetails">CPSS_PATH</a>=~/cpss
+cd $CPSS_PATH
+./Build.sh Linux i386 LinuxWM DX simulation CPSS_ENABLER $OBJS -
+    </pre>
+
+
+    <a name="exlinux">
+    <h4>Build linux black mode</h4>
+    <pre class="exampleold">
+export LINUX_CPSS_TARGET="CPSS_ENABLER"
+
+cd $CPSS
+./Build_Linux_CpssDev.sh \
+    ~/images/cpss_images \
+    PPC85XX \
+    ~/linux 2.6.14 \
+    ~/lsp gda8548_lsp \
+    $CPSS \
+    EXMXPM PCI \
+    ${1:-CPSS} \
+    $OBJS
+    </pre>
+    will be mapped to
+    <pre class="examplenew">
+export <a href="#productdetails">CPSS_PATH</a>=~/cpss
+export <a href="#targetlinux">LINUX_DIST_PATH</a>=~/linux
+export <a href="#targetlinux">LSP_USER_BASE</a>=~/lsp
+cd $CPSS_PATH
+./Build.sh Linux PPC85XX <a href="#targetlinux">Linux</a> EXMXPM HW CPSS_ENABLER $OBJS ~/images/cpss_images
+    </pre>
+    For this case <span class="env">LINUX_DIST_PATH</span> and
+    <span class="env">LSP_USER_BASE</span> can be defined in users profile
+
+
+    <a name="exfreebsd">
+    <h4>Build FreeBSD black mode</h4>
+    The following sequence should be used to build FreeBSD image:
+    <pre class="examplenew">
+export <a href="#productdetails">CPSS_PATH</a>=~/cpss
+export <a href="#targetfreebsd">KERNEL_TREE</a>=~/fsp
+cd $CPSS_PATH
+./Build.sh FreeBSD PPC85XX <a href="#targetfreebsd">FreeBSD</a> DX HW CPSS_ENABLER $OBJS ~/images/cpss_images
+    </pre>
+    For this case <span class="env">KERNEL_TREE</span> can be defined in users profile
+
+</div>
+</div>
+<hr>
+
+<a name="details"><h2>Details</h2>
+<div class="section">
+    <p>Each product/os/cpu may require a small number of options which are not
+    covered by script parameters because these options are os/cpu/product
+    specific</p>
+
+    <p>Because these options are rarely changed a good solution for this is
+    pass these options as environment variables</p>
+
+<a name="productdetails"><h3>Product details</h3>
+<div class="section">
+    <dl>
+        <dt class="env">CPSS_PATH</dt>
+            <dd>required for CPSS* projects and for PSS_O_CPSS</dd>
+        <dt class="env">PSS_PATH</dt>
+            <dd>required for PSS* abd POC project</dd>
+    </dl>
+</div>
+
+<a name="targetvxworks"><h3>vxWorks details</h3>
+<div class="section">
+    <p>vxWorks target OS require only one additional option:<br>
+    <dl>
+        <dt class="env">BSP_CONFIG_DIR</dt>
+            <dd>It is directory where BSP configs are located.
+            For example: <tt>Z:\cpss\Bsp\config</tt><br>
+            The following directories can be found in this directory:
+            <i>mv_pmc8245, GDA8548_6.5, db_88f5181_prpmc,
+             db_88f5281_mng, ...</i>
+            </dd>
+    </dl>
+</div>
+
+
+
+<a name="targetlinux"><h3>Linux (embedded) details</h3>
+<div class="section">
+    <dl>
+        <dt class="env">LINUX_DIST_PATH</dt>
+            <dd><strong>Required option.</strong>
+            Kernel sources should be found here,
+            kernel will be compiled in this directory
+            </dd>
+        <dt class="env">LSP_USER_BASE</dt>
+            <dd><strong>Required option.</strong>
+            </dd>
+        <dt class="env">LSP_SUBDIR</dt>
+            <dd>If this option specified then script will look for LSP
+            in this subdirectory of <span class="env">LSP_USER_BASE</span>
+            first
+            </dd>
+        <dt class="env">LINUX_KERNEL_VERSION</dt>
+            <dd>Overwrite DEFAULT_LINUX_KERNEL_VERSION specified in CPU
+            definitions
+            </dd>
+        <dt class="env">LINUX_LSP_NAME</dt>
+            <dd>Overwrite DEFAULT_LINUX_LSP_NAME specified in CPU
+            definitions
+            </dd>
+        <dt class="env">LINUX_BUILD_KERNEL</dt>
+            <dd>Set this option to <i>NO</i> to skip kernel build.
+            <br>Default is YES
+            </dd>
+    </dl>
+</div>
+
+<a name="targetfreebsd"><h3>FreeBSD (embedded) details</h3>
+<div class="section">
+    <dl>
+        <dt class="env">KERNEL_TREE</dt>
+            <dd><strong>Required option.</strong>
+            Path to FreeBSD kernel.<br>
+            The following files will be found in this directory:
+            <br><i><tt>Makefile</tt></i>,
+            <br><i><tt>kernel.bin</tt></i>
+            <br><i><tt>rootfs_fbsd_e500/</tt></i>
+            <br><i><tt>scripts/</tt></i>
+            <br><i><tt>src/</tt></i>
+            <br><i><tt>compiler_frontend/</tt></i>
+            </dd>
+    </dl>
+</div>
+
+<a name="marvelldevcpss"><h3>Marvell CPSS development environment</h3>
+<div class="section">
+    <p>If <span class="param">win32_marvell_cpss_dev</span> specified
+    as <a href="#hostos" class="param">HostOS</a> then the following done
+    before project build:
+    <ul>
+        <li>Default <span class="env">CPSS_PATH</span> set to
+            <span class="env">%DRIVE%\cpss\SW\prestera</span> if no
+            one was specified before
+        <li>Default for <span class="env">COMPILATION_ROOT</span> is set if
+            <a href="#comproot" class="param">CompRoot</a> parameter
+            is empty or "-" (minus sign)
+        <li>object files and libraries are copied from server to
+            <span class="env">%COMPILATION_ROOT%</span>;
+        <li>BSPs are copied from server to
+            <span class="env">%COMPILATION_ROOT%\config</span>
+        <li><span class="env">BSP_CONFIG_DIR</span> is set
+    </ul>
+    <p>As a result you don't need any additional variable to be set
+    if you use <span class="param">win32_marvell_cpss_dev</span>
+    host OS</p>
+</div>
+
+
+</div>
+</body>
+</html>

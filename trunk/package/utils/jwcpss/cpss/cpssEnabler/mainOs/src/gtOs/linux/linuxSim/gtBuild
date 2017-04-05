@@ -1,0 +1,28 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST = 
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+	LIB_NAME = gtOs.lib
+endif
+
+ifeq (EXISTS, $(RTOS_ON_SIM))
+      C_EXCLUDE_FILE_LIST = osLinuxSimEther.c  
+endif
+
+
+#feq (APPLICATION_SIDE_ONLY, $(DISTRIBUTED_SIMULATION_ROLE))
+      C_EXCLUDE_FILE_LIST = osLinuxSimEther.c  
+#endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

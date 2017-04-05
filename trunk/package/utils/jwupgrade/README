@@ -1,0 +1,7 @@
+jwpackup.py
+将openwrt生成的各种镜像文件打包成joyware镜像格式。
+需要在顶层makefile里增加调用，在编译最后阶段自动生成joyware镜像。
+
+jwupgrade.py
+接收OBCP协议的升级指令，同时处理OBCP设备自动发现。
+目前测试的时候使用新版本的升级工具还有问题。

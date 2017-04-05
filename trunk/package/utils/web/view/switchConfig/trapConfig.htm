@@ -1,0 +1,363 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+<%
+    local ubus = require "luci.ubus"
+    local portNum = ubus.getPortNum()
+    local typeStatus = ubus.getPortType(portNum)
+
+    -- 收到设置trap应用处理 
+    local trapJson = luci.http.formvalue("setTrap")
+    if trapJson then
+        local setJson = luci.json.decode(trapJson)
+        local setTrapSnd = {}
+        
+        if setJson.trap_status == "2" then
+            setTrapSnd = {{["trap_status"] = setJson.trap_status}}
+        elseif setJson.trap_status == "1" then 
+            setTrapSnd = {{["trap_status"] = setJson.trap_status},{["trap_port"] = setJson.trap_port},{["trap_server_ip"] = setJson.trap_server_ip}}
+        end
+        
+        local setTrapStatus = ubus.set_args("snmp", "snmp_set", setTrapSnd, 1)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setTrapStatus)
+
+        return
+    
+    end
+
+    -- 电源告警配置应用处理
+    local powerJson = luci.http.formvalue("setPower")
+    if powerJson then
+        local setPowerJson = luci.json.decode(powerJson)
+        local setPowerSnd = {["power_trap"] = setPowerJson.power_trap}
+        local setPowerStatus = ubus.set_args("trap", "trap_set",setPowerSnd, 2)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setPowerStatus)
+        return
+    end
+
+    -- 端口告警配置应用处理
+    local portJson = luci.http.formvalue("setPort")
+    if portJson then
+        local setJson = luci.json.decode(portJson)
+        local setSnd = {}
+        local setStatus = {}
+        for i=1,portNum do
+            local pVal = string.format("port-%d",i)
+                if setJson.data[i].tx_able == "2" and setJson.data[i].rx_able == "2" then
+                    setSnd[i]={[pVal]={{["port_trap"] = setJson.data[i].port_able},{["port_tx_shreshold_enable"] = setJson.data[i].tx_able},{["port_rx_shreshold_enable"] = setJson.data[i].rx_able}}} 
+                elseif setJson.data[i].tx_able == "1" and setJson.data[i].rx_able == "2" then
+                    setSnd[i]={[pVal]={{["port_trap"] = setJson.data[i].port_able},{["port_tx_shreshold_enable"] = setJson.data[i].tx_able},{["port_tx_shreshold_perc"] = setJson.data[i].tx_perc},{["port_rx_shreshold_enable"] = setJson.data[i].rx_able}}} 
+                    
+                elseif setJson.data[i].tx_able == "2" and setJson.data[i].rx_able == "1" then
+                    setSnd[i]={[pVal]={{["port_trap"] = setJson.data[i].port_able},{["port_tx_shreshold_enable"] = setJson.data[i].tx_able},{["port_rx_shreshold_enable"] = setJson.data[i].rx_able},{["port_rx_shreshold_perc"] = setJson.data[i].rx_perc}}} 
+                elseif setJson.data[i].tx_able == "1" and setJson.data[i].rx_able == "1" then
+                    setSnd[i]={[pVal]={{["port_trap"] = setJson.data[i].port_able},{["port_tx_shreshold_enable"] = setJson.data[i].tx_able},{["port_tx_shreshold_perc"] = setJson.data[i].tx_perc},{["port_rx_shreshold_enable"] = setJson.data[i].rx_able},{["port_rx_shreshold_perc"] = setJson.data[i].rx_perc}}} 
+                end
+        end
+        setStatus = ubus.set_args("trap", "trap_set",setSnd,1)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setStatus)
+        return
+    end
+
+    local getTrapStatus = ubus.get_args("snmp", "snmp_get", {"trap_status","trap_port","trap_server_ip" }, 2)
+    
+
+    local getPowerStatus = ubus.get_args("trap","trap_get",{"power_trap"}, 2)
+    local para = {"port_trap","port_tx_shreshold_enable","port_tx_shreshold_perc","port_rx_shreshold_enable","port_rx_shreshold_perc"}
+    local snd = {}
+    
+    for i=1,portNum do
+        local pa = string.format("port-%d",i)
+        snd[i]={[pa] = para}
+    end
+
+    local getStatus = ubus.get_args("trap", "trap_get",snd,1)
+%>
+
+
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">
+function trapAble(e){
+    var target = e.target||e.srcElement;
+    if(target.nodeName=="TD"){return;}
+    document.getElementById("trap_port").disabled = document.getElementById("trap_server_ip").disabled = (target.value == 1? false : true);
+}
+
+//设置告警开关
+function setTrap(){
+    var a =JSON.parse("{\"trap_status\":\"\",\"trap_port\":\"\",\"trap_server_ip\":\"\"}"); 
+    //将表格中内容转化为json格式
+    a.trap_status = document.getElementsByName("trap_status")[0].checked == true?"1":"2";
+    a.trap_port = document.getElementById("trap_port").value;
+    if(a.trap_status == "1"){
+        if((Number(a.trap_port) <1) || (Number(a.trap_port) >65535)){
+            alert("<%:trap id form 1to 65535%>");
+            return;
+        } 
+    }
+    a.trap_server_ip = document.getElementById("trap_server_ip").value;
+    //alert(JSON.stringify(a));
+    //异步提交数据
+    XHR.get('<%=REQUEST_URI%>',{"setTrap": JSON.stringify(a)}, 
+            function(x,rv) {
+                var flag = 0;
+                for(var i = 0; i < rv.length; i++){
+                    if(rv[i].ret == "-1"){
+                        flag = 1;
+                        alert("<%:NO.%>"+(i+1)+"<%:configuration failure%>");
+                        return ;
+                    }
+                }
+                if(flag == 0){
+                    alert("<%:Succesfully configured%>");
+                }
+            }
+           );
+}
+
+//电源告警
+function setPower(){
+    var a = JSON.parse("{\"power_trap\":\"\"}");
+    var powObj = document.getElementById("power");
+    a.power_trap = powObj.checked?"1":"2";
+    console.log(JSON.stringify(a));
+    //异步提交数据
+    XHR.get('<%=REQUEST_URI%>',{"setPower": JSON.stringify(a)}, 
+            function(x,rv) {
+           //     alert(JSON.stringify(rv));
+                    if(rv.ret == "-1"){
+                        alert("<%:Configuration failed%>");
+                   //     window.location.reload();
+                    }else if (rv.ret == "0"){
+                        alert("<%:Succesfully configured%>");
+                    }
+             //   window.location.reload();
+            }
+           );
+
+}
+
+//端口告警
+function setPort(){
+    var a = JSON.parse("{\"data\":[]}");
+    for(var r=1;r<=<%=portNum%>;r++){
+        var para = new Object();//这里一定要new新的对象，要不然保存的都是一样的数据；都是最后一行的数据
+        para.port_able = document.getElementById("port_trap"+r).checked?"1":"2";
+        para.tx_able = document.getElementById("tx_able"+r).checked?"1":"2";
+        para.tx_perc = document.getElementById("tx_perc"+r).value;
+        para.rx_able = document.getElementById("rx_able"+r).checked?"1":"2";
+        para.rx_perc = document.getElementById("rx_perc"+r).value;
+        a.data.push(para);
+    }
+    console.log(JSON.stringify(a));
+    //异步提交数据
+    XHR.get('<%=REQUEST_URI%>',{"setPort": JSON.stringify(a)}, 
+            function(x,rv) {
+              var flag = 0;
+                for(var i = 0; i < rv.length; i++){
+                    if(rv[i].ret == "-1"){
+                        flag = 1;
+                        alert("<%:NO.%>"+(i+1)+"<%:configuration failure%>");
+                        window.location.reload();
+                        return ;
+                    }
+                }
+                if(flag == 0){
+                    alert("<%:Succesfully configured%>");
+                }  
+             //   window.location.reload();
+            }
+           );
+
+}
+
+$(document).ready(function(){
+    $("[id^=tx_able]").each(function(){
+        $(this).click(function(){
+           var numId = this.id.replace(/[^0-9]/ig,""); 
+           $("#tx_perc"+numId)[0].disabled = !this.checked;
+           if(this.checked){
+                $("#tx_perc"+numId).focus();
+           }
+        })
+    });
+    $("[id^=rx_able]").each(function(){
+        $(this).click(function(){
+            var numId = this.id.replace(/[^0-9]/ig,"");
+            $("#rx_perc"+numId)[0].disabled = !this.checked;
+            if(this.checked){
+                $("#rx_perc"+numId).focus();
+           }
+        })
+    });
+    //端口名称
+    var typeRcv = <%=luci.json.encode(typeStatus)%>;
+    setPortHTMLByName(typeRcv);
+    /*
+//    alert(JSON.stringify(typeRcv));
+    $.each(typeRcv, function(i,val) {
+        var rcv = val.ret[0]["port-"+(i+1)];
+        if(rcv[0].type == "4"){
+            document.getElementById("port"+(i+1)).innerHTML = "G"+(i+1);
+        }
+        else if(rcv[0].type == "2"){
+            document.getElementById("port"+(i+1)).innerHTML = "F"+(i+1);
+        }
+    });*/
+
+    //trap 告警开关
+    var rcv = <%=luci.json.encode(getTrapStatus)%>;
+//    alert(JSON.stringify(rcv));
+    rcv["ret"][0].trap_status == "1" ? document.getElementsByName("trap_status")[0].click() : document.getElementsByName("trap_status")[1].click();
+    document.getElementById("trap_port").value  = rcv["ret"][1].trap_port;
+    document.getElementById("trap_server_ip").value  = rcv["ret"][2].trap_server_ip;
+
+    //电源告警显示
+    var powerRcv = <%=luci.json.encode(getPowerStatus)%>;
+    document.getElementById("power").checked = powerRcv["ret"][0].power_trap == "1"?true:false;
+
+    //端口流量告警显示
+    var portRcv = <%=luci.json.encode(getStatus)%>;
+    for(i=0;i<<%=portNum%>;i++){
+        document.getElementById("port_trap"+(i+1)).checked = portRcv[i]["ret"][0]["port-"+(i+1)][0].port_trap == "1"?true:false;
+        if(portRcv[i]["ret"][0]["port-"+(i+1)][1].port_tx_shreshold_enable == "1"){
+            document.getElementById("tx_able"+(i+1)).checked =true;
+            document.getElementById("tx_perc"+(i+1)).disabled = false;
+        }else{
+            document.getElementById("tx_able"+(i+1)).checked =false;
+            document.getElementById("tx_perc"+(i+1)).disabled = true;
+        }
+        if(portRcv[i]["ret"][0]["port-"+(i+1)][3].port_rx_shreshold_enable == "1"){
+            document.getElementById("rx_able"+(i+1)).checked =true;
+            document.getElementById("rx_perc"+(i+1)).disabled = false;
+        }else{
+            document.getElementById("rx_able"+(i+1)).checked =false;
+            document.getElementById("rx_perc"+(i+1)).disabled = true;
+        }
+        document.getElementById("tx_perc"+(i+1)).value = portRcv[i]["ret"][0]["port-"+(i+1)][2].port_tx_shreshold_perc;
+        document.getElementById("rx_perc"+(i+1)).value = portRcv[i]["ret"][0]["port-"+(i+1)][4].port_rx_shreshold_perc;
+
+    }
+});
+</script>
+
+
+
+<div class="alarm"  id = "alarmconfig" >
+    <h3 class="h3"><%:Alarm configuration%></h3>
+    <!--    <div class = "alarm-descr"><%:该系列设备支持以下几种类型的告警:电源告警:使能情况下,单电源输入时会产生告警;IP/MAC冲突告警:使能情况下,IP/MAC地址冲突时会产生告警;端口告警:使能情况下,端口Link down时会产生告警;环告警:使能情况下,环开时会产生告警.%></div>
+    -->
+    <fieldset class="">
+        <legend><%:Access configuration%></legend>
+
+        <table class = "miniTab">
+            <tr>
+                <th><%:Trap switch%></th>
+                <td onclick="trapAble(event)">
+                    <input type="radio" name="trap_status" value="1" checked = true /><%:Enable%>&nbsp;&nbsp;&nbsp;
+                    <input type="radio" name="trap_status" value="2" /><%:Disable%>&nbsp;&nbsp;&nbsp;
+                </td>
+            </tr>
+            <tr>
+                <th><%:Trap port number%></th>
+                <td><input name="" id="trap_port" type="text" value="162" align="center" style = "width:10em"/><small>(1-65535)</small></td>
+            </tr>
+            <tr style="background-color: #fff;">
+                <th><%:Server IP address%></th>
+                <td><input name=""id = "trap_server_ip" type="text" align="center" style = "width:10em" value="192.168.9.11"/><small>(IP-Address)</small></td>
+            </tr> 
+            <tfoot>
+                <tr>
+                    <td colspan="2"><input class="cbi-button cbi-input-apply" type="button" name="ok" align="center" value="<%:Apply%>" onclick="setTrap()"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </fieldset>
+
+
+    <fieldset class=""> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+        <legend><%:Power supply alarm%></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+
+        <!-- <div class = "alarm-section-node"> -->
+        <table class = "miniTab">
+            <tr>
+                <th><%:Power supply alarm%></th>
+                <td>
+                    <input type="checkbox" name="power" id = "power" value="1"/>
+                </td>
+            </tr>
+            <tfoot>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" name="ok" value="<%:Apply%>" class="cbi-button cbi-input-apply" onclick="setPower()">
+                    </td>
+                </tr>
+            </tfoot>      
+        </table>
+        <!-- </div> -->
+    </fieldset>
+
+    <fieldset class=""> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+        <legend><%:Port alarm configuration%></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+
+        <!-- <div class = "alarm-section-node"> -->
+            <table class = "alarm-section-table">
+                <tr>
+                    <th><%:Port%></th> 
+                    <th><%:alarm enable%></th>
+                    <th><%:TX threshold%></th>
+                    <th><%:TX threshold proportion%></th>
+                    <th><%:RX threshold%></th>
+                    <th><%:RX threshold proportion%></th>
+                </tr>
+                <% for i=1,portNum do%>
+                <tr>
+                    <td name = "port<%=i%>" id = "port<%=i%>"><%=i%></td> 
+                    <td><input type="checkbox" name="" id = "port_trap<%=i%>" value=""/></td>
+                    <td><input type="checkbox" name="" id = "tx_able<%=i%>" value=""/></td>
+                    <td><input type="text" name = ""   id = "tx_perc<%=i%>" value = "1" style="width:80px;text-align:center"></td>
+                    <td><input type="checkbox" name="" id = "rx_able<%=i%>" value=""/></td>
+                    <td><input type="text" name = ""   id = "rx_perc<%=i%>" value = "1" style="width:80px;text-align:center"></td>
+                </tr>
+
+                <%end%>
+            </table>
+            <div class="cbi-button-grow" >
+                <input type="submit" name="ok" value="<%:Apply%>" class="cbi-button cbi-input-apply" onclick="setPort()">
+            </div>
+        <!-- </div> -->
+    </fieldset>
+
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,33 @@
+diff -urN libubox-2015-09-15/uloop.c libubox-2017-01-25/uloop.c
+--- libubox-2015-09-15/uloop.c	2015-09-21 18:02:42.000000000 +0800
++++ libubox-2017-01-25/uloop.c	2017-01-25 16:54:15.421464851 +0800
+@@ -237,6 +237,9 @@
+ 	if (flags & ULOOP_EDGE_TRIGGER)
+ 		ev.events |= EPOLLET;
+ 
++    if (flags & ULOOP_PRI)
++        ev.events |= EPOLLPRI;
++
+ 	ev.data.fd = fd->fd;
+ 	ev.data.ptr = fd;
+ 	fd->flags = flags;
+@@ -369,7 +372,7 @@
+ 	unsigned int fl;
+ 	int ret;
+ 
+-	if (!(flags & (ULOOP_READ | ULOOP_WRITE)))
++	if (!(flags & (ULOOP_READ | ULOOP_WRITE | ULOOP_PRI)))
+ 		return uloop_fd_delete(sock);
+ 
+ 	if (!sock->registered && !(flags & ULOOP_BLOCKING)) {
+diff -urN libubox-2015-09-15/uloop.h libubox-2017-01-25/uloop.h
+--- libubox-2015-09-15/uloop.h	2015-09-21 18:02:42.000000000 +0800
++++ libubox-2017-01-25/uloop.h	2017-01-25 16:51:22.581468970 +0800
+@@ -54,6 +54,7 @@
+ #endif
+ 
+ #define ULOOP_ERROR_CB		(1 << 6)
++#define ULOOP_PRI           (1 << 7)
+ 
+ struct uloop_fd
+ {

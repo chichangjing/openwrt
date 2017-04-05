@@ -1,0 +1,109 @@
+#*******************************************************************************
+# input parameters to this file are:
+#*******************************************************************************
+#
+#  TOOL - the CPU comiling tool -- gnu / diab / visual ...
+#  CPU_TOOL - the the CPU tool -- arm / ppc / intel ...
+#  CPU - the CPU type - PPC603 / PPC604 / ARMARCH5 / PPC860 / VC /
+#  USER_BASE - the directory where the CPSS code exists
+#  XBAR_VENDOR - the XBAR vendor - empty / DUNE / PRESTERA
+#  FA_VENDOR - the FA vendor - empty / PRESTERA
+#  COMPILATION_ROOT - directory to output the compiled fise and libs
+#  NO_PP_USED - is it non-PP compilation ? -- empty / NOT_USED
+#  USER_MAKE - name of the make file to run for the different compilation flags
+#  RTOS_ON_SIM - indicate that the simulation lib need to be included 
+#                because this image run on "target" but comunicate via simulation
+#                lib with the remote simulation
+#
+#*******************************************************************************
+#  output parameters to this file are:
+#*******************************************************************************
+#
+# ADDED_CFLAGS - the flags to use when the C file are compiled
+#                may add next flags : INCLUDE_USER_APPL
+#
+# LIB_EXTRA - the order of the libraries to be linked in the image
+# MACH_EXTRA - the order of extra libraries to be linked in the image
+#
+#*******************************************************************************
+
+USER_BASE_REAL=$(CURDIR)
+export USER_BASE_REAL
+
+
+ifeq ($(TOOL),visual)
+	ADDED_CFLAGS += /DINCLUDE_USER_APPL
+else
+	ADDED_CFLAGS += -DINCLUDE_USER_APPL
+endif
+
+ifeq ($(TOOL),visual)
+	APP_DIR = $(subst \,/,$(PROJ_BSP_DIR))
+	PRE_BUILD = mkdir -p $(APP_DIR)
+endif
+
+#Get all folders with gtTopMake script inside
+SUBD = $(patsubst  %/,%,$(dir $(wildcard $(USER_BASE)/*/gtTopMake) $(if $(CUSTOM_BASE),$(wildcard $(CUSTOM_BASE)/*/gtTopMake),)))
+
+ifdef BUILD_ONLY
+  SUBDIRS_FILTER=\
+        $(sort \
+            $(foreach \
+                SUBDIRS_FILTER_O, \
+                $(subst $(CURDIR)/,,$(filter $(CURDIR)/%, \
+                    $(addprefix $(USER_BASE_REAL)/,$(subst \,/,$(BUILD_ONLY))) \
+                    $(addprefix $(CUSTOM_BASE)/,$(subst \,/,$(BUILD_ONLY))) \
+					) \
+                ), \
+                $(firstword $(subst /, ,$(SUBDIRS_FILTER_O))) \
+            ) \
+        )
+  ifneq ($(SUBDIRS_FILTER),)
+	SUBD := $(filter $(addprefix $(USER_BASE)/,$(SUBDIRS_FILTER)) \
+			$(addprefix $(CUSTOM_BASE)/,$(SUBDIRS_FILTER)),$(SUBD))
+  endif
+endif
+
+# Don't build cpssEnabler,etc if CPSS_LIB_ONLY==YES
+ifeq (YES,$(CPSS_LIB_ONLY))
+  CPSS_LIB_ONLY_EXCLUDELIST=cpssEnabler luaCLI_standalone mainGaltisWrapper mainLuaWrapper mainUT
+  SUBD := $(filter-out $(addprefix $(USER_BASE)/,$(CPSS_LIB_ONLY_EXCLUDELIST)),$(SUBD))
+endif
+#Fix Dos to Unix path
+SUBD_FIX = $(subst \,/,$(SUBD))
+
+#Loop process 'gmake' with the same target on all subdirs with gtTopMake
+DO_LOOP = for i in $(SUBD_FIX); do $(MAKE) -f gtTopMake -C $$i $@; done
+DO_CLEAN = for i in $(SUBD_FIX); do $(MAKE) -f gtTopMake -C $$i $@; done
+
+include $(USER_BASE)/cpssCommon.mk
+
+full: dep
+ifeq ($(TOOL),visual)
+	+$(PRE_BUILD);set -e;$(DO_LOOP)
+else
+	+set -e;$(DO_LOOP)
+endif
+
+dep:
+ifeq ($(TOOL),visual)
+	+$(PRE_BUILD);set -e;$(DO_LOOP)
+else
+	+set -e;$(DO_LOOP)
+endif
+
+image_full:
+	$(MAKE) -f $(USER_BASE)/$(USER_MAKE) full
+
+re_image: image_full
+	make vxWorks.st
+
+image: clean image_full
+	make vxWorks.st
+
+clean_p:
+	set -e;$(DO_CLEAN)
+
+.PHONY: clean_image
+clean_image:
+	$(MAKE) -f $(USER_BASE)/$(USER_MAKE) clean_p

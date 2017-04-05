@@ -1,0 +1,22 @@
+## VIPS compilation environment #################
+ifeq (VIPS, $(HOME_ENV))
+PROJ_NAME = mainLabServices
+
+PRESTERA_COMMON_DIR = $(subst \,/,$(SW_ROOT))
+
+
+include $(PRESTERA_COMMON_DIR)/mainCommon/make/vxWorks/gtBuild
+##################################################
+
+else
+## CPSS compilation environment #################
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake
+endif

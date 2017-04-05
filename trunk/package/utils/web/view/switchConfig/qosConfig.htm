@@ -1,0 +1,467 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+<%
+    local ubus = require "luci.ubus"
+    local portNum = ubus.getPortNum()
+--    local typeStatus = ubus.getPortType(portNum)
+    --qos端口配置应用
+    local portJson = luci.http.formvalue("setPort")
+    if portJson then
+        local portVal = luci.json.decode(portJson)
+        local setPortSnd = {}
+        local setPortStatus = {}
+        for i=1,portNum do
+            local pVal = string.format("port-%d",i)
+            if portVal.data[i].assignment == "4" then
+            setPortSnd[i]={[pVal]={{["port_priority_assignment"] = portVal.data[i].assignment},{["port_priority_map_rule"] =portVal.data[i].map},{["port_default_priority_level"] =portVal.data[i].level},{["port_schedule_mode"] =portVal.data[i].mode}}} 
+            else
+            setPortSnd[i]={[pVal]={{["port_priority_assignment"] = portVal.data[i].assignment},{["port_default_priority_level"] =portVal.data[i].level},{["port_schedule_mode"] =portVal.data[i].mode}}} 
+            end
+        end
+        setPortStatus = ubus.set_args("qos_config", "qos_config_set",setPortSnd,1)
+
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setPortStatus)
+        return
+    end
+    --8021p配置应用
+    local rcvTagJson = luci.http.formvalue("set8021p")
+    if rcvTagJson then
+        local tagJson = luci.json.decode(rcvTagJson)
+        local set8021pSnd = {}
+        local set8021pStatus = {}
+        for i=0,7 do
+            local pVal = string.format("8021p-%d",i)
+            set8021pSnd[i+1]={[pVal]={{["8021p_priority_queue_id"] = tagJson.data[i+1].queueId}}} 
+        end
+        set8021pStatus = ubus.set_args("qos_config", "qos_config_set",set8021pSnd,1)
+
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(set8021pStatus)
+        return
+    end
+    --dscp配置应用
+    local dscpJson = luci.http.formvalue("setDscp")
+    if dscpJson then
+        local ipJson = luci.json.decode(dscpJson)
+        local setDscpSnd = {}
+        local setDscpStatus = {}
+        for i=0,63 do
+            local pVal = string.format("dscp-%d",i)
+            setDscpSnd[i+1]={[pVal]={{["dscp_priority_queue_id"] = ipJson.data[i+1].queueId}}} 
+        end
+        setDscpStatus = ubus.set_args("qos_config", "qos_config_set",setDscpSnd,1)
+
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setDscpStatus)
+        return
+    end
+
+--    local portNum = ubus.getPortNum()
+    local typeStatus = ubus.getPortType(portNum)
+    --读取页面三张表格内容
+    --读port
+    local para = {"port_priority_assignment","port_priority_map_rule","port_default_priority_level","port_schedule_mode"}
+    local snd = {}
+    for i=1,portNum do
+        local pa = string.format("port-%d",i)
+        snd[i]={[pa] = para}
+    end
+    
+    local getStatus = {}
+    getStatus = ubus.get_args("qos_config", "qos_config_get",snd,1)
+    
+    --读8021p
+    local tagSnd = {}
+    for i=0,7 do
+        local tag_pa = string.format("8021p-%d",i)
+        tagSnd[i+1] = {[tag_pa] = {"8021p_priority_queue_id"}}
+    end
+
+    local get8021pStatus = {}
+    get8021pStatus = ubus.get_args("qos_config", "qos_config_get",tagSnd,1)
+
+    --读dscp
+    local ipSnd = {}
+    for i=0,63 do
+        local ip_pa = string.format("dscp-%d",i)
+        ipSnd[i+1] = {[ip_pa] = {"dscp_priority_queue_id"}}
+    end
+
+    local getDscpStatus = {}
+    getDscpStatus = ubus.get_args("qos_config", "qos_config_get",ipSnd,1)
+%>
+
+<%+header%>
+
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">
+//获得端口配置内容转化为json格式并下发后台
+function setPort(){
+    var a = JSON.parse("{\"data\":[]}");
+
+    var rowsNum = $("#qosTable tr").length-1;  //获取当前行数
+    //将表格中每行内容转化为json格式
+    for(var i = 1; i < rowsNum; i++){
+        var para = new Object();//这里一定要new新的对象，要不然保存的都是一样的数据；都是最后一行的数据
+        para.assignment = $("input[name=mode"+i+"]:checked").val();
+        para.map = $("input[name=map"+i+"]")[0].disabled?"1":$("input[name=map"+i+"]:checked").val();
+        para.level = $("#level"+i).val();
+        para.mode = $("input[name=schedule"+i+"]:checked").val();
+        a.data.push(para);
+    }
+  //  alert(JSON.stringify(a));
+    //异步提交数据
+    XHR.get('<%=REQUEST_URI%>',{"setPort": JSON.stringify(a)}, 
+            function(x,rv) {
+                var flag = 0;
+                for(var i = 0; i < rv.length; i++){
+                    if(rv[i].ret == "-1"){
+                        flag = 1;
+                        alert("<%:NO.%>"+(i+1)+"<%:configuration failure%>");
+                        return ;
+                    }
+                }
+                if(flag == 0){
+                    alert("<%:Succesfully configured%>");
+                }
+            }
+           );
+
+}
+
+//获得8021q表单内容转化为json格式并下发后台
+function set8021q(){
+    var a = JSON.parse("{\"data\":[]}");
+    var colsNum=$("#prioTable tr:eq(0) th").length;//获取行的列数
+    //将表格中内容转化为json格式
+    for(var i = 1; i < colsNum; i++){
+        var para = new Object();//这里一定要new新的对象，要不然保存的都是一样的数据；都是最后一行的数据
+        para.queueId = $("#p8021_"+(i-1)).val();
+
+        a.data.push(para);
+    }
+ //   alert(JSON.stringify(a));
+    //异步提交数据
+    XHR.get('<%=REQUEST_URI%>',{"set8021p": JSON.stringify(a)}, 
+            function(x,rv) {
+                var flag = 0;
+                for(var i = 0; i < rv.length; i++){
+                    if(rv[i].ret == "-1"){
+                        flag = 1;
+                        alert("<%:NO.%>"+(i+1)+"<%:configuration failure%>");
+                        return ;
+                    }
+                }
+                if(flag == 0){
+                    alert("<%:Succesfully configured%>");
+                }
+            }
+           );
+}
+
+//获得dscp表单内容转化为json格式并下发后台
+function setDscp(){
+    var a = JSON.parse("{\"data\":[]}");
+    //将表格中内容转化为json格式
+    for(var i = 1; i < 65; i++){
+        var para = new Object();//这里一定要new新的对象，要不然保存的都是一样的数据；都是最后一行的数据
+        para.queueId = $("#dscp_"+(i-1)).val();
+        a.data.push(para);
+    }
+    //异步提交数据
+    XHR.get('<%=REQUEST_URI%>',{"setDscp": JSON.stringify(a)}, 
+            function(x,rv) {
+                var flag = 0;
+                for(var i = 0; i < rv.length; i++){
+                    if(rv[i].ret == "-1"){
+                        flag = 1;
+                        alert("<%:NO.%>"+(i+1)+"<%:configuration failure%>");
+                        return ;
+                    }
+                }
+                if(flag == 0){
+                    alert("<%:Succesfully configured%>");
+                }
+            }
+           );
+}
+
+$(document).ready(function(){
+    //maprule列处理
+    function mapSelect(x,i){
+        if(x){
+            for(var j=0;j<document.getElementsByName("map"+i).length;j++){
+                document.getElementsByName("map"+i)[j].disabled = false;
+            }
+        }else {
+            for(var j=0;j<document.getElementsByName("map"+i).length;j++){
+                document.getElementsByName("map"+i)[j].checked = false;
+                document.getElementsByName("map"+i)[j].disabled = true;
+            }
+        }
+    }
+
+    $("#qosTable tbody tr td:nth-child(2)").on("change","input[type=radio]",function(){
+        var i = this.name.replace(/[^0-9]/ig,"");
+        var bool = this.value==4;
+        mapSelect(bool,i)
+    });
+
+    //在页面上显示后台传来的数据
+    (function ($) {
+        var typeRcv = <%=luci.json.encode(typeStatus)%>;
+        setPortHTMLByName(typeRcv);
+        /*
+        $.each(typeRcv, function(i,val) {
+            var rcv = val.ret[0]["port-"+(i+1)];
+            if(rcv[0].type == "4"){
+                 document.getElementById("port"+(i+1)).innerHTML = "G"+(i+1);
+            }
+            else if(rcv[0].type == "2"){
+                 document.getElementById("port"+(i+1)).innerHTML = "F"+(i+1);
+            }
+        });*/
+
+        //端口配置表
+        var rcv = <%=luci.json.encode(getStatus)%>;
+    //    alert(JSON.stringify(rcv));
+        var assignmentObj = new Array();　//创建一个数组
+        var ruleObj       = new Array();　//创建一个数组
+        var levelObj      = new Array();　//创建一个数组
+        var modeObj       = new Array();　//创建一个数组
+        for(j=1;j<=<%=portNum%>;j++){
+            assignmentObj[j] = rcv[j-1]["ret"][0]["port-"+j][0].port_priority_assignment;
+            for(i=0;i<document.getElementsByName("mode"+j).length;i++){
+                if(document.getElementsByName("mode"+j)[i].value == assignmentObj[j]){
+                    document.getElementsByName("mode"+j)[i].checked = true;
+                }
+            }
+            var bool = assignmentObj[j] == 4;
+            if(bool){
+                ruleObj[j] = rcv[j-1]["ret"][0]["port-"+j][1].port_priority_map_rule;
+                for(i=0;i<document.getElementsByName("map"+j).length;i++){
+                    if(document.getElementsByName("map"+j)[i].value == ruleObj[j]){
+                        document.getElementsByName("map"+j)[i].checked = true;
+                    }
+                }
+            }
+    //        mapSelect(j,assignmentObj[j]);
+            levelObj[j] = rcv[j-1]["ret"][0]["port-"+j][2].port_default_priority_level;
+            for(i=0;i<document.getElementById("level"+j).length;i++){
+                if(document.getElementById("level"+j)[i].value == levelObj[j]){
+                    document.getElementById("level"+j)[i].selected = true;
+                }
+            }
+            modeObj[j] = rcv[j-1]["ret"][0]["port-"+j][3].port_schedule_mode;
+            for(i=0;i<document.getElementsByName("schedule"+j).length;i++){
+                if(document.getElementsByName("schedule"+j)[i].value == modeObj[j]){
+                    document.getElementsByName("schedule"+j)[i].checked = true;
+                }
+            }
+            mapSelect(bool,j);
+        }
+        //8021p表
+        var tagRcv = <%=luci.json.encode(get8021pStatus)%>;
+        var tagObj       = new Array();　//创建一个数组
+    //    alert(JSON.stringify(tagRcv[0]["ret"][0]["8021p-0"][0]["8021p_priority_queue_id"]));
+        for(j=0;j<=7;j++){
+            tagObj[j] = tagRcv[j]["ret"][0]["8021p-"+j][0]["8021p_priority_queue_id"];
+            for(i=0;i<document.getElementById("p8021_"+j).length;i++){
+                if(document.getElementById("p8021_"+j)[i].value == tagObj[j]){
+                    document.getElementById("p8021_"+j)[i].selected = true;
+                }
+            } 
+        }
+        //dscp表
+        var ipRcv = <%=luci.json.encode(getDscpStatus)%>;
+        var ipObj       = new Array();　//创建一个数组
+        for(j=0;j<=63;j++){
+            ipObj[j] = ipRcv[j]["ret"][0]["dscp-"+j][0]["dscp_priority_queue_id"];
+            for(i=0;i<document.getElementById("dscp_"+j).length;i++){
+                if(document.getElementById("dscp_"+j)[i].value == ipObj[j]){
+                    document.getElementById("dscp_"+j)[i].selected = true;
+                }
+            } 
+        }
+    })(jQuery);
+});
+
+</script>
+<div class="qos"  id = "qosconfig" >
+ <!--   <h3 class="h3"><%:QOS配置%></h3>
+    <div class = "cbi-map-descr"><p><%:QOS是IP网络中利用流量控制和资源分配思想来解决有限带宽条件下为有不同需求的多业务提供有区别的服务，尽可能满足不同业务的传输特点减少网络拥塞发生的概率，并将网络拥塞对高优先级业务的影响减到最少的一种机制%></p></div>
+-->
+    <fieldset>
+        <legend><%:Qos Configuration list%></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+        <!--<div class = "qos-section-node">-->
+            <table class = "" id="qosTable" >
+                <thead>
+                    <tr>
+                        <th><%:Port%></th>
+                        <th><%:Pattern configuration%></th>
+                        <th><%:MapRule%></th>
+                        <th><%:Default priority%></th>
+                        <th><%:Scheduling mode%></th>
+                    </tr>
+                </thead>
+                <tbody>
+                <% for i=1,portNum do %>
+                <tr>
+                    <td name = "port<%=i%>"id = "port<%=i%>"><%=i%></td>
+                    <td style="border-left: 1px solid #dddddd">
+                        <input type="radio" name="mode<%=i%>" value="1" /><%:Port%>&nbsp;&nbsp;
+                        <input type="radio" name="mode<%=i%>" value="2" />802.1P&nbsp;&nbsp;
+                        <input type="radio" name="mode<%=i%>" value="3" />DSCP&nbsp;&nbsp;
+                        <input type="radio" name="mode<%=i%>" value="4" />802.1P&DSCP
+                    </td>
+                    <td style="border-left: 1px solid #dddddd">
+                        <input type="radio" name="map<%=i%>" value="1" />DSCP&nbsp;&nbsp;
+                        <input type="radio" name="map<%=i%>" value="2" />802.1P&nbsp;&nbsp;
+                    </td>
+                    <td style="border-left: 1px solid #dddddd">
+                        <select id ="level<%=i%>">
+                            <option value="1"> <%:LOWEST %></option>
+                            <option value="2"> <%:SELLOW %></option>
+                            <option value="3"> <%:SELHIGH%> </option>
+                            <option value="4" selected = "true"><%:HIGHEST%></option>
+                        </select>
+                    </td>
+                    <td style="border-left: 1px solid #dddddd">
+                        <input type="radio" name="schedule<%=i%>" value="1" />SR&nbsp;&nbsp;
+                        <input type="radio" name="schedule<%=i%>" value="2" />WRR&nbsp;&nbsp;
+                    </td>
+                </tr>
+                <% end %>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5"><input type="submit" class="cbi-button cbi-input-apply" name="ok" align="center" value="<%:Apply%>" onclick="setPort()"></td>
+                    </tr>
+                </tfoot>
+           </table>
+    </fieldset>
+    <fieldset>
+        <legend><%:802.1p priority%></legend>
+        <table class = "" id="prioTable">
+            <thead>
+                <tr>
+                    <th><%:priority%></th>
+                    <% for i=0,7 do %>
+                    <th><%=i%></th>
+                    <% end %>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th><%:queue%></th>
+                    <% for i=0,7 do %>
+                    <td>
+                        <select name="p8021_<%=i%>" id="p8021_<%=i%>">
+                            <option value="0"> 0 </option>
+                            <option value="1"> 1 </option>
+                            <option value="2"> 2 </option>
+                            <option value="3"> 3 </option>
+                        </select>
+                    </td>
+                    <% end %>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="9">
+                        <input type="submit" class="cbi-button cbi-input-apply" name="ok" align="center" value="<%:Apply%>" onclick="set8021q()">
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </fieldset>
+    <fieldset>
+        <legend><%:DSCP priority%></legend>
+        <table class = "qos-dscpPrio-table" id="dscpTable">
+            <thead>
+                <tr>
+                    <% for i=1,4 do %>
+                    <th>DSCP</th>
+                    <th style ="text-align: left"><%:queue%></th>
+                    <% end %>
+                </tr>
+            </thead>
+            <tbody>
+            <% for i=0,15 do %>
+            <tr>
+                <td><%=i%></td>
+                <td style="text-align:left;">
+                    <select  name="" id="dscp_<%=i%>">
+                        <option value="0"> 0</option>
+                        <option value="1"> 1</option>
+                        <option value="2"> 2</option>
+                        <option value="3"> 3</option>
+                    </select>
+                </td>
+                <td style="border-left: 1px solid #dddddd"><%=i+16%></td>
+                <td style="text-align:left;">
+                    <select  name="" id="dscp_<%=i+16%>">
+                        <option value="0"> 0</option>
+                        <option value="1"> 1</option>
+                        <option value="2"> 2</option>
+                        <option value="3"> 3</option>
+                    </select>
+                </td>
+                <td style="border-left: 1px solid #dddddd"><%=i+32%></td>
+                <td style="text-align:left;">
+                    <select name="" id="dscp_<%=i+32%>">
+                        <option value="0"> 0</option>
+                        <option value="1"> 1</option>
+                        <option value="2"> 2</option>
+                        <option value="3">3</option>
+                    </select>
+                </td>
+                <td style="border-left: 1px solid #dddddd"><%=i+48%></td>
+                <td style="text-align:left;">
+                    <select name="" id="dscp_<%=i+48%>">
+                        <option value="0"> 0</option>
+                        <option value="1"> 1</option>
+                        <option value="2"> 2</option>
+                        <option value="3"> 3</option>
+                    </select>
+                </td>
+            </tr>
+            <% end %>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="8">
+                        <input type="submit" class="cbi-button cbi-input-apply" name="ok" value="<%:Apply%>" onclick="setDscp()">
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </fieldset>
+
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

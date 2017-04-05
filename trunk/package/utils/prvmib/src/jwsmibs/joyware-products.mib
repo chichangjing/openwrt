@@ -1,0 +1,99 @@
+-- ============================================================================
+-- MibName   : JOYWARE-PRODUCTS-MIB
+-- FileName  : joyware-products.mib
+-- ============================================================================
+JOYWARE-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY     FROM SNMPv2-SMI
+        jwProducts          FROM JOYWARE-SMI;
+
+jwSwitchProducts            OBJECT IDENTIFIER ::= { jwProducts 1 }
+
+-- Joyware switch products
+-- (ModelId: 53-20-01-05-01-01-00-00, HardwareVersion: GE-Z20208D_v1.00-01)
+JW-SE20-GF1E4-DL-<53-20-01-05-01-01-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 1 }	
+-- (ModelId: 53-20-01-09-01-02-00-00, HardwareVersion: GE-Z20208D_v1.00-02)
+JW-SE20-GF1E8-DL-<53-20-01-09-01-02-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 2 }	
+-- (ModelId: 53-20-01-05-01-03-00-00, HardwareVersion: GE-Z20208D_v1.00-03)
+JW-SE20-GF1E4-DPL-<53-20-01-05-01-03-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 3 }	
+-- (ModelId: 53-20-01-09-01-04-00-00, HardwareVersion: GE-Z20208D_v1.00-04)
+JW-SE20-GF1E8-DPL-<53-20-01-09-01-04-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 4 }	
+-- (ModelId: 53-20-01-05-01-05-00-00, HardwareVersion: GE-Z20208D_v1.00-05)
+JW-SE20-GF1E4-DKL-<53-20-01-05-01-05-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 5 }	
+-- (ModelId: 53-20-01-09-01-06-00-00, HardwareVersion: GE-Z20208D_v1.00-06)
+JW-SE20-GF1E8-DKL-<53-20-01-09-01-06-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 6 }	
+-- (ModelId: 53-20-01-05-01-07-00-00, HardwareVersion: GE-Z20208D_v1.00-07)
+JW-SE20-GF1E4-DEL-<53-20-01-05-01-07-00-00>           OBJECT IDENTIFIER ::= { jwSwitchProducts 7 }	
+-- (ModelId: 53-20-01-09-01-08-00-00, HardwareVersion: GE-Z20208D_v1.00-08)
+JW-SE20-GF1E8-DEL-<53-20-01-09-01-08-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 8 }	
+-- (ModelId: 53-20-01-05-01-09-00-00, HardwareVersion: GE-Z20208D_v1.00-09)
+JW-SE20-GF1E4D04-DL-<53-20-01-05-01-09-00-00>          OBJECT IDENTIFIER ::= { jwSwitchProducts 9 }	
+-- (ModelId: 53-20-01-09-01-0A-00-00, HardwareVersion: GE-Z20208D_v1.00-0A)
+JW-SE20-GF1E8D04-DL-<53-20-01-09-01-0A-00-00>          OBJECT IDENTIFIER ::= { jwSwitchProducts 10 }	
+-- (ModelId: 53-20-01-05-01-0B-00-00, HardwareVersion: GE-Z20208D_v1.00-0B)
+JW-SE20-GF1E4D004-DL-<53-20-01-05-01-0B-00-00>         OBJECT IDENTIFIER ::= { jwSwitchProducts 11 }	
+-- (ModelId: 53-20-01-09-01-0C-00-00, HardwareVersion: GE-Z20208D_v1.00-0C)
+JW-SE20-GF1E8D004-DL-<53-20-01-09-01-0C-00-00>         OBJECT IDENTIFIER ::= { jwSwitchProducts 12 }	
+-- (ModelId: 53-20-01-05-01-0D-00-00, HardwareVersion: GE-Z20208D_v1.00-0D)
+JW-SE20-GF1E4D0004-DL-<53-20-01-05-01-0D-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 13 }	
+-- (ModelId: 53-20-01-09-01-0E-00-00, HardwareVersion: GE-Z20208D_v1.00-0E)
+JW-SE20-GF1E8D0004-DL-<53-20-01-09-01-0E-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 14 }	
+
+-- (ModelId: 53-20-01-06-01-0F-00-00, HardwareVersion: GE-Z20208D_v1.00-0F)
+JW-SE20-GF2E4-DL-<53-20-01-06-01-0F-00-00>             OBJECT IDENTIFIER ::= { jwSwitchProducts 15 }	
+-- (ModelId: 53-20-01-0A-01-10-00-00, HardwareVersion: GE-Z20208D_v1.00-10)
+JW-SE20-GF2E8-DL-<53-20-01-0A-01-10-00-00>             OBJECT IDENTIFIER ::= { jwSwitchProducts 16 }	
+-- (ModelId: 53-20-01-06-01-11-00-00, HardwareVersion: GE-Z20208D_v1.00-11)
+JW-SE20-GF2E4-DPL-<53-20-01-06-01-11-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 17 }	
+-- (ModelId: 53-20-01-0A-01-12-00-00, HardwareVersion: GE-Z20208D_v1.00-12)
+JW-SE20-GF2E8-DPL-<53-20-01-0A-01-12-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 18 }	
+-- (ModelId: 53-20-01-06-01-13-00-00, HardwareVersion: GE-Z20208D_v1.00-13)
+JW-SE20-GF2E4-DKL-<53-20-01-06-01-13-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 19 }	
+-- (ModelId: 53-20-01-0A-01-14-00-00, HardwareVersion: GE-Z20208D_v1.00-14)
+JW-SE20-GF2E8-DKL-<53-20-01-0A-01-14-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 20 }	
+-- (ModelId: 53-20-01-06-01-15-00-00, HardwareVersion: GE-Z20208D_v1.00-15)
+JW-SE20-GF2E4-DEL-<53-20-01-06-01-15-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 21 }	
+-- (ModelId: 53-20-01-0A-01-16-00-00, HardwareVersion: GE-Z20208D_v1.00-16)
+JW-SE20-GF2E8-DEL-<53-20-01-0A-01-16-00-00>            OBJECT IDENTIFIER ::= { jwSwitchProducts 22 }	
+-- (ModelId: 53-20-01-06-01-17-00-00, HardwareVersion: GE-Z20208D_v1.00-17)
+JW-SE20-GF2E4D04-DL-<53-20-01-06-01-17-00-00>          OBJECT IDENTIFIER ::= { jwSwitchProducts 23 }	
+-- (ModelId: 53-20-01-0A-01-18-00-00, HardwareVersion: GE-Z20208D_v1.00-18)
+JW-SE20-GF2E8D04-DL-<53-20-01-0A-01-18-00-00>          OBJECT IDENTIFIER ::= { jwSwitchProducts 24 }	
+-- (ModelId: 53-20-01-06-01-19-00-00, HardwareVersion: GE-Z20208D_v1.00-19)
+JW-SE20-GF2E4D004-DL-<53-20-01-06-01-19-00-00>         OBJECT IDENTIFIER ::= { jwSwitchProducts 25 }	
+-- (ModelId: 53-20-01-0A-01-1A-00-00, HardwareVersion: GE-Z20208D_v1.00-1A)
+JW-SE20-GF2E8D0004-DL-<53-20-01-0A-01-1A-00-00>         OBJECT IDENTIFIER ::= { jwSwitchProducts 26 }	
+-- (ModelId: 53-20-01-06-01-1B-00-00, HardwareVersion: GE-Z20208D_v1.00-1B)
+JW-SE20-GF2E4-DL-P-<53-20-01-06-01-1B-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 27 }	
+-- (ModelId: 53-20-01-0A-01-1C-00-00, HardwareVersion: GE-Z20208D_v1.00-1C)
+JW-SE20-GF2E8-DL-P-<53-20-01-0A-01-1C-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 28 }	
+
+-- (ModelId: 53-20-01-05-04-01-00-00, HardwareVersion: GE-Z20204A_v1.10-01)
+JW-SE20-GF1GE1E3-DL-<53-20-01-05-04-01-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 30 }	
+-- (ModelId: 53-20-01-06-04-02-00-00, HardwareVersion: GE-Z20204A_v1.10-02)
+JW-SE20-GF2GE1E3-DL-<53-20-01-06-04-02-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 31 }	
+-- (ModelId: 53-20-01-09-04-03-00-00, HardwareVersion: GE-Z20204A_v1.10-03)
+JW-SE20-GF1GE1E7-DL-<53-20-01-09-04-03-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 32 }	
+-- (ModelId: 53-20-01-0A-04-04-00-00, HardwareVersion: GE-Z20204A_v1.10-04)
+JW-SE20-GF2GE1E7-DL-<53-20-01-0A-04-04-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 33 }	
+
+-- (ModelId: 53-20-01-0A-02-01-00-00, HardwareVersion: GE-Z20205D_v1.00-01)
+JW-SE20-GF1F4GE1E4-DL-<53-20-01-0A-02-01-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 40 }	
+-- (ModelId: 53-20-01-0A-02-02-00-00, HardwareVersion: GE-Z20205D_v1.00-02)
+JW-SE20-GF1F4GE1E4-DKL-<53-20-01-0A-02-02-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 41 }	
+-- (ModelId: 53-20-01-0A-02-03-00-00, HardwareVersion: GE-Z20205D_v1.00-03)
+JW-SE20-GF1F4GE1E4-DEL-<53-20-01-0A-02-03-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 42 }	
+
+-- (ModelId: 53-20-01-0C-02-03-00-00, HardwareVersion: GE-Z20210D_v1.00-01)
+JW-SE20-GF2E8-DL-<53-20-01-0C-02-03-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 50 }	
+
+-- (ModelId: 54-10-01-06-01-01-00-00, HardwareVersion: GD-SDI1000M_v1.00-01)
+OB9331DTA-G1-E4-<54-10-01-06-01-01-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 60 }	
+-- (ModelId: 54-20-01-06-01-02-00-00, HardwareVersion: GD-SDI1000M_v1.00-02)
+OB9331DRA-G1-E4-<54-20-01-06-01-02-00-00>        OBJECT IDENTIFIER ::= { jwSwitchProducts 61 }	
+
+JW-Undefined                OBJECT IDENTIFIER ::= { jwSwitchProducts 9999}
+
+END
+

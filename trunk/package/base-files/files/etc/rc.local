@@ -1,0 +1,19 @@
+# Put your custom commands here that should be executed once
+# the system init finished. By default this file does nothing.
+#
+#
+#config pin pad
+devmem 0x020e0300 32 0x1b0b0
+#config smi holdtime
+devmem 0x02188044 32 0x71a
+
+# turn on run led and power alarm
+echo "75" > /sys/class/gpio/export
+echo "76" > /sys/class/gpio/export
+echo "out" > /sys/class/gpio/gpio75/direction
+echo "out" > /sys/class/gpio/gpio76/direction
+
+# /usr/sbin/switchd -u 2 -d 7&
+
+/usr/sbin/jwps.sh&
+exit 0

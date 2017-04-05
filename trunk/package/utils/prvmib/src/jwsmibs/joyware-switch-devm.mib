@@ -1,0 +1,297 @@
+-- ============================================================================
+-- MibName   : JWS-DEVM-MIB
+-- FileName  : joyware-switch-devm.mib
+-- ============================================================================
+JWS-DEVM-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress          FROM SNMPv2-SMI
+        DisplayString, PhysAddress                                  FROM SNMPv2-TC
+        jwSwitch                                                    FROM JOYWARE-SMI
+        JwsModelIdValue, JwsEnableValue                             FROM JWS-TC;
+
+jwsDevmMib MODULE-IDENTITY
+    LAST-UPDATED    "201603011200Z"
+    ORGANIZATION    "Joyware Electronic Technology Co.,Ltd"
+    CONTACT-INFO    "Postal: BlockA,Chang TorchHotel,No.259 Wensan Road,Hangzhou,Zhejiang 310012 China
+                     E-mail: jw-snmp@joyware.com
+                        Tel: 800-8571264 "
+    DESCRIPTION     "This MIB module defines MIB objects which provide device manangement
+                     information about the Joyware switch devices."
+    -- revision history
+    REVISION        "201603011200Z"
+    DESCRIPTION     "Initial revision."
+
+    REVISION        "201606221200Z"
+    DESCRIPTION     "v1.4. Removed oid:
+                        jwsDevSupportedMibs,
+                        jwsDevTransferGroup,
+                        jwsDevUpgradeGroup"
+    ::= { jwSwitch 1 }
+
+jwsDevGeneral               OBJECT IDENTIFIER ::= { jwsDevmMib 1 }
+jwsDevFactoryInfo           OBJECT IDENTIFIER ::= { jwsDevmMib 2 }
+jwsDevNetworkConfig         OBJECT IDENTIFIER ::= { jwsDevmMib 3 }
+jwsDevSnmpConfig            OBJECT IDENTIFIER ::= { jwsDevmMib 4 }
+
+-- ****************************************************************************
+--                  jwsDevBaseInfo
+-- ****************************************************************************
+jwsDevModelName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Device model name."
+    ::= { jwsDevGeneral 1 }
+
+jwsDevModelId OBJECT-TYPE
+    SYNTAX      JwsModelIdValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Device model unique identifier."
+    ::= { jwsDevGeneral 2 }
+
+jwsSysDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Device description."
+    ::= { jwsDevGeneral 3 }
+
+jwsSysName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Device name."
+    ::= { jwsDevGeneral 4 }
+
+jwsSysLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Device location."
+    ::= { jwsDevGeneral 5 }
+
+jwsSysUptime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Device uptime."
+    ::= { jwsDevGeneral 6 }
+
+jwsHardwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Device hardware version"
+    ::= { jwsDevGeneral 7 }
+
+jwsBootloaderVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Device bootloader version"
+    ::= { jwsDevGeneral 8 }
+
+jwsSoftwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Device software version"
+    ::= { jwsDevGeneral 9 }
+
+jwsResetSystemAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                noAction(1),
+                action(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reset the switch."
+    ::= { jwsDevGeneral 10 }
+
+jwsSaveConfigAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                noAction(1),
+                action(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Save configuration to nvram."
+    ::= { jwsDevGeneral 11 }
+
+jwsSaveConfigStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                success(1),
+                failure(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current status of an save configuration request."
+    ::= { jwsDevGeneral 12 }
+
+jwsClearConfigAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                noAction(1),
+                action(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear configuration to factory default."
+    ::= { jwsDevGeneral 13 }
+
+jwsClearConfigStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                success(1),
+                failure(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the current status of an clear configuration request."
+    ::= { jwsDevGeneral 14 }
+
+jwsPowerSupplyStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                pw1ok-and-pw2ok(1),
+                pw1ok-and-pw2fail(2),
+                pw1fail-and-pw2ok(3),
+                pw1fail-and-pw2fail(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate power supply status."
+    ::= { jwsDevGeneral 15 }
+
+-- ****************************************************************************
+--                  jwsDevFactoryInfo
+-- ****************************************************************************
+jwsSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Device factory info for serial number"
+    ::= { jwsDevFactoryInfo 1 }
+
+jwsBurnedInMacAddress OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Device factory info for burned-in MAC address"
+    ::= { jwsDevFactoryInfo 2 }
+
+-- ************************************************************************
+--                  jwsDevNetworkConfig
+-- ************************************************************************
+jwsNetworkIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The switch's network ip address"
+    ::= { jwsDevNetworkConfig 1 }
+
+jwsNetworkSubnetMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The switch's network subnet mask"
+    ::= { jwsDevNetworkConfig 2 }
+
+jwsNetworkDefaultGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The switch's network default gateway"
+    ::= { jwsDevNetworkConfig 3 }
+
+jwsNetworkProtocol OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none(1),
+                dhcp(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The switch's network DHCP mode"
+    DEFVAL      { none }
+    ::= { jwsDevNetworkConfig 4 }
+
+-- ************************************************************************
+--                  jwsDevSnmpConfig
+-- ************************************************************************
+jwsSnmpEnable OBJECT-TYPE
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "SNMP agent enable/disable. Default: enable"
+    ::= { jwsDevSnmpConfig 1 }
+
+jwsSnmpReadOnlyCommunity OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (3..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "SNMP read only community name."
+    ::= { jwsDevSnmpConfig 2 }
+
+jwsSnmpReadWriteCommunity OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (3..16))
+    MAX-ACCESS  write-only
+    STATUS      current
+    DESCRIPTION
+                "SNMP read write community name."
+    ::= { jwsDevSnmpConfig 3 }
+
+jwsSnmpPort OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "SNMP port for receive message. Default: 161."
+    ::= { jwsDevSnmpConfig 4 }
+
+jwsSnmpTrapEnable OBJECT-TYPE
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "SNMP trap enable/disable. Default: enable"
+    ::= { jwsDevSnmpConfig 5 }
+
+jwsSnmpTrapPort OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "SNMP trap port, Default: 162."
+    ::= { jwsDevSnmpConfig 6 }
+
+jwsSnmpTrapServerIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "SNMP trap server IP address."
+    ::= { jwsDevSnmpConfig 7 }
+
+END
+

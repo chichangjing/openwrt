@@ -1,0 +1,37 @@
+1.编译
+  1)在主目录下 mv config_3336.config，此为对应的marvel_3336配置选项
+
+  2)rm -rf target/linux/generic/files 
+    *此问题有待解决 
+
+  3)修改对应的代码，使得其可以兼容3336的编译
+    目录如下
+    package/utils/web/controller/base.lua
+    package/utils/web/controller/ethernet.lua               -----删除一些特色功能页面
+    package/network/config/netifd/files/etc/config/network
+    package/network/config/netifd/files/etc/init.d/network  -----修改对应的网络启动脚本
+    package/utils/jrpp/Makefile
+    package/utils/jrpp/src/Makefile                        
+    feeds/luci/modules/luci-mod-admin-full/Makefile
+    feeds/luci/modules/luci-mod-admin-full/src/Makefile
+    feeds/packages/net/net-snmp/Makefile                    -----编译兼容修改
+    	
+    scripts/jws_product_info.csv                            -----添加机型
+
+  4)运行make V=sc  文件系统生成
+
+  5)将bin生成的文件系统解压，在CODEC/Marvel3336/workdir/obcp_dir/marvel_upgrade/CreatDxx/rootfs/jffs2下进行制作
+
+  6)uboot的编译和生成在CODEC/Marvel3336/workdir/uboot_dir
+    *对于5，6两步还需要在openwrt的编译选项里实现
+
+2.功能添加可以参考的文档
+  文档目录在CODEC/Marvel3336/doc下，
+  CPSS_4_1_User_Guide_Rev_A.pdf                                     -----cpss的用户手册，对于cpss的学习参考此文档
+  MV-S109530-00B_-_AlleyCat3_and_PonCat3_Functional_Specificat.pdf  -----AlleyCat3的芯片手册，对于原理性的内容比user_guide详细
+  MV-S800846-00F---LUA-CLI-User-Guide.pdf                           -----lua cli的命令手册，对于一些常用功能的使用可以通过此手册了解
+
+3.遗留问题
+  八大功能的调试还需要进行，有些功能涉及到web -- switchd ---等的修改；
+  代码修改说明.txt 列举的问题
+  特色功能的支持lldp,obring,rstp

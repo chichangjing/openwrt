@@ -1,0 +1,142 @@
+#!/bin/sh /etc/rc.common
+START=51
+STOP=51
+USE_PROCD=1
+PROG="/usr/sbin/jrppd"
+CONFIGFILE="/var/run/jrppd.conf"
+PIDFILE=/var/run/jrppd.pid
+
+jrppd_checkpid() {
+	pid=
+	if [ -f "$1" ] ; then
+		local line p
+		read line < "$PIDFILE"
+		for p in $line ; do
+			[ -z "${p//[0-9]/}" -a -d "/proc/$p" ] && pid="$pid $p"
+		done
+		if [ -n "$pid" ]; then
+			return 0
+		fi
+		return 1 # "Program is dead and /var/run pid file exists"
+	fi
+	return 3 # "Program is not running"
+}
+
+jrppd_ring_add() {
+	local cfg="$1"
+
+	# config_get ring_id "$cfg" ring_id
+    ring_id=${cfg#*ring}
+	[ -n "$ring_id" ] || return 0
+	echo "# Ring-$ring_id" >> $CONFIGFILE
+	echo "addring $ring_id" >> $CONFIGFILE
+
+	config_get primary_port "$cfg" primary_port
+	[ -n "$primary_port" ] || return 0
+	config_get secondary_port "$cfg" secondary_port
+	[ -n "$secondary_port" ] || return 0
+	echo "addringport $ring_id $primary_port $secondary_port" >> $CONFIGFILE
+
+	config_get priority "$cfg" priority
+	[ -n "$priority" ] && echo "setnodeprio $ring_id $priority" >> $CONFIGFILE
+
+	config_get admin "$cfg" admin
+	[ -n "$admin" ] && echo "setringmode $ring_id $admin" >> $CONFIGFILE
+	
+	echo >> $CONFIGFILE
+}
+
+jrppd_admin_add() {
+	local cfg="$1"
+
+	config_get jrpp "$cfg" jrpp
+	[ -n "$jrpp" ] || return 0
+
+	if [ "$jrpp" != "on" ]; then
+		echo "jrpp off" >> $CONFIGFILE
+    else
+	    echo "jrpp on" >> $CONFIGFILE
+	fi
+	echo >> $CONFIGFILE
+
+	echo "# =========================" >> $CONFIGFILE
+	echo "# Jrpp ring configuration"   >> $CONFIGFILE
+	echo "# =========================" >> $CONFIGFILE
+	config_foreach jrppd_ring_add ring
+
+	procd_set_param command $PROG
+}
+
+port_action() {
+    for i in $(ls /sys/class/net)
+    do
+        val=${i%-*}
+        if [ $val == "Fex" -o $val == "Gex" ]; then
+            ifconfig $i down      
+            ifconfig $i up
+
+            if [ -n "$1" ]; then
+                val=${i#*-}
+                jssdk_sh port dot1d-state set $val forwarding
+            fi
+        fi
+    done
+}
+
+start_service() {
+    
+    uid_line=`jwboardinfo | grep uid`
+    uid=${uid_line:4}
+    if [ "$uid" == "54-10-01-06-01-01-00-00" ] || [ "$uid" == "54-20-01-06-01-02-00-00" ]
+    then
+        {
+            echo "Yuxi customized board, return jrpp"
+            return
+        }
+    fi
+
+	local pid
+
+	jrppd_checkpid $PIDFILE
+	if [ -n "$pid" ]; then
+		echo "Program is already running"
+		return
+	fi
+
+	[ -f "$CONFIGFILE" ] && rm -f "$CONFIGFILE"
+	rm -f $PIDFILE
+
+    # enable stp in kernel
+    brctl stp br-lan on
+    port_action
+    sleep 2
+
+	procd_open_instance
+
+	echo "# Auto-generated from /etc/config/jrppd"   >> $CONFIGFILE
+	echo >> $CONFIGFILE
+	config_load jrppd
+	config_foreach jrppd_admin_add admin
+
+	procd_close_instance 
+}
+
+stop_service() {
+	local pid
+
+	jrppd_checkpid $PIDFILE
+	if [ -n "$pid" ]; then
+		kill $pid
+		rm -f $PIDFILE
+		[ -f "$CONFIGFILE" ] && rm -f "$CONFIGFILE"
+		echo "pid $pid is killed"
+	fi
+
+    if [ -f /sys/class/gpio/gpio121/value ]; then
+        echo 1 > /sys/class/gpio/gpio121/value
+    fi
+
+    # disable stp in kernel
+    brctl stp br-lan off
+    port_action forwarding
+}

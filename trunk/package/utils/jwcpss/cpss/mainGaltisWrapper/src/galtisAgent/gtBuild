@@ -1,0 +1,25 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+
+SUBDIRS = wrapCpss wrapSimulation wrapUtil
+
+ifeq (DUNE, $(XBAR_VENDOR))
+ifeq (DUNE, $(BSP_VENDOR))
+    SUBDIRS += wrapFe
+else
+    SUBDIRS += wrapFx950
+endif
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

@@ -1,0 +1,121 @@
+###########################################
+##                                       ##
+##    Top Make file Galtis Agent         ##
+##                                       ##
+###########################################
+PROJ_NAME = mainGaltisWrapper
+
+
+include $(USER_BASE)/gtDefsTopMake.mk
+
+##AD_CFLAGS += $(FD)CPSS_PRODUCT	       
+
+PROJECT_PATH = $(PP_DRV_PATH)     \
+               $(GALTIS_PATH)     \
+               $(CMD_PATH)        \
+               $(BASE_PATH)       \
+               $(FA_DRV_PATH)     \
+               $(XBAR_DRV_PATH)   \
+               $(OS_INCLUDE)      \
+               $(EXT_MAC_PATH)    \
+               $(EXT_UTILS_PATH)  \
+               $(UTFTOOL_PATH)    \
+               $(COMMON_PATH)     \
+	       $(FPGA_PATH)       \
+	       $(FPGA_COMMON_PATH) 
+
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/h$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/port/gop/h$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/port/gop/h/port$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/ddr/ddr3libv2/h/Driver$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/ddr/ddr3libv2/h/Driver/ddr3$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/ddr/ddr3libv2/h/Silicon$(FIE)
+PROJECT_PATH += $(FIS)$(SW_ROOT)/mainPpDrv/src/cpss/generic/labServices/ddr/bap/h$(FIE)
+AD_CFLAGS += $(FD)CONFIG_DDR3
+
+#not allowed to use next paths :
+#   because located in cpssEnabler , that real application may not have
+#   only the main cmd in the cpssEnabler is allowed
+#               $(SYSCONFIG_PATH)  
+#               $(EXT_DRV_PATH)    
+#               $(OS_PATH)         
+
+
+ifeq (EXISTS,$(RTOS_ON_SIM))
+  PROJECT_PATH += $(SIMULATION_PATH)
+endif
+
+#Shared memory requires OS_PATH
+ifeq (1,$(SHARED_MEMORY))
+  PROJECT_PATH += $(OS_PATH) \
+	      	  $(SYSCONFIG_PATH) \
+		  $(EXT_DRV_PATH)
+endif
+
+##############
+## CPSS PP  ##
+##############
+
+# check if need to use 'GM_USED'.
+#needed when 'force' image to use GM.
+#also needed for Puma2,3 where use always GM. (for simulation)
+ifeq (EXISTS, $(FORCE_GM_USE))
+  AD_CFLAGS += $(FD)GM_USED
+else
+  ifeq (EXISTS, $(PM_FAMILY))
+    ifeq (EXISTS, $(ASIC_SIMULATION))
+      AD_CFLAGS += $(FD)GM_USED
+    endif
+  endif
+endif
+
+ifeq (EXISTS, $(TG_FAMILY))
+CMD_CFLAGS += $(FD)IMPL_CPSS_EXMXTG
+CMD_CFLAGS += $(FD)TG_FAMILY
+endif
+ifeq (EXISTS, $(EX_FAMILY))
+CMD_CFLAGS += $(FD)IMPL_CPSS_EXMX
+CMD_CFLAGS += $(FD)EX_FAMILY
+CMD_CFLAGS += $(FD)MX_FAMILY
+endif
+ifeq (EXISTS, $(CHX_FAMILY))
+CMD_CFLAGS += $(FD)IMPL_CPSS_DXCHX
+CMD_CFLAGS += $(FD)IMPL_TM
+CMD_CFLAGS += $(FD)CHX_FAMILY
+endif
+ifeq (EXISTS, $(CH3_FAMILY))
+CMD_CFLAGS += $(FD)IMPL_CPSS_DXCH3
+CMD_CFLAGS += $(FD)CH3_FAMILY
+endif
+ifeq (EXISTS, $(CH3P_FAMILY))
+CMD_CFLAGS += $(FD)IMPL_CPSS_DXCH3P
+CMD_CFLAGS += $(FD)CH3P_FAMILY
+endif
+ifeq (EXISTS, $(SAL_FAMILY))
+CMD_CFLAGS += $(FD)IMPL_CPSS_DXSAL
+CMD_CFLAGS += $(FD)SAL_FAMILY
+endif
+ifeq (EXISTS, $(PM_FAMILY))
+CMD_CFLAGS += $(FD)IMPL_CPSS_EXMXPM
+CMD_CFLAGS += $(FD)EXMXPM_FAMILY
+endif
+
+##########
+## Fpga ##
+##########
+ifeq (RHODES, $(FPGA_TYPE))
+AD_CFLAGS += $(FD)IMPL_FPGA
+endif
+
+CFLAGS += $(CFLAGS1) $(CFLAGS2) $(CFLAGS_OPT) $(OS_DEFINE) $(CPU_FLAGS) $(LFLAGS) $(AD_CFLAGS) $(CMD_CFLAGS)
+
+include $(USER_BASE)/gtTargetsTopMake.mk
+
+ifeq (visual,$(TOOL))
+  #for visual no need for 'onelib' and 'elf' , because same end result --> use elf !
+  full: elf
+else
+  full: elf onelib
+endif
+
+

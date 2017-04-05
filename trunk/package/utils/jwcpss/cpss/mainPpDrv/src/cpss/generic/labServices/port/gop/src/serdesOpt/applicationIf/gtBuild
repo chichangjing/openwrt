@@ -1,0 +1,43 @@
+
+
+###
+###  add include path and file list
+###
+
+ifeq (VIPS, $(HOME_ENV))
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+ifeq (lion2, $(PROJ_CHIP))
+C_EXCLUDE_FILE_LIST = SerdesRxOptUbootIf.c SerdesRxOptMilos4AppIf.c
+else
+C_EXCLUDE_FILE_LIST = SerdesRxOptUbootIf.c
+endif
+
+PROJECT_COMMON_DIR = $(subst \,/,$(CHJ_ROOT))
+
+INCLUDE_PATH +=  -I$(PROJECT_COMMON_DIR)/mainDrv/h
+
+
+##################################################
+##################################################
+
+PRESTERA_COMMON_DIR = $(subst \,/,$(SW_ROOT))
+include $(PRESTERA_COMMON_DIR)/mainLabServices/gtBuild
+
+else
+
+#INCLUDE_PATH =
+C_FILE_LIST  = SerdesRxOptCpssIf.c
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+LIB_NAME = cpssGenDiagOptAppIf.lib
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake 
+
+endif

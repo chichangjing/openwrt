@@ -1,0 +1,86 @@
+
+
+###
+###  add include path and file list 
+###
+
+#INCLUDE_PATH = 
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+    LIB_NAME = gtOs.lib
+endif
+
+ifeq (YES,$(APP_DEMO_ONLY))
+    USE_KERNEL_EXT = 0
+else
+ifeq (PPC603, $(CPU))
+    ifeq (6,$(KPATCHLEVEL))
+        USE_KERNEL_EXT = 1
+    endif
+    ifeq (4,$(KPATCHLEVEL))
+        USE_KERNEL_EXT = 1
+    endif
+endif
+ifeq (ARMARCH5, $(CPU))
+    USE_KERNEL_EXT = 1
+endif
+ifeq (ARMARCH7, $(CPU))
+    USE_KERNEL_EXT = 1
+endif
+ifeq (PPC85XX, $(CPU))
+    USE_KERNEL_EXT = 1
+endif
+ifeq (EP3041A, $(CPU))
+    USE_KERNEL_EXT = 1
+endif
+
+ifeq (MIPS64, $(CPU))
+    USE_KERNEL_EXT = 1
+endif
+ifeq (INTEL64, $(CPU))
+    USE_KERNEL_EXT = 1
+endif
+endif
+ifeq (YES, $(LINUX_NOKM))
+    USE_KERNEL_EXT = 0
+endif
+
+export USE_KERNEL_EXT
+SUBDIRS=stubs
+
+ifeq (1,$(USE_KERNEL_EXT))
+    AD_CFLAGS += -DV2L_KERNEL
+    SUBDIRS += kernelExt
+else
+    AD_CFLAGS += -DV2L_PTHREADS
+    SUBDIRS += pthreads
+endif   
+
+ifneq (1,$(SHARED_MEMORY))
+    # userspace mutexes doesn't work in multiprocess environment
+    ifeq (1, $(LINUX_SIM))
+        AD_CFLAGS += -DOS_USERSPACE_MUTEXES=512
+    else
+        AD_CFLAGS += -DOS_USERSPACE_MUTEXES=128
+    endif
+endif
+
+# optional valgrind support
+ifeq (yes, $(USE_VALGRIND))
+    AD_CFLAGS += -DUSE_VALGRIND
+endif
+
+ifeq (1, $(LINUX_SIM))
+#ifneq (APPLICATION_SIDE_ONLY, $(DISTRIBUTED_SIMULATION_ROLE))
+    SUBDIRS += linuxSim
+#endif
+endif
+
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

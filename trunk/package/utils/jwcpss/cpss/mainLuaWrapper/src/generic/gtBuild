@@ -1,0 +1,19 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      = NONE
+
+
+ifeq (yes,$(LUACLI_STANDALONE_BUILD))
+C_EXCLUDE_FILE_LIST = wraplGaltisWrapper.c wraplCpssGenEvents.c
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

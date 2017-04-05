@@ -1,0 +1,35 @@
+###########################################
+##                                       ##
+##    Top Make file for PSS/CPSS drivers ##
+##                                       ##
+###########################################
+PROJ_NAME = mainCmd
+
+include $(USER_BASE)/gtDefsTopMake.mk  
+
+PROJECT_PATH = $(BASE_PATH)    \
+               $(PRES_PATH)    \
+               $(OS_PATH)      \
+               $(APPDEMO_PATH) \
+               $(EXT_DRV_PATH)  \
+               $(OS_INCLUDE) \
+               $(XBAR_DRV_PATH)
+
+
+ifeq (workbench, $(TOOL_ENV))
+ AD_CFLAGS += $(FD)WORKBENCH_TOOL_ENV
+endif
+
+#############################
+### CPSS mode support ###
+#############################
+ifeq (CPSS, $(PRODUCT_TYPE))
+PROJECT_PATH += $(CPSS_MAIN_CMD) $(CPSS_INCLUDE)
+endif
+
+CFLAGS += $(CFLAGS1) $(CFLAGS2) $(CFLAGS3) $(CFLAGS_OPT) $(OS_DEFINE) $(CPU_FLAGS) $(LFLAGS) $(AD_CFLAGS)
+
+include $(USER_BASE)/gtTargetsTopMake.mk 
+
+full: build_dir dep compile elf
+

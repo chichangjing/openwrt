@@ -1,0 +1,23 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+C_FILE_LIST += $(wildcard *.c) \
+    ../generic/cmdOsData.c \
+	../generic/cmdStream.c \
+    ../generic/cmdStreamTelnetProto.c
+
+ifeq (yes,$(CMD_LUA_CLI))
+    AD_CFLAGS += $(FD)CMD_LUA_CLI
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

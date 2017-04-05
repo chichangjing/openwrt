@@ -1,0 +1,32 @@
+##############################################################################
+#	cpss_code_size.spt   -    AWK program file 
+#
+#       used to count the CPSS libs text, data and bss section size
+#       this AWK file is called from cpss_code_size.sh     
+#
+#       Revision: 1 
+#############################################################################
+
+BEGIN {
+	text = 0;
+	data = 0;
+	bss = 0;
+	dec = 0;
+} 
+{
+	if($1 != "text")
+	{
+		text = text + $1
+		data = data + $2
+		bss = bss + $3
+		dec = dec + $4		
+	}
+}
+END{
+	printf  "        text         data          bss        total  \n"
+	 printf  "       --------------------------------------------  \n"
+	 printf  "%12d %12d %12d %12d \n",text,data,bss,dec 
+	printf  "       --------------------------------------------  \n"
+	printf "\n"
+	printf "\n"						
+}

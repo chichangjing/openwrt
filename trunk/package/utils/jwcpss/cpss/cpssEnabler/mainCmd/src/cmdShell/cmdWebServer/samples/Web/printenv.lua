@@ -1,0 +1,8 @@
+print("<html>")
+print("<body>")
+print("This is printenv.lua script")
+print("<pre>")
+print("http="..to_string(http))
+print("</pre>")
+print("</body>")
+print("</html>")

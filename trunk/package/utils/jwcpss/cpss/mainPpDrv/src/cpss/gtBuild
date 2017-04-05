@@ -1,0 +1,48 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+SUBDIRS = generic
+
+addExMx =
+
+### check if compilation need EX files ###
+ifeq (EXISTS, $(EX_FAMILY))
+addExMx = YES
+endif
+
+### check if compilation need MX files ###
+ifeq (EXISTS, $(MX_FAMILY))
+addExMx = YES
+endif
+
+### check if compilation need dx-cheetah-x files ###
+ifeq (EXISTS, $(CHX_FAMILY))
+SUBDIRS += dxCh
+endif
+
+### check if compilation need dx-salsa files ###
+ifeq (EXISTS, $(SAL_FAMILY))
+SUBDIRS += dxSal
+endif
+
+ifeq (YES, $(addExMx))
+SUBDIRS += exMx
+endif
+
+## check if compilation need exmx-Pm files ##
+ifeq (EXISTS, $(PM_FAMILY))
+SUBDIRS += exMxPm
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

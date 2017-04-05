@@ -1,0 +1,127 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH = 
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+SUBDIRS = NONE
+
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+  LIB_NAME = gtOs.lib
+endif
+
+ifeq (linux, $(OS_RUN))
+  ifeq (1,$(SHARED_MEMORY))
+
+	NAMED_SEM_TYPE = NO_NAMED_SEM
+	# first check if mainOs compiled with kernel semaphores
+	MAINOS_SEM_OBJ = $(COMPILATION_ROOT)/cpssEnabler/objTemp/$(CPU_DIR)/osLinuxSem.o
+	OBJ_NM = $(PREFIX)nm$(POSTFIX) $(MAINOS_SEM_OBJ)
+
+	#
+	# KERNEL SYSCALL OPTION - uses kernel module semaphores 
+	#                                                      accessed by system calls
+	#
+
+	ifneq (,$(wildcard $(MAINOS_SEM_OBJ)))
+		ifeq (YES,$(shell $(OBJ_NM) | sed -n 's/^.*T osSemMOpenNamed.*/YES/p'))
+			# osSemMOpenNamed (implemented in kernel module only) found
+			# It is imposible to use this function if IOCTL calls used
+			# because this require device file to be opened first
+			ifeq (yes,$(KERNEL_SYSCALL_TABLE_EXPORTED))
+				NAMED_SEM_TYPE = OS_NAMED_SEM
+			endif
+		endif
+	endif
+	
+	#
+	# LINUX SIMULATION uses posix semaphores
+	#
+
+	ifeq ($(NAMED_SEM_TYPE),NO_NAMED_SEM)
+		ifeq (1,$(LINUX_SIM))
+			ifndef RTOS_ON_SIM
+				# Linux sim on PC
+				NAMED_SEM_TYPE = POSIX_SEM
+			endif
+		endif
+	endif
+
+        #
+	# ARM GNUEABI - uses posix semaphores
+	#
+
+	ifeq ($(NAMED_SEM_TYPE),NO_NAMED_SEM)
+		ifdef USE_GNUEABI
+			# GnuEabi
+			NAMED_SEM_TYPE = POSIX_SEM
+		endif
+	endif
+
+	#
+	# PSS ELDK - do not uses posix semaphores 
+	#                       semaphore option is NO_NAMED_SEM
+	#
+
+	AD_CFLAGS += -D$(NAMED_SEM_TYPE)
+
+    SUBDIRS = intraCPSSdata
+#    ifeq (1,$(INCLUDE_SHMT))
+#        SUBDIRS += testClients
+#    endif
+	ifeq (1,$(LINUX_SIM))
+#		Skip PP initialization routines for WM
+		C_EXCLUDE_FILE_LIST = shrMemPpInit.c shrMemFunctionsPointers.c
+
+#       Use libc wrappers for Puma only for PUMA simulation!
+        ifneq (EXISTS, $(PM_FAMILY))
+	        C_EXCLUDE_FILE_LIST += libcWrappersPuma.c
+        endif
+    else
+#       BlackMode doesn't use wrappers at all (no ASIC simulation inside)!
+		C_EXCLUDE_FILE_LIST = libcWrappers.c libcWrappersPuma.c libcWrappersOs.c
+	endif
+	
+  else
+	ifeq (1,$(LINUX_SIM))
+		C_EXCLUDE_FILE_LIST = ALL
+	else
+#		BM uses shared buffer for /dev/mvPP in any case
+		C_FILE_LIST = shrMemCommonMem.c shrMemPpInit.c
+	endif
+#    ifeq (1,$(INCLUDE_SHMT))
+#        SUBDIRS = testClients
+#        endif
+  endif
+endif
+
+ifeq (FreeBSD, $(OS_RUN))
+  ifeq (1,$(LINUX_SIM))
+		C_EXCLUDE_FILE_LIST = ALL
+  else
+#		BM uses shared buffer for /dev/mvPP in any case
+		C_FILE_LIST = shrMemCommonMem.c shrMemPpInit.c
+  endif
+endif
+
+ifeq (VXWORKS, $(OS_RUN))
+  C_EXCLUDE_FILE_LIST = ALL
+endif
+
+ifeq (uClinux, $(OS_RUN))
+  C_EXCLUDE_FILE_LIST = ALL
+endif
+
+ifeq (win32, $(OS_RUN))
+  C_EXCLUDE_FILE_LIST = ALL
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

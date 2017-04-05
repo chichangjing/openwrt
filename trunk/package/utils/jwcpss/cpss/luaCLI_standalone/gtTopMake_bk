@@ -1,0 +1,51 @@
+############################################
+##                                        ##
+##    Top Make file for luaCLI_standalone ##
+##                                        ##
+############################################
+PROJ_NAME = luaCLI_standalone
+
+include $(USER_BASE)/gtDefsTopMake.mk
+
+
+PROJECT_PATH =  $(OS_INCLUDE)       \
+                $(OS_PATH)          \
+                $(COMMON_PATH)      \
+                $(PP_DRV_PATH)      \
+                $(CMD_PATH)         \
+                $(LUA_PATH)         \
+                $(LUA_SRC_PATH)     \
+                $(SYSCONFIG_PATH)   \
+                $(EXT_DRV_PATH)     \
+                $(EXT_UTILS_PATH)   \
+                $(FIS)$(SW_ROOT)/luaCLI_standalone/h$(FIE)
+
+
+PROJECT_PATH += $(FIS)$(SW_ROOT)/cpssEnabler/mainCmd/h/cmdShell/FS 
+PROJECT_PATH += $(FIS)$(SW_ROOT)/cpssEnabler/mainCmd/h/cmdShell/os
+PROJECT_PATH += $(FIS)$(SW_ROOT)/cpssEnabler/mainCmd/h/cmdShell/lua
+PROJECT_PATH += $(FIS)$(SW_ROOT)/common/h/cpss/extServices/os$(FIE) 
+                
+PROJECT_DEFS += ENV_POSIX CLI_STANDALONE
+
+ifeq (1.yes,$(SHARED_MEMORY).$(LUACLI_STANDALONE))
+
+CFLAGS += $(CFLAGS1) $(CFLAGS2) $(CFLAGS_OPT) $(OS_DEFINE) $(CPU_FLAGS) $(LFLAGS) $(AD_CFLAGS) $(CMD_CFLAGS)
+
+include $(USER_BASE)/gtTargetsTopMake.mk
+
+full: elf onelib
+
+else
+
+#skip
+full: 
+build_dir:
+dep:
+compile:
+lib:
+elf:
+onelib:
+
+endif
+

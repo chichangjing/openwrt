@@ -1,0 +1,36 @@
+
+
+## VIPS compilation environment #################
+ifeq (VIPS, $(HOME_ENV))
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+#SUBDIRS = vxWorks
+
+ifeq (np5, $(DEVICE))
+SUBDIRS      = common port galtisAgent
+endif
+
+##################################################
+##################################################
+ROOT_DIR = $(subst \,/,$(SW_ROOT))
+include $(ROOT_DIR)/mainLabServices/gtBuild
+
+##################################################
+
+else
+
+## CPSS compilation environment #################
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+SUBDIRS      = common port
+C_EXCLUDE_FILE_LIST = np5GeneralAccess.c
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake
+endif

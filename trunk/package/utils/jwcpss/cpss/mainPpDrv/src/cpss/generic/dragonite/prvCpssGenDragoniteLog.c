@@ -1,0 +1,554 @@
+/*******************************************************************************
+*              (c), Copyright 2001, Marvell International Ltd.                 *
+* THIS CODE CONTAINS CONFIDENTIAL INFORMATION OF MARVELL SEMICONDUCTOR, INC.   *
+* NO RIGHTS ARE GRANTED HEREIN UNDER ANY PATENT, MASK WORK RIGHT OR COPYRIGHT  *
+* OF MARVELL OR ANY THIRD PARTY. MARVELL RESERVES THE RIGHT AT ITS SOLE        *
+* DISCRETION TO REQUEST THAT THIS CODE BE IMMEDIATELY RETURNED TO MARVELL.     *
+* THIS CODE IS PROVIDED "AS IS". MARVELL MAKES NO WARRANTIES, EXPRESSED,       *
+* IMPLIED OR OTHERWISE, REGARDING ITS ACCURACY, COMPLETENESS OR PERFORMANCE.   *
+********************************************************************************
+* prvCpssGenDragoniteLog.c
+*       WARNING!!! this is a generated file, please don't edit it manually
+* COMMENTS:
+*
+* FILE REVISION NUMBER:
+*       $Revision: 1 $
+*******************************************************************************/
+#include <cpss/generic/log/cpssLog.h>
+#include <cpss/generic/log/prvCpssLog.h>
+#include <cpss/extServices/private/prvCpssBindFunc.h>
+#include <cpss/generic/dragonite/cpssGenDragonite.h>
+#include <cpss/generic/dragonite/private/prvCpssGenDragoniteLog.h>
+#include <cpss/generic/log/prvCpssGenCommonTypesLog.h>
+
+
+/********* enums *********/
+
+PRV_CPSS_ENUM_STRING_VALUE_PAIR_STC prvCpssLogEnum_map_CPSS_GEN_DRAGONITE_DATA_TYPE_ENT[]  =
+{PRV_CPSS_LOG_ENUM_NAME_AND_VALUE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_CONFIG_E),
+PRV_CPSS_LOG_ENUM_NAME_AND_VALUE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_SYSTEM_E),
+PRV_CPSS_LOG_ENUM_NAME_AND_VALUE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_CHIP_E),
+PRV_CPSS_LOG_ENUM_NAME_AND_VALUE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_PORT_COMMANDS_E),
+PRV_CPSS_LOG_ENUM_NAME_AND_VALUE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_PORT_CNTRS_E),
+PRV_CPSS_LOG_ENUM_NAME_AND_VALUE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_PORT_STATUS_E),
+PRV_CPSS_LOG_ENUM_NAME_AND_VALUE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_PORT_MEASURE_E),
+PRV_CPSS_LOG_ENUM_NAME_AND_VALUE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_LAYER2_E),
+PRV_CPSS_LOG_ENUM_NAME_AND_VALUE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_DEBUG_E),
+PRV_CPSS_LOG_ENUM_NAME_AND_VALUE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_OTHER_E),
+PRV_CPSS_LOG_ENUM_NAME_AND_VALUE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_MAX_E)
+};
+PRV_CPSS_LOG_STC_ENUM_MAP_ARRAY_SIZE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_ENT);
+char * prvCpssLogEnum_CPSS_GEN_DRAGONITE_CHIP_STATE_ENT[]  =
+{
+    "CPSS_GEN_DRAGONITE_CHIP_STATE_NOT_EXISTS_E",
+    "CPSS_GEN_DRAGONITE_CHIP_STATE_EXISTS_E",
+    "CPSS_GEN_DRAGONITE_CHIP_STATE_NA_E",
+    "CPSS_GEN_DRAGONITE_CHIP_STATE_ERROR_E"
+};
+PRV_CPSS_LOG_STC_ENUM_ARRAY_SIZE_MAC(CPSS_GEN_DRAGONITE_CHIP_STATE_ENT);
+char * prvCpssLogEnum_CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STATUS_ENT[]  =
+{
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_ON_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_ON_TM_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STARTUP_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STARTUP_TM_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_SEARCHING_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_INVALID_SIGNATURE_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_CLASS_ERROR_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_TEST_MODE_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_VALID_SIGNATURE_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_DISABLED_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STARTUP_OVERLOAD_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STARTUP_UNDERLOAD_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STARTUP_SHORT_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STARTUP_DVDT_FAIL_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STARTUP_TEST_ERROR_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_OVERLOAD_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_UNDERLOAD_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_SHORT_CIRCUIT_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_POWER_MANAGE_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_SYSTEM_DISABLED_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_UNKNOWN_E"
+};
+PRV_CPSS_LOG_STC_ENUM_ARRAY_SIZE_MAC(CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STATUS_ENT);
+char * prvCpssLogEnum_CPSS_GEN_DRAGONITE_PORT_CTRL_MODE_ENT[]  =
+{
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_MODE_AF_E",
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_MODE_AT_E",
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_MODE_AT4PAIR_E",
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_MODE_RESERVED_E"
+};
+PRV_CPSS_LOG_STC_ENUM_ARRAY_SIZE_MAC(CPSS_GEN_DRAGONITE_PORT_CTRL_MODE_ENT);
+char * prvCpssLogEnum_CPSS_GEN_DRAGONITE_PORT_CTRL_PAIRCTRL_ENT[]  =
+{
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_PAIRCTRL_RESERVED_0_E",
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_PAIRCTRL_ALTER_A_E",
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_PAIRCTRL_ALTER_B_E",
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_PAIRCTRL_RESERVED_3_E"
+};
+PRV_CPSS_LOG_STC_ENUM_ARRAY_SIZE_MAC(CPSS_GEN_DRAGONITE_PORT_CTRL_PAIRCTRL_ENT);
+char * prvCpssLogEnum_CPSS_GEN_DRAGONITE_PORT_CTRL_PRIORITY_ENT[]  =
+{
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_PRIORITY_CRITICAL_E",
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_PRIORITY_HIGH_E",
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_PRIORITY_LOW_E",
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_PRIORITY_RESERVED_E"
+};
+PRV_CPSS_LOG_STC_ENUM_ARRAY_SIZE_MAC(CPSS_GEN_DRAGONITE_PORT_CTRL_PRIORITY_ENT);
+char * prvCpssLogEnum_CPSS_GEN_DRAGONITE_PORT_CTRL_STATUS_ENT[]  =
+{
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_STATUS_DISABLED_E",
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_STATUS_ENABLED_E",
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_STATUS_FORCE_E",
+    "CPSS_GEN_DRAGONITE_PORT_CTRL_STATUS_RESERVED_E"
+};
+PRV_CPSS_LOG_STC_ENUM_ARRAY_SIZE_MAC(CPSS_GEN_DRAGONITE_PORT_CTRL_STATUS_ENT);
+char * prvCpssLogEnum_CPSS_GEN_DRAGONITE_PORT_STATUS_SR_AF_AT_STATUS_ENT[]  =
+{
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_AF_AT_DISABLED_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_AF_AT_SEARCHING_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_AF_AT_DELIVERING_POWER_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_AF_AT_TEST_MODE_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_AF_AT_TEST_ERROR_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_AF_AT_IMPLEMENTATION_SPECIFIC_E"
+};
+PRV_CPSS_LOG_STC_ENUM_ARRAY_SIZE_MAC(CPSS_GEN_DRAGONITE_PORT_STATUS_SR_AF_AT_STATUS_ENT);
+char * prvCpssLogEnum_CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_CLASS_ENT[]  =
+{
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_CLASS_0_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_CLASS_1_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_CLASS_2_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_CLASS_3_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_CLASS_4_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_CLASS_ERROR_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_CLASS_RESERVED_E",
+    "CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_CLASS_UNDEFINED_E"
+};
+PRV_CPSS_LOG_STC_ENUM_ARRAY_SIZE_MAC(CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_CLASS_ENT);
+char * prvCpssLogEnum_CPSS_GEN_DRAGONITE_POWER_SOURCE_TYPE_ENT[]  =
+{
+    "CPSS_GEN_DRAGONITE_POWER_SOURCE_UNKNOWN_E",
+    "CPSS_GEN_DRAGONITE_POWER_SOURCE_PRIMARY_E",
+    "CPSS_GEN_DRAGONITE_POWER_SOURCE_BACKUP_E",
+    "CPSS_GEN_DRAGONITE_POWER_SOURCE_RESERVED_E"
+};
+PRV_CPSS_LOG_STC_ENUM_ARRAY_SIZE_MAC(CPSS_GEN_DRAGONITE_POWER_SOURCE_TYPE_ENT);
+char * prvCpssLogEnum_CPSS_GEN_DRAGONITE_PRIORITY_ENT[]  =
+{
+    "CPSS_GEN_DRAGONITE_PRIORITY_UNKNOWN_E",
+    "CPSS_GEN_DRAGONITE_PRIORITY_CRITICAL_E",
+    "CPSS_GEN_DRAGONITE_PRIORITY_HIGH_E",
+    "CPSS_GEN_DRAGONITE_PRIORITY_LOW_E"
+};
+PRV_CPSS_LOG_STC_ENUM_ARRAY_SIZE_MAC(CPSS_GEN_DRAGONITE_PRIORITY_ENT);
+
+
+/********* structure fields log functions *********/
+
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_CHIP_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_CHIP_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, chipInfo);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, measuredTemp);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, maxMeasuredTemp);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, numOfPorts);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, vmainHighError);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, overTempError);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, disablePortsActiveError);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, vmainLowAfError);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, vmainLowAtError);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, tempAlarm);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, chipDevId);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_CONFIG_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_CONFIG_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, dcDisconnectEn);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, externalSyncDis);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, capDis);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, disPortsOverride);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, rprDisable);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, vmainAtPolicyEn);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, class0EqAf);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, class123EqAf);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, classBypass2ndError);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, classErrorEq0);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, classErrorEq4);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, layer2En);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, portPrioritySetByPD);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, privateLableBit);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, lowPriDiscoForHiPriStartupEn);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, portMethodLimitMode);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, portMethodCalcMode);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, guardBandValue);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, startupHiPrOverride);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, IcutMaxAt);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, tempAlarmTh);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, vmainHighTh);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, vmainAtLowTh);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, vmainAfLowTh);
+    PRV_CPSS_LOG_STC_TYPE_ARRAY_MAC(valPtr, matrixPort, CPSS_GEN_DRAGONITE_PORTS_NUM_CNS, CPSS_GEN_DRAGONITE_PORT_MATRIX_STC);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, commPollingTime);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, irqGenTime);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_PORT_COMMAND_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_PORT_COMMAND_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_STC_MAC(valPtr, portCtrl, CPSS_GEN_DRAGONITE_PORT_CTRL_STC);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, portPpl);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, portTppl);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_PORT_COUNTERS_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_PORT_COUNTERS_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_TYPE_ARRAY_MAC(valPtr, invalidSignatureCounter, CPSS_GEN_DRAGONITE_PORTS_NUM_CNS, GT_U8);
+    PRV_CPSS_LOG_STC_TYPE_ARRAY_MAC(valPtr, powerDeniedCounter, CPSS_GEN_DRAGONITE_PORTS_NUM_CNS, GT_U8);
+    PRV_CPSS_LOG_STC_TYPE_ARRAY_MAC(valPtr, overloadCounter, CPSS_GEN_DRAGONITE_PORTS_NUM_CNS, GT_U8);
+    PRV_CPSS_LOG_STC_TYPE_ARRAY_MAC(valPtr, shortCyrcuitCounter, CPSS_GEN_DRAGONITE_PORTS_NUM_CNS, GT_U8);
+    PRV_CPSS_LOG_STC_TYPE_ARRAY_MAC(valPtr, underloadCounter, CPSS_GEN_DRAGONITE_PORTS_NUM_CNS, GT_U8);
+    PRV_CPSS_LOG_STC_TYPE_ARRAY_MAC(valPtr, classErrorCounter, CPSS_GEN_DRAGONITE_PORTS_NUM_CNS, GT_U8);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_PORT_LAYER2_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_PORT_LAYER2_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_STC_MAC(valPtr, layer2PdInfo, CPSS_GEN_DRAGONITE_PORT_LAYER2_PD_STC);
+    PRV_CPSS_LOG_STC_STC_MAC(valPtr, layer2PseInfo, CPSS_GEN_DRAGONITE_PORT_LAYER2_PSE_STC);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_PORT_MEASUREMENTS_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_PORT_MEASUREMENTS_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, powerConsumption);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, current);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, volt);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, calcPowerConsumption);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_PORT_STATUSES_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_PORT_STATUSES_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_STC_MAC(valPtr, portSr, CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STC);
+    PRV_CPSS_LOG_STC_ENUM_MAC(valPtr, lastDisconnect, CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STATUS_ENT);
+    PRV_CPSS_LOG_STC_STC_MAC(valPtr, indications, CPSS_GEN_DRAGONITE_PORT_INDICATIONS_STC);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_SYSTEM_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_SYSTEM_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, systemMask0);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, activeBudget);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, vmain);
+    PRV_CPSS_LOG_STC_TYPE_ARRAY_MAC(valPtr, powerBudgetArr, CPSS_GEN_DRAGONITE_POWER_BUDGETS_NUM_CNS, CPSS_GEN_DRAGONITE_POWER_BUDGET_STC);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, vmainHigh);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, vmainLowAT);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, vmainLowAF);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, tempAlarm);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, overTemp);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, disablePortsActive);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, osStatus);
+    PRV_CPSS_LOG_STC_TYPE_ARRAY_MAC(valPtr, chipStatusArr, CPSS_GEN_DRAGONITE_CHIPS_NUM_CNS, CPSS_GEN_DRAGONITE_CHIP_STATE_ENT);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, sysTotalCriticalCons);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, sysTotalHighCons);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, sysTotalLowCons);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, sysTotalCriticalReq);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, sysTotalHighReq);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, sysTotalLowReq);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, sysTotalCalcPowerCons);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, sysTotalPowerRequest);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, sysTotalDeltaPower);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, sysTotalRealPowerCons);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, minorVersion);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, majorVersion);
+    PRV_CPSS_LOG_STC_TYPE_ARRAY_MAC(valPtr, bldDateTime, CPSS_GEN_DRAGONITE_BLD_TIME_STRING_LEN_CNS, GT_U8);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, checkSumErrorCounter);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, lengthErrorCounter);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, structVersionErrorCounter);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, typeErrorCounter);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, configErrorCounter);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, irqErrorCounter);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_CHIP_STATE_ENT_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_SET_FIELD_VAL_PTR_MAC(CPSS_GEN_DRAGONITE_CHIP_STATE_ENT *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_ENUM_MAC(namePtr, *valPtr, CPSS_GEN_DRAGONITE_CHIP_STATE_ENT);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_PORT_CTRL_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_PORT_CTRL_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_ENUM_MAC(valPtr, pseEnable, CPSS_GEN_DRAGONITE_PORT_CTRL_STATUS_ENT);
+    PRV_CPSS_LOG_STC_ENUM_MAC(valPtr, pairControl, CPSS_GEN_DRAGONITE_PORT_CTRL_PAIRCTRL_ENT);
+    PRV_CPSS_LOG_STC_ENUM_MAC(valPtr, portMode, CPSS_GEN_DRAGONITE_PORT_CTRL_MODE_ENT);
+    PRV_CPSS_LOG_STC_ENUM_MAC(valPtr, portPriority, CPSS_GEN_DRAGONITE_PORT_CTRL_PRIORITY_ENT);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_PORT_INDICATIONS_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_PORT_INDICATIONS_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, underload);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, overload);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, shortCircuit);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, invalidSignature);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, validSignature);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, powerDenied);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, validCapacitor);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, backoff);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, classError);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_PORT_LAYER2_PD_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_PORT_LAYER2_PD_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, pdRequestedPower);
+    PRV_CPSS_LOG_STC_ENUM_MAC(valPtr, pdPriority, CPSS_GEN_DRAGONITE_PRIORITY_ENT);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, portCableLen);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_PORT_LAYER2_PSE_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_PORT_LAYER2_PSE_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, pseAllocPower);
+    PRV_CPSS_LOG_STC_ENUM_MAC(valPtr, psePriority, CPSS_GEN_DRAGONITE_PRIORITY_ENT);
+    PRV_CPSS_LOG_STC_ENUM_MAC(valPtr, pseType, CPSS_GEN_DRAGONITE_POWER_SOURCE_TYPE_ENT);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_PORT_MATRIX_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_PORT_MATRIX_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, physicalPortNumber);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, chipNumber);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_ENUM_MAC(valPtr, status, CPSS_GEN_DRAGONITE_PORT_STATUS_SR_STATUS_ENT);
+    PRV_CPSS_LOG_STC_ENUM_MAC(valPtr, extStatus, CPSS_GEN_DRAGONITE_PORT_STATUS_SR_AF_AT_STATUS_ENT);
+    PRV_CPSS_LOG_STC_ENUM_MAC(valPtr, portClass, CPSS_GEN_DRAGONITE_PORT_STATUS_SR_PORT_CLASS_ENT);
+    PRV_CPSS_LOG_STC_BOOL_MAC(valPtr, portAtBehavior);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+void prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_POWER_BUDGET_STC_PTR
+(
+    IN CPSS_LOG_LIB_ENT         contextLib,
+    IN CPSS_LOG_TYPE_ENT        logType,
+    IN GT_CHAR_PTR              namePtr,
+    IN void                   * fieldPtr,
+    INOUT PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC     * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_FIELD_STC_MAC(CPSS_GEN_DRAGONITE_POWER_BUDGET_STC *, valPtr);
+    PRV_CPSS_LOG_UNUSED_MAC(inOutParamInfoPtr);
+    PRV_CPSS_LOG_STC_NUMBER_MAC(valPtr, availablePower);
+    PRV_CPSS_LOG_STC_ENUM_MAC(valPtr, powerSourceType, CPSS_GEN_DRAGONITE_POWER_SOURCE_TYPE_ENT);
+    prvCpssLogStcLogEnd(contextLib, logType);
+}
+
+
+/********* parameters log functions *********/
+
+void prvCpssLogParamFunc_CPSS_GEN_DRAGONITE_DATA_STC_PTR(
+    IN CPSS_LOG_LIB_ENT            contextLib,
+    IN CPSS_LOG_TYPE_ENT           logType,
+    IN GT_CHAR_PTR                 namePtr,
+    IN va_list                   * argsPtr,
+    IN GT_BOOL                     skipLog,
+    IN PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC   * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_START_PARAM_STC_MAC(CPSS_GEN_DRAGONITE_DATA_STC*, paramVal);
+    prvCpssLogParamFuncStc_CPSS_GEN_DRAGONITE_DATA_STC_PTR(contextLib, logType, namePtr, paramVal, inOutParamInfoPtr);
+}
+void prvCpssLogParamFunc_CPSS_GEN_DRAGONITE_DATA_TYPE_ENT(
+    IN CPSS_LOG_LIB_ENT            contextLib,
+    IN CPSS_LOG_TYPE_ENT           logType,
+    IN GT_CHAR_PTR                 namePtr,
+    IN va_list                   * argsPtr,
+    IN GT_BOOL                     skipLog,
+    IN PRV_CPSS_LOG_PARAM_ENTRY_INFO_STC   * inOutParamInfoPtr
+)
+{
+    PRV_CPSS_LOG_SET_PARAM_VAL_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_ENT, paramVal);
+    PRV_CPSS_LOG_ENUM_MAP_MAC(namePtr, paramVal, CPSS_GEN_DRAGONITE_DATA_TYPE_ENT);
+}
+
+
+/********* API fields DB *********/
+
+PRV_CPSS_LOG_FUNC_PARAM_STC IN_CPSS_GEN_DRAGONITE_DATA_STC_PTR_dataPtr = {
+     "dataPtr", PRV_CPSS_LOG_PARAM_IN_E,  PRV_CPSS_LOG_FUNC_TYPE_PTR_MAC(CPSS_GEN_DRAGONITE_DATA_STC)
+};
+PRV_CPSS_LOG_FUNC_PARAM_STC IN_CPSS_GEN_DRAGONITE_DATA_TYPE_ENT_type = {
+     "type", PRV_CPSS_LOG_PARAM_IN_E,  PRV_CPSS_LOG_FUNC_TYPE_MAC(CPSS_GEN_DRAGONITE_DATA_TYPE_ENT)
+};
+PRV_CPSS_LOG_FUNC_PARAM_STC IN_GT_U32_intMask = {
+     "intMask", PRV_CPSS_LOG_PARAM_IN_E,  PRV_CPSS_LOG_FUNC_TYPE_MAC(GT_U32)
+};
+PRV_CPSS_LOG_FUNC_PARAM_STC IN_GT_U32_intVectNum = {
+     "intVectNum", PRV_CPSS_LOG_PARAM_IN_E,  PRV_CPSS_LOG_FUNC_TYPE_MAC(GT_U32)
+};
+PRV_CPSS_LOG_FUNC_PARAM_STC OUT_CPSS_GEN_DRAGONITE_DATA_STC_PTR_dataPtr = {
+     "dataPtr", PRV_CPSS_LOG_PARAM_OUT_E,  PRV_CPSS_LOG_FUNC_TYPE_PTR_MAC(CPSS_GEN_DRAGONITE_DATA_STC)
+};
+
+
+/********* API prototypes DB *********/
+
+PRV_CPSS_LOG_FUNC_PARAM_STC * cpssDragoniteWrite_PARAMS[] =  {
+    &IN_CPSS_GEN_DRAGONITE_DATA_STC_PTR_dataPtr
+};
+PRV_CPSS_LOG_FUNC_PARAM_STC * cpssDragoniteReadTrigger_PARAMS[] =  {
+    &IN_CPSS_GEN_DRAGONITE_DATA_TYPE_ENT_type
+};
+PRV_CPSS_LOG_FUNC_PARAM_STC * cpssDragoniteInit_PARAMS[] =  {
+    &IN_GT_U32_intVectNum,
+    &IN_GT_U32_intMask
+};
+PRV_CPSS_LOG_FUNC_PARAM_STC * cpssDragoniteReadData_PARAMS[] =  {
+    &OUT_CPSS_GEN_DRAGONITE_DATA_STC_PTR_dataPtr
+};
+
+
+/********* lib API DB *********/
+
+static PRV_CPSS_LOG_FUNC_ENTRY_STC prvCpssDxChDragoniteLogLibDb[] = {
+    {"cpssDragoniteInit", 2, cpssDragoniteInit_PARAMS, NULL},
+    {"cpssDragoniteReadTrigger", 1, cpssDragoniteReadTrigger_PARAMS, NULL},
+    {"cpssDragoniteReadData", 1, cpssDragoniteReadData_PARAMS, NULL},
+    {"cpssDragoniteWrite", 1, cpssDragoniteWrite_PARAMS, NULL},
+};
+
+/******** DB Access Function ********/
+void prvCpssLogParamLibDbGet_CPSS_LOG_LIB_DRAGONITE(
+    OUT PRV_CPSS_LOG_FUNC_ENTRY_STC ** logFuncDbPtrPtr,
+    OUT GT_U32 * logFuncDbSizePtr
+)
+{
+    *logFuncDbPtrPtr = prvCpssDxChDragoniteLogLibDb;
+    *logFuncDbSizePtr = sizeof(prvCpssDxChDragoniteLogLibDb) / sizeof(PRV_CPSS_LOG_FUNC_ENTRY_STC);
+}
+

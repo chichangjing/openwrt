@@ -1,0 +1,38 @@
+<%#
+ Copyright 2008 Steven Barth <steven@midlink.org>
+ Copyright 2008 Jo-Philipp Wich <jow@openwrt.org>
+ Licensed to the public under the Apache License 2.0.
+-%>
+
+<%+header%>
+<h2 id="content" name="content"><%:reboot device%></h2>
+
+<%-
+local c = require("luci.model.uci").cursor():changes()
+if c and next(c) then
+-%>
+	<p class="warning"><%:Warning: There are unsaved changes that will be lost while rebooting!%></p> 
+<%-
+end
+if not reboot then 
+-%>
+<h3><a href="<%=controller%>/admin/reboot?reboot=1"><%:Perform reboot%></a></h3>
+<%- else -%>
+<h3><%:Please wait: Device rebooting%></h3>
+<p><img src="<%=resource%>/icons/loading.gif" alt="<%:Loading%>" style="vertical-align:middle" />
+    <%:Waiting for changes to be applied...%></p>
+<script type="text/javascript" src="<%=resource%>/xhr.js"></script>
+        <script type="text/javascript">//<![CDATA[
+            var interval = window.setInterval(function() {
+                var img = new Image();
+
+                img.onload = function() {
+                    window.clearInterval(interval);
+                    location.href = ('https:' == document.location.protocol ? 'https://' : 'http://') + '<%=addr or luci.http.getenv("SERVER_NAME")%>/';
+                };
+
+                img.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + '<%=addr or luci.http.getenv("SERVER_NAME")%><%=resource%>/icons/loading.gif?' + Math.random();
+            }, 5000);
+//]]></script>
+<%- end -%>
+<%+footer%>

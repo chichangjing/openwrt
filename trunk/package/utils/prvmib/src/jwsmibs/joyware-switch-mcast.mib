@@ -1,0 +1,105 @@
+-- ============================================================================
+-- MibName   : JWS-MCAST-MIB
+-- FileName  : joyware-switch-mcast.mib
+-- ============================================================================
+JWS-MCAST-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32                     FROM SNMPv2-SMI
+        DisplayString, PhysAddress, MacAddress, RowStatus           FROM SNMPv2-TC
+        jwSwitch                                                    FROM JOYWARE-SMI
+        JwsEnableValue, JwsPortList                                 FROM JWS-TC;
+
+jwsMcastMib MODULE-IDENTITY
+    LAST-UPDATED    "201603011200Z"
+    ORGANIZATION    "Joyware Electronic Technology Co.,Ltd"
+    CONTACT-INFO    "Postal: BlockA,Chang TorchHotel,No.259 Wensan Road,Hangzhou,Zhejiang 310012 China
+                     E-mail: jw-snmp@joyware.com
+                        Tel: 800-8571264 "
+    DESCRIPTION     "This MIB module defines MIB objects which provide multicast
+                     configurable information about the Joyware switch devices."
+    -- revision history
+    REVISION        "201603011200Z"
+    DESCRIPTION     "Initial revision."
+    ::= { jwSwitch 8 }
+
+jwsStaticMcastGroup      OBJECT IDENTIFIER ::= { jwsMcastMib 1 }
+
+-- ****************************************************************************
+--                  jwsStaticMcastObject
+-- ****************************************************************************
+jwsStaticMcastEnableStatus  OBJECT-TYPE
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Enable/Disable static multicast configuration feature."
+    ::= { jwsStaticMcastGroup 1 }
+
+jwsStaticMcastNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Multicast group number."
+    ::= { jwsStaticMcastGroup 2 }
+
+jwsStaticMcastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JwsStaticMcastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "A table of the static multicast config entries"
+    ::= { jwsStaticMcastGroup 3 }
+
+jwsStaticMcastEntry OBJECT-TYPE
+    SYNTAX      JwsStaticMcastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "Switch's static multicast config entry"
+    INDEX       { jwsStaticMcastIndex }
+    ::= { jwsStaticMcastTable 1 }
+
+JwsStaticMcastEntry ::= SEQUENCE {
+    jwsStaticMcastIndex             Integer32,
+    jwsStaticMcastAddress           PhysAddress,
+    jwsStaticMcastMembers           JwsPortList,
+    jwsStaticMcastRowStatus         RowStatus
+    }
+
+jwsStaticMcastIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Multicast group index."
+    ::= { jwsStaticMcastEntry 1 }
+
+jwsStaticMcastAddress OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Multicast Mac address."
+    ::= { jwsStaticMcastEntry 2 }
+
+jwsStaticMcastMembers OBJECT-TYPE
+    SYNTAX      JwsPortList (SIZE(1..8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Multicast group members port list."
+    ::= { jwsStaticMcastEntry 3 }
+
+jwsStaticMcastRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+               "The status of this entry.
+                active(1)        - valid instance
+                createAndGo(4)   - used to create a new instance.
+                destroy(6)       - removes an instance."
+    ::= { jwsStaticMcastEntry 4 }
+
+END

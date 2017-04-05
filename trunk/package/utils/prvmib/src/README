@@ -1,0 +1,106 @@
+===============================================================================
+一、本动态库加载安装指南
+===============================================================================
+
+1. make menuconfig找到snmpd和prvmib模块，通过[*]snmpd和[*]prvmib添加模块
+2. 通过配置snmpd.conf加载对象（已经编写好，可以参考）
+3. 编译
+    make package/net-snmp/compile
+    make package/prvmib/compile
+4. 安装（我在X86平台下编译生成的ipk包,查找对应平台ipk包）
+    opkg install prvmib_1.0-1_x86.ipk
+    opkg install snmpd_5.4.4-2_x86.ipk
+
+===============================================================================
+二、工程简介
+===============================================================================
+
+工程目录结构
+
+./
+├── inc
+│   ├── jwsDevBaseInfo.h
+│   ├── jwsDevFactoryInfo.h
+│   ├── jwsDevGeneral.h
+│   ├── jwsDevNetworkConfig.h
+│   ├── jwsDevSnmpConfig.h
+│   ├── jwsDot1qVlanStaticTable.h
+│   ├── jwsIfExtEthStats.h
+│   ├── jwsIfExtEthStatsTable.h
+│   ├── jwsIfExtPortTable.h
+│   ├── jwsLldpConfiguration.h
+│   ├── jwslog.h
+│   ├── jwsMirrorConfigGroup.h
+│   ├── jwsMirrorTable.h
+│   ├── jwsPagMibGroup.h
+│   ├── jwsPagStaticConfig.h
+│   ├── jwsPagStaticTable.h
+│   ├── jwsPortbasedVlanTable.h
+│   ├── jwsPriRateLimitTable.h
+│   ├── jwsQosConfigGroup.h
+│   ├── jwsStaticMcastGroup.h
+│   ├── jwsStaticMcastTable.h
+│   ├── jwsTrapConfigGroup.h
+│   ├── jwsTrapPortRateThreshold.h
+│   ├── jwsTrapPortStatus.h
+│   ├── jwsTrapPowerSupply.h
+│   ├── jws_ubus_if.h
+│   └── jwsVlanMngtGroup.h
+├── jwsmibs
+│   ├── joyware-products.mib
+│   └── ......
+├── lib
+├── Makefile
+├── objs
+├── README
+└── src
+    ├── jwsDevBaseInfo.c
+    ├── jwsDevFactoryInfo.c
+    ├── jwsDevGeneral.c
+    ├── jwsDevNetworkConfig.c
+    ├── jwsDevSnmpConfig.c
+    ├── jwsDot1qVlanStaticTable.c
+    ├── jwsIfExtEthStats.c
+    ├── jwsIfExtEthStatsTable.c
+    ├── jwsIfExtPortTable.c
+    ├── jwsLldpConfiguration.c
+    ├── jwslog.c
+    ├── jwsMirrorConfigGroup.c
+    ├── jwsMirrorTable.c
+    ├── jwsPagMibGroup.c
+    ├── jwsPagStaticConfig.c
+    ├── jwsPagStaticTable.c
+    ├── jwsPortbasedVlanTable.c
+    ├── jwsPriRateLimitTable.c
+    ├── jwsQosConfigGroup.c
+    ├── jwsStaticMcastGroup.c
+    ├── jwsStaticMcastTable.c
+    ├── jwsTrapConfigGroup.c
+    ├── jwsTrapPortRateThreshold.c
+    ├── jwsTrapPortStatus.c
+    ├── jwsTrapPowerSupply.c
+    ├── jws_ubus_if.c
+    └── jwsVlanMngtGroup.c
+
+src中主要有三个模块构成
+1. jwslog.c日志打印模块
+2. 包含Trap字串的模块为主动告警模块
+3. jws_ubus_if.c调用ubusd数据的客服端模块
+4. jwsDevBaseInfo.c获取产品信息和告警配置信息
+5. 其他jwsDevGeneral.c等模块是snmp私有mib库源代码模块
+
+===============================================================================
+三、日志打印模块启用
+===============================================================================
+
+1. 首先目标设备已经安装好该动态库
+2. openwrt系统/root目录下创建log.conf配置文件添加以下配置
+        path=/var/log/
+        level=ALL
+3. 日志配置文件含义
+    path代表会在/var/log/目录下生成以日期命名的日志文件
+    level代表输出日志信息等级，没有log.conf文件时,默认INF等级/var/log/目录,
+    ALL：全部打印；
+    DEBUG：只打印DEBUG信息；
+    INF：只打印INF信息；
+    ERROR：只打印ERROR信息）

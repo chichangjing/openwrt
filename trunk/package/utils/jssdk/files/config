@@ -1,0 +1,32 @@
+
+# ***********************************************************
+#    Copyright (C) 2016 Joyware
+# ***********************************************************
+
+CPU=arm
+OS=linux
+KERNEL_MODE=FALSE
+FAL=TRUE
+CHIP_TYPE=MARVELL_88E6097
+UK_IF=FALSE
+API_LOCK=TRUE
+
+# *******************************
+#    ALL supported features:
+# *******************************
+IN_PORTCONTROL=TRUE
+IN_MIB=TRUE
+IN_FDB=TRUE
+IN_IGMP=FALSE
+IN_LEAKY=FALSE
+IN_LED=FALSE
+IN_MIRROR=TRUE
+IN_MISC=FALSE
+IN_PORTVLAN=FALSE
+IN_QOS=TRUE
+IN_RATE=TRUE
+IN_STP=FALSE
+IN_VLAN=TRUE
+IN_REDUCED_ACL=FALSE
+IN_TRUNK=TRUE
+IN_MCAST=TRUE

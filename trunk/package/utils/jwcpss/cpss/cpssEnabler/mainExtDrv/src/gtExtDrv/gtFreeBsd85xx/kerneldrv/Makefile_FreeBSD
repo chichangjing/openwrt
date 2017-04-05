@@ -1,0 +1,26 @@
+all: .PHONY
+
+OBJDIR=${COMPILATION_ROOT}
+
+## there is system bug that make's global variable .TARGETS getting value = w 
+## in addition to real targets needed. here is the rule fixing that
+w:
+	@echo "bug fixing of .TARGETS w"
+
+## this target appeares when you try to compile with option -s
+ws:
+	@echo "bug fixing of .TARGETS ws"
+
+s:
+	@echo "bug fixing of .TARGETS s"
+
+all: 
+	@echo "build KLD module"
+	@if ! [ -e ${OBJDIR} ] ; \
+	    then mkdir -p ${OBJDIR} ; \
+	fi
+	KERNEL_TREE=${FSP_SOURCE} MAKEOBJDIR=${OBJDIR} make -f mvPpDrv.mk all ${MAKE_FLAGS}
+
+clean cleanup:
+	KERNEL_TREE=${FSP_SOURCE} MAKEOBJDIR=${OBJDIR} make -f mvPpDrv.mk clean ${MAKE_FLAGS}
+

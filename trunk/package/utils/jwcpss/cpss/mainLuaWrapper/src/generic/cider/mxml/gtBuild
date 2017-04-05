@@ -1,0 +1,20 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+	LIB_NAME = mxml.lib
+endif
+
+SUBDIRS = NONE
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

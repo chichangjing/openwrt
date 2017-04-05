@@ -1,0 +1,8 @@
+config system
+	option hostname	JoyWare
+	option timezone	UTC
+
+config timeserver ntp
+	list server	
+	option enabled 1
+	option enable_server 0

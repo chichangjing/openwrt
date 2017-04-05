@@ -1,0 +1,30 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+KERNEL_MODULE_SUBDIR = kerneldrv_gtLinux_2_6_8245
+
+ifeq (1,$(CPSS_SPLIT_LIBRARIES))
+	LIB_NAME = mainExtDrv.lib
+endif
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake
+
+KERNELSUBDIRS = $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)
+
+build_dir: $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)
+
+$(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR): $(SCRAP_DIR)
+	rm -rf $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)
+	-mkdir $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)
+	cp -R kerneldrv/* $(SCRAP_DIR)/$(KERNEL_MODULE_SUBDIR)

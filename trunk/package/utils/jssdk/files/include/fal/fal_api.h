@@ -1,0 +1,278 @@
+
+#ifndef _FAL_API_H_
+#define _FAL_API_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef IN_PORTCONTROL
+#define PORTCONTROL_API \
+    SW_API_DEF(SW_API_PT_TYPE_GET, fal_port_type_get), \
+    SW_API_DEF(SW_API_PT_LINK_STATUS_GET, fal_port_link_status_get), \
+    SW_API_DEF(SW_API_PT_ADMIN_MODE_SET, fal_port_admin_mode_set), \
+    SW_API_DEF(SW_API_PT_ADMIN_MODE_GET, fal_port_admin_mode_get), \
+    SW_API_DEF(SW_API_PT_PHYSICAL_MODE_SET, fal_port_physical_mode_set), \
+    SW_API_DEF(SW_API_PT_PHYSICAL_MODE_GET, fal_port_physical_mode_get), \
+    SW_API_DEF(SW_API_PT_PHYSICAL_STATUS_GET, fal_port_physical_status_get), \
+    SW_API_DEF(SW_API_PT_FLOWCTRL_MODE_SET, fal_port_flowctrl_mode_set), \
+    SW_API_DEF(SW_API_PT_FLOWCTRL_MODE_GET, fal_port_flowctrl_mode_get), \
+    SW_API_DEF(SW_API_PT_DOT1D_STATE_SET, fal_port_dot1d_state_set), \
+    SW_API_DEF(SW_API_PT_DOT1D_STATE_GET, fal_port_dot1d_state_get), \    
+    SW_API_DEF(SW_API_PT_TEST_SHOW_ALL, fal_port_test_show_all), \
+    SW_API_DEF(SW_API_PT_PCS_STATUS_GET, fal_port_pcs_status_get), \
+    SW_API_DEF(SW_API_PT_COMB_PORT_SET, fal_port_comb_type_set), \
+    SW_API_DEF(SW_API_PT_COMB_PORT_GET, fal_port_comb_type_get),
+    
+#define PORTCONTROL_API_PARAM \
+    SW_API_DESC(SW_API_PT_TYPE_GET) \
+    SW_API_DESC(SW_API_PT_LINK_STATUS_GET) \
+    SW_API_DESC(SW_API_PT_ADMIN_MODE_SET) \
+    SW_API_DESC(SW_API_PT_ADMIN_MODE_GET) \
+    SW_API_DESC(SW_API_PT_PHYSICAL_MODE_SET) \
+    SW_API_DESC(SW_API_PT_PHYSICAL_MODE_GET) \
+    SW_API_DESC(SW_API_PT_PHYSICAL_STATUS_GET) \
+    SW_API_DESC(SW_API_PT_FLOWCTRL_MODE_SET) \
+    SW_API_DESC(SW_API_PT_FLOWCTRL_MODE_GET) \
+    SW_API_DESC(SW_API_PT_DOT1D_STATE_SET) \
+    SW_API_DESC(SW_API_PT_DOT1D_STATE_GET) \    
+    SW_API_DESC(SW_API_PT_TEST_SHOW_ALL) \
+    SW_API_DESC(SW_API_PT_PCS_STATUS_GET) \
+    SW_API_DESC(SW_API_PT_COMB_PORT_SET) \
+    SW_API_DESC(SW_API_PT_COMB_PORT_GET)
+#else
+#define PORTCONTROL_API
+#define PORTCONTROL_API_PARAM
+#endif
+
+#ifdef IN_MIB
+#define MIB_API \
+    SW_API_DEF(SW_API_PT_MIB_GET, fal_mib_info_get), \
+    SW_API_DEF(SW_API_PT_MIB_CLEAR, fal_mib_info_clear),
+
+#define MIB_API_PARAM \
+    SW_API_DESC(SW_API_PT_MIB_GET) \
+    SW_API_DESC(SW_API_PT_MIB_CLEAR)
+#else
+#define MIB_API
+#define MIB_API_PARAM
+#endif
+
+
+#ifdef IN_MIRROR
+#define MIRROR_API \
+	SW_API_DEF(SW_API_MIRROR_DEST_PORT_SET, fal_mirror_dest_port_set), \
+	SW_API_DEF(SW_API_MIRROR_DEST_PORT_GET, fal_mirror_dest_port_get), \
+	SW_API_DEF(SW_API_MIRROR_SOURCE_PORT_MODE_SET, fal_mirror_source_port_mode_set), \
+	SW_API_DEF(SW_API_MIRROR_SOURCE_PORT_MODE_GET, fal_mirror_source_port_mode_get),
+	
+#define MIRROR_API_PARAM \
+	SW_API_DESC(SW_API_MIRROR_DEST_PORT_SET) \
+	SW_API_DESC(SW_API_MIRROR_DEST_PORT_GET) \
+    SW_API_DESC(SW_API_MIRROR_SOURCE_PORT_MODE_SET) \
+    SW_API_DESC(SW_API_MIRROR_SOURCE_PORT_MODE_GET) 
+#else
+#define MIRROR_API
+#define MIRROR_API_PARAM 
+#endif
+
+#ifdef IN_TRUNK
+#define TRUNK_API \
+	SW_API_DEF(SW_API_TRUNK_PAG_MODE_SET, fal_trunk_pag_mode_set), \
+	SW_API_DEF(SW_API_TRUNK_PAG_MODE_GET, fal_trunk_pag_mode_get), \
+	SW_API_DEF(SW_API_TRUNK_LOAD_BALANCE_SET, fal_trunk_load_balance_set), \
+	SW_API_DEF(SW_API_TRUNK_LOAD_BALANCE_GET, fal_trunk_load_balance_get), \
+	SW_API_DEF(SW_API_TRUNK_ID_SET, fal_trunk_id_set), \
+	SW_API_DEF(SW_API_TRUNK_MEMBERS_SET, fal_trunk_members_set), \
+	SW_API_DEF(SW_API_TRUNK_ROW_CREATE, fal_trunk_row_create), \
+	SW_API_DEF(SW_API_TRUNK_ROW_DESTROY, fal_trunk_row_destroy), \
+	SW_API_DEF(SW_API_TRUNK_SHOW_STATUS, fal_trunk_show_row_status),
+
+#define TRUNK_API_PARAM \
+	SW_API_DESC(SW_API_TRUNK_PAG_MODE_SET) \
+	SW_API_DESC(SW_API_TRUNK_PAG_MODE_GET) \
+	SW_API_DESC(SW_API_TRUNK_LOAD_BALANCE_SET) \
+    SW_API_DESC(SW_API_TRUNK_LOAD_BALANCE_GET) \
+    SW_API_DESC(SW_API_TRUNK_ID_SET) \
+    SW_API_DESC(SW_API_TRUNK_MEMBERS_SET) \
+    SW_API_DESC(SW_API_TRUNK_ROW_CREATE) \
+    SW_API_DESC(SW_API_TRUNK_ROW_DESTROY) \
+    SW_API_DESC(SW_API_TRUNK_SHOW_STATUS)
+#else
+#define TRUNK_API
+#define TRUNK_API_PARAM
+#endif
+
+#ifdef IN_RATE
+#define RATE_API \
+    SW_API_DEF(SW_API_RATE_BUCKET_EGRL_SET, fal_rate_bucket_egrl_set), \
+    SW_API_DEF(SW_API_RATE_BUCKET_EGRL_GET, fal_rate_bucket_egrl_get), \
+    SW_API_DEF(SW_API_RATE_BUCKET_PIRL_SET, fal_rate_bucket_pirl_set), \
+    SW_API_DEF(SW_API_RATE_BUCKET_PIRL_GET, fal_rate_bucket_pirl_get),
+
+#define RATE_API_PARAM \
+    SW_API_DESC(SW_API_RATE_BUCKET_EGRL_SET) \
+    SW_API_DESC(SW_API_RATE_BUCKET_EGRL_GET) \
+    SW_API_DESC(SW_API_RATE_BUCKET_PIRL_SET) \
+    SW_API_DESC(SW_API_RATE_BUCKET_PIRL_GET)
+#else
+#define RATE_API
+#define RATE_API_PARAM
+#endif
+
+#ifdef IN_MCAST
+#define MULTICAST_API \
+	SW_API_DEF(SW_API_MULTICAST_ENABLE_SET, fal_multicast_enable_set), \
+	SW_API_DEF(SW_API_MULTICAST_ENABLE_GET, fal_multicast_enable_get), \
+	SW_API_DEF(SW_API_MULTICAST_ROW_CREATE, fal_multicast_row_create), \
+	SW_API_DEF(SW_API_MULTICAST_ROW_DESTROY, fal_multicast_row_destroy), \
+	SW_API_DEF(SW_API_MGMT_FRAME_SET, fal_mgmt_frame_set),
+
+#define MULTICAST_API_PARAM \
+	SW_API_DESC(SW_API_MULTICAST_ENABLE_SET) \
+	SW_API_DESC(SW_API_MULTICAST_ENABLE_GET) \
+	SW_API_DESC(SW_API_MULTICAST_ROW_CREATE) \
+	SW_API_DESC(SW_API_MULTICAST_ROW_DESTROY) \
+	SW_API_DESC(SW_API_MGMT_FRAME_SET)
+#else
+#define MULTICAST_API
+#define MULTICAST_API_PARAM
+#endif
+
+#ifdef IN_VLAN
+#define VLAN_API \
+	SW_API_DEF(SW_API_VLAN_MODE_SET, fal_vlan_mode_set), \
+	SW_API_DEF(SW_API_VLAN_MODE_GET, fal_vlan_mode_get), \
+	SW_API_DEF(SW_API_PORT_BASED_VLAN_SET, fal_port_based_vlan_set), \
+	SW_API_DEF(SW_API_8021Q_VLAN_ROW_CREATE, fal_8021q_vlan_row_create), \
+	SW_API_DEF(SW_API_8021Q_VLAN_ROW_DESTROY, fal_8021q_vlan_row_destroy), \
+	SW_API_DEF(SW_API_8021Q_VLAN_SHOW_STATUS, fal_8021q_vlan_show_status), \
+	SW_API_DEF(SW_API_8021Q_VLAN_ROW_STATUS, fal_8021q_vlan_row_status),
+
+#define VLAN_API_PARAM \
+	SW_API_DESC(SW_API_VLAN_MODE_SET) \
+	SW_API_DESC(SW_API_VLAN_MODE_GET) \
+	SW_API_DESC(SW_API_PORT_BASED_VLAN_SET) \
+	SW_API_DESC(SW_API_8021Q_VLAN_ROW_CREATE) \
+	SW_API_DESC(SW_API_8021Q_VLAN_ROW_DESTROY) \
+	SW_API_DESC(SW_API_8021Q_VLAN_SHOW_STATUS) \
+	SW_API_DESC(SW_API_8021Q_VLAN_ROW_STATUS)
+#else
+#define VLAN_API
+#define VLAN_API_PARAM
+#endif
+
+#ifdef IN_QOS
+#define QOS_API \
+	SW_API_DEF(SW_API_QOS_PRIO_MAP_SET, fal_qos_port_prio_map_rule_set), \
+	SW_API_DEF(SW_API_QOS_PRIO_MAP_GET, fal_qos_port_prio_map_rule_get), \
+	SW_API_DEF(SW_API_QOS_SCHEDULE_MODE_SET, fal_qos_port_schedule_mode_set), \
+	SW_API_DEF(SW_API_QOS_SCHEDULE_MODE_GET, fal_qos_port_schedule_mode_get), \
+	SW_API_DEF(SW_API_QOS_TAG_PRIO_MAP_SET, fal_qos_tag_prio_map_set), \
+	SW_API_DEF(SW_API_QOS_IP_PRIO_MAP_SET, fal_qos_ip_prio_map_set), \
+	SW_API_DEF(SW_API_QOS_ASSIGN_MODE_SET, fal_qos_port_prio_assign_mode_set), \
+	SW_API_DEF(SW_API_QOS_DEFAULT_PRIO_SET, fal_qos_port_default_prio_set), \
+	SW_API_DEF(SW_API_QOS_SHOW_STATUS, fal_qos_show_status),
+
+#define QOS_API_PARAM \
+	SW_API_DESC(SW_API_QOS_PRIO_MAP_SET) \
+	SW_API_DESC(SW_API_QOS_PRIO_MAP_GET) \
+	SW_API_DESC(SW_API_QOS_SCHEDULE_MODE_SET) \
+	SW_API_DESC(SW_API_QOS_SCHEDULE_MODE_GET) \
+	SW_API_DESC(SW_API_QOS_TAG_PRIO_MAP_SET) \
+	SW_API_DESC(SW_API_QOS_IP_PRIO_MAP_SET) \
+	SW_API_DESC(SW_API_QOS_ASSIGN_MODE_SET) \
+	SW_API_DESC(SW_API_QOS_DEFAULT_PRIO_SET) \
+	SW_API_DESC(SW_API_QOS_SHOW_STATUS)
+#else
+#define QOS_API
+#define QOS_API_PARAM
+#endif
+
+#ifdef IN_FDB
+#define MAC_API \
+	SW_API_DEF(SW_API_MAC_AGING_TIMEOUT_SET, fal_mac_aging_timeout_set), \
+	SW_API_DEF(SW_API_MAC_SECURE_PORT_ENABLE_SET, fal_mac_secure_port_enable_set), \
+	SW_API_DEF(SW_API_MAC_ROW_CREATE, fal_mac_row_create), \
+	SW_API_DEF(SW_API_MAC_ROW_DESTROY, fal_mac_row_destroy), \
+	SW_API_DEF(SW_API_MAC_ADDR_TABLE_SHOW, fal_mac_addr_table_show), \
+	SW_API_DEF(SW_API_MAC_ADDR_TABLE_CLEAR, fal_mac_addr_table_clear), \
+	SW_API_DEF(SW_API_MAC_SHOW_BLACKLIST, fal_mac_show_blacklist), \
+	SW_API_DEF(SW_API_MAC_FLUSH_PORT, fal_mac_flush_port), \
+	SW_API_DEF(SW_API_8021X_PORT_AUTH_SET, fal_8021x_port_auth_set), \
+	SW_API_DEF(SW_API_8021X_MAC_BIND, fal_8021x_mac_bind),
+
+#define MAC_API_PARAM \
+	SW_API_DESC(SW_API_MAC_AGING_TIMEOUT_SET) \
+	SW_API_DESC(SW_API_MAC_SECURE_PORT_ENABLE_SET) \
+	SW_API_DESC(SW_API_MAC_ROW_CREATE) \
+	SW_API_DESC(SW_API_MAC_ROW_DESTROY) \
+	SW_API_DESC(SW_API_MAC_ADDR_TABLE_SHOW) \
+	SW_API_DESC(SW_API_MAC_ADDR_TABLE_CLEAR) \
+	SW_API_DESC(SW_API_MAC_SHOW_BLACKLIST) \
+	SW_API_DESC(SW_API_MAC_FLUSH_PORT) \
+	SW_API_DESC(SW_API_8021X_PORT_AUTH_SET) \
+	SW_API_DESC(SW_API_8021X_MAC_BIND)
+#else
+#define MAC_API
+#define MAC_API_PARAM
+#endif
+
+
+
+
+#define REG_API \
+    SW_API_DEF(SW_API_REG_GET, fal_reg_get), \
+    SW_API_DEF(SW_API_REG_SET, fal_reg_set), \
+    SW_API_DEF(SW_API_REG_FIELD_GET, fal_reg_field_get), \
+    SW_API_DEF(SW_API_REG_FIELD_SET, fal_reg_field_set), \
+    SW_API_DEF(SW_API_PHY_REG_GET, fal_phy_reg_get), \
+    SW_API_DEF(SW_API_PHY_REG_SET, fal_phy_reg_set),
+
+#define REG_API_PARAM \
+    SW_API_DESC(SW_API_REG_GET)  \
+    SW_API_DESC(SW_API_REG_SET)  \
+    SW_API_DESC(SW_API_REG_FIELD_GET) \
+    SW_API_DESC(SW_API_REG_FIELD_SET) \
+    SW_API_DESC(SW_API_PHY_REG_GET) \
+    SW_API_DESC(SW_API_PHY_REG_SET)
+
+#define SSDK_API \
+    SW_API_DEF(SW_API_SSDK_CFG, fal_ssdk_cfg), \
+    SW_API_DEF(SW_API_SWITCH_RESET, fal_reset), \
+    SW_API_DEF(SW_API_SWITCH_MODE_TAG, fal_mode_tag), \
+    PORTCONTROL_API \
+	MIB_API \
+    MIRROR_API \
+    TRUNK_API \
+    RATE_API \
+    MULTICAST_API \
+    VLAN_API \
+    QOS_API \
+    MAC_API \
+    REG_API \
+    SW_API_DEF(SW_API_MAX, NULL),
+
+#define SSDK_PARAM  \
+    SW_PARAM_DEF(SW_API_SSDK_CFG, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_SWITCH_RESET, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_SWITCH_MODE_TAG, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"), \
+    SW_PARAM_DEF(SW_API_SSDK_CFG, SW_SSDK_CFG, sizeof(ssdk_cfg_t), SW_PARAM_PTR|SW_PARAM_OUT, "ssdk configuration"), \
+    PORTCONTROL_API_PARAM \
+    MIB_API_PARAM \
+	MIRROR_API_PARAM \
+	TRUNK_API_PARAM \
+	RATE_API_PARAM \
+	MULTICAST_API_PARAM \
+	VLAN_API_PARAM \
+	QOS_API_PARAM \
+	MAC_API_PARAM \
+    REG_API_PARAM \
+    SW_PARAM_DEF(SW_API_MAX, SW_UINT32, 4, SW_PARAM_IN, "Dev ID"),
+
+
+#ifdef __cplusplus
+}
+#endif
+#endif
+

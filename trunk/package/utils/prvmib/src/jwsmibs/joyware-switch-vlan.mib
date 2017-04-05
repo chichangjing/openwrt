@@ -1,0 +1,176 @@
+-- ============================================================================
+-- MibName   : JWS-VLAN-MIB
+-- FileName  : joyware-switch-vlan.mib
+-- ============================================================================
+JWS-VLAN-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32                     FROM SNMPv2-SMI
+        DisplayString, PhysAddress, MacAddress, RowStatus           FROM SNMPv2-TC
+        jwSwitch                                                    FROM JOYWARE-SMI
+        JwsPortList, JwsVlanID                                      FROM JWS-TC;
+
+jwsVlanMib MODULE-IDENTITY
+    LAST-UPDATED    "201603011200Z"
+    ORGANIZATION    "Joyware Electronic Technology Co.,Ltd"
+    CONTACT-INFO    "Postal: BlockA,Chang TorchHotel,No.259 Wensan Road,Hangzhou,Zhejiang 310012 China
+                     E-mail: jw-snmp@joyware.com
+                        Tel: 800-8571264 "
+    DESCRIPTION     "This MIB module defines MIB objects which provide vlan
+                     configurable information about the Joyware switch devices."
+    -- revision history
+    REVISION        "201603011200Z"
+    DESCRIPTION     "Initial revision."
+    ::= { jwSwitch 9 }
+
+jwsVlanMngtGroup         OBJECT IDENTIFIER ::= { jwsVlanMib 1 }
+
+-- ****************************************************************************
+--                  jwsVlanMngtGroup
+-- ****************************************************************************
+jwsVlanMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            port-based(1),
+            ieee8021q(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "The vlan mode select."
+    DEFVAL  { port-based }
+    ::= { jwsVlanMngtGroup 1 }
+
+jwsPortbasedVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JwsPortbasedVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing static configuration information for port-based VLAN."
+    ::= { jwsVlanMngtGroup 2 }
+
+jwsPortbasedVlanEntry OBJECT-TYPE
+    SYNTAX      JwsPortbasedVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry for port-based vlan configuration information."
+    INDEX      { jwsPortbasedVlanPortIndex }
+    ::= { jwsPortbasedVlanTable 1 }
+
+JwsPortbasedVlanEntry ::= SEQUENCE {
+    jwsPortbasedVlanPortIndex           Integer32,
+    jwsPortbasedVlanSwitchPorts         JwsPortList
+    }
+
+jwsPortbasedVlanPortIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "ifIndex of the port."
+    ::= { jwsPortbasedVlanEntry 1 }
+
+jwsPortbasedVlanSwitchPorts OBJECT-TYPE
+    SYNTAX      JwsPortList (SIZE(1..8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Portlist which should forward with own port."
+    ::= { jwsPortbasedVlanEntry 2 }
+
+
+jwsDot1qVlanNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Dot1q Vlan entry number."
+    ::= { jwsVlanMngtGroup 3 }
+
+jwsDot1qVlanStaticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JwsDot1qVlanStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "A table containing static configuration information for
+                 each VLAN configured into the device by (local or network) management."
+    ::= { jwsVlanMngtGroup 4 }
+
+jwsDot1qVlanStaticEntry OBJECT-TYPE
+    SYNTAX      JwsDot1qVlanStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "Static information for a VLAN configured into the
+                 device by (local or network) management."
+    INDEX      { jwsDot1qVlanIndex }
+    ::= { jwsDot1qVlanStaticTable 1 }
+
+JwsDot1qVlanStaticEntry ::= SEQUENCE {
+    jwsDot1qVlanIndex                   Integer32,
+    jwsDot1qVlanId                      JwsVlanID,
+    jwsDot1qVlanName                    DisplayString,
+    jwsDot1qVlanEgressPorts             JwsPortList,
+    jwsDot1qVlanTaggedPorts             JwsPortList,
+    jwsDot1qVlanRowStatus               RowStatus
+    }
+
+jwsDot1qVlanIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "Vlan entry table index."
+    ::= { jwsDot1qVlanStaticEntry 1 }
+
+jwsDot1qVlanId OBJECT-TYPE
+    SYNTAX      JwsVlanID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+                "Vlan ID for which this entry is associated with."
+    ::= { jwsDot1qVlanStaticEntry 2 }
+
+jwsDot1qVlanName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+                "An administratively assigned string, which may be used
+                 to identify the VLAN."
+    ::= { jwsDot1qVlanStaticEntry 3 }
+
+jwsDot1qVlanEgressPorts OBJECT-TYPE
+    SYNTAX      JwsPortList (SIZE(1..8))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+               "The set of ports that are permanently assigned to the
+                egress list for this VLAN by management.  Changes to a
+                bit in this object affect the per-port, per-VLAN
+                Registrar control for Registration Fixed for the
+                relevant GVRP state machine on each port.  A port may
+                not be added in this set if it is already a member of
+                the set of ports in dot1qVlanForbiddenEgressPorts.  The
+                default value of this object is a string of zeros of
+                appropriate length, indicating not fixed."
+    ::= { jwsDot1qVlanStaticEntry 4 }
+
+jwsDot1qVlanTaggedPorts OBJECT-TYPE
+    SYNTAX      JwsPortList (SIZE(1..8))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+               "The set of ports which should transmit egress packets
+                for this VLAN as tagged."
+    ::= { jwsDot1qVlanStaticEntry 5 }
+
+jwsDot1qVlanRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+               "This object indicates the status of this entry."
+    ::= { jwsDot1qVlanStaticEntry 6 }
+
+
+END

@@ -1,0 +1,152 @@
+-- ============================================================================
+-- MibName   : JWS-JRPP-MIB
+-- FileName  : joyware-switch-jrpp.mib
+-- ============================================================================
+JWS-JRPP-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32          FROM SNMPv2-SMI
+        DisplayString, MacAddress, RowStatus                        FROM SNMPv2-TC
+        jwSwitch                                                    FROM JOYWARE-SMI
+        JwsEnableValue                                              FROM JWS-TC;
+
+jwsJrppMib MODULE-IDENTITY
+    LAST-UPDATED    "201603011200Z"
+    ORGANIZATION    "Joyware Electronic Technology Co.,Ltd"
+    CONTACT-INFO    "Postal: BlockA,Chang TorchHotel,No.259 Wensan Road,Hangzhou,Zhejiang 310012 China
+                     E-mail: jw-snmp@joyware.com
+                        Tel: 800-8571264 "
+    DESCRIPTION     "This MIB module defines MIB objects which provide JRPP
+                     (Joyware Ring Protect Protocal) information about the switch devices."
+    -- revision history
+    REVISION        "201603011200Z"
+    DESCRIPTION     "Initial revision."
+    ::= { jwSwitch 10 }
+
+jwsJrppGlobalGroup          OBJECT IDENTIFIER ::= { jwsJrppMib 1 }
+jwsJrppTable                OBJECT IDENTIFIER ::= { jwsJrppMib 2 }
+
+-- ****************************************************************************
+--                  jwsJrppGlobalGroup
+-- ****************************************************************************
+jwsJrppAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+                "JRPP enable status"
+    DEFVAL      { disabled }
+    ::= { jwsJrppGlobalGroup 1 }
+
+jwsJrppRingNumber OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "number of ring"
+    ::= { jwsJrppGlobalGroup 2 }
+
+-- ****************************************************************************
+--                  jwsJrppRingTable
+-- ****************************************************************************
+
+jwsJrppRingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JwsJrppRingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information about configurations
+         and status of a JRPP Ring."
+    ::= { jwsJrppTable 2 }
+
+jwsJrppRingEntry OBJECT-TYPE
+    SYNTAX      JwsJrppRingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Static information for a OB-Ring configured into the
+         device by (local or network) management."
+    INDEX   { jwsJrppRingIndex }
+    ::= { jwsJrppRingTable 1 }
+
+JwsJrppRingEntry ::= SEQUENCE {
+    jwsJrppRingIndex                    Integer32,
+    jwsJrppRingID                       Integer32,
+    jwsJrppRingEnableStatus             JwsEnableValue,
+    jwsJrppRingNodePriority             INTEGER,
+    jwsJrppRingPrimaryPort              Integer32,
+    jwsJrppRingSecondaryPort            Integer32,
+    jwsJrppRingRowStatus                RowStatus
+
+--  jwsJrppPrimaryPortState             INTEGER,
+--  jwsJrppSecondaryPortState           INTEGER,
+--  jwsJrppPrimaryNeighborPort          Integer32,
+--  jwsJrppSecondaryNeighborPort        Integer32,
+--  jwsJrppPrimaryNeighborMac           MacAddress,
+--  jwsJrppSecondaryNeighborMac         MacAddress
+    }
+
+jwsJrppRingIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..64)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Index of the joyware ring."
+    ::= { jwsJrppRingEntry 1 }
+
+jwsJrppRingID OBJECT-TYPE
+    SYNTAX      Integer32(1..64)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An index uniquely identifies a RRPP Ring, which ranges from 1~64.
+         This value can't be modified after created."
+    ::= { jwsJrppRingEntry 2 }
+
+jwsJrppRingEnableStatus OBJECT-TYPE
+    SYNTAX      JwsEnableValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicating whether the JRPP is enabled on this Ring."
+    ::= { jwsJrppRingEntry 3 }
+
+jwsJrppRingNodePriority OBJECT-TYPE
+    SYNTAX  INTEGER {
+            low(1),
+            medium(2),
+            high(3)
+            }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicating the JRPP node priority on this Ring."
+    ::= { jwsJrppRingEntry 4 }
+
+jwsJrppRingPrimaryPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This value is the primary port ifIndex."
+    ::= { jwsJrppRingEntry 5 }
+
+jwsJrppRingSecondaryPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This value is the secondary port ifIndex."
+    ::= { jwsJrppRingEntry 6 }
+
+jwsJrppRingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { jwsJrppRingEntry 7 }
+
+END

@@ -1,0 +1,181 @@
+Release notes for HW Services suite v2.0
+============================================================================
+
+
+Table of Contents
+-----------------
+1.      Contents of the Release
+2.      Main Functionality
+3. 	Changes from Previous Releases
+4.      Known problems
+5.      Disclaimer
+
+
+1. Contents of the Release 
+==========================
+
+	LabServices utils v2.0
+
+
+2. Main Changes
+=====================
+Support new Port modes for Lion2B0 and Puma3 silicons added:
+    XLHGL_KR4,
+    HGL16G,
+    HGS,
+    HGS4,
+    _100GBase_SR10,
+    CHGL_LR12,
+    TCAM,
+    INTLKN_12Lanes_6_25G,
+    INTLKN_16Lanes_6_25G,
+    INTLKN_24Lanes_6_25G,
+    INTLKN_12Lanes_10_3125G,
+    INTLKN_16Lanes_10_3125G,
+    INTLKN_12Lanes_12_5G,
+    INTLKN_16Lanes_12_5G.
+
+Support AP protocol. 
+Add new SERDES revision 2 support.
+Add interface to init HWS for Puma3 silicion.
+
+Fixed SERDES functions interface:
+	mvHwsSerdesManualTxConfig
+New functions added to SERDES IF:
+	serdesTxEnableFunc
+	serdesTxEnableGetFunc
+	serdesCalibrationStatusFunc
+	serdesDfeStatusExtFunc
+
+New functions added to PORT IF:
+	mvHwsPortPolaritySet
+	mvHwsPortTxEnable
+
+Fixed processing keep in reset all unused MACs in XLG MAC.
+HWS init process changed in order to support different devices (Lion2 and Puma3) in the same image.
+
+
+
+3. Changes from Previous Releases
+=================================
+
+Release v1.13.9
+===============
+
+	- Fixed EOM algorithm for 12.5G port mode.
+	- Improve WA for 40G MMPCS configuration - keep in reset all unused XLG MAC units.
+	- Fixed (by Yakov) mvHwsComHSerdesLoopbackGet().
+
+Release v1.13.8
+===============
+	- Change EOM Matrix row size to be constant value (128).
+	- Improve WA for 40G MMPCS configuration - keep in reset all unused MM PCS units.
+	- Keep in reset all unused MMPCS units.
+
+
+
+Release v1.13.6
+===============
+	- Full support EOM mechanism interface with GUI application.
+	- Add global function mvHwsEomClose() to close EOM facility.
+	- Fixed serdes initialization data for all serdes speeds.
+	- Fixed ports 8, 9 link indication for modes XG or SGMII/1000Base.
+	- Fixed Gig MAC initalization to be 1000Base_X mode.
+	- Improve ports elements data base structure.
+
+Release 5 (v1.12.7.1)
+===================
+	- Support Create/Delete Port at 10/20/40G KR (FEC enable), 20G-KX4, 12.5G-KR modes.
+	- Support TX Port Auto Tune (SAS mode only).
+	- Support EOM mechanism.
+	- Support HGL (not tested).
+
+Release 3 (v1.11.4)
+===================
+
+	- Support Create/Delete Port at mode XAUI, RXAUI.
+
+	- Support impoved Port Auto Tune (Rx only).
+	- Support Set_Polarity().
+
+
+Release 3 (v1.11)
+=================
+	- Support Create/Delete Port at mode 10G serial SR/LR, 40G serial SR/LR, 1G serial SR/LR. 
+	  Use FEC disable in all KR modes (will be enabled in next release).
+
+	- Support Port Auto Tune (Rx only), Get_Port_Lanes, Set_Port_LoopBack.
+	- PCS RX reset WA integrated into mvHwsPcsReset().
+
+
+Release 2 (v1.7)
+================
+	- Support Create/Delete Port at mode 10G-SR, 40G-SR, 1G-SR. 
+	  Use FEC disable in all KR modes (will be enabled in next release).
+
+	- Support Serdes PRBS, Get_Port_Status, Set_Port_Manual_Tune configuration.
+
+	
+4. Known problems
+=================
+
+	- Rx auto tune has some limitations on specific lanes of cores 0, 1.
+	  This will be resolved in next release.
+
+
+5. Disclaimer
+=============
+This document provides preliminary information about the products described, 
+and such information should not be used for purpose of final design. Visit the 
+Marvell® web site at www.marvell.com for the latest information on Marvell products.
+No part of this document may be reproduced or transmitted in any form or by any 
+means, electronic or mechanical, including photocopying and recording, for any 
+purpose, without the express written permission of Marvell. Marvell retains the 
+right to make changes to this document at any time, without notice. Marvell 
+makes no warranty of any kind, expressed or implied, with regard to any information
+ contained in this document, including, but not limited to, the implied warranties
+ of merchantability or fitness for any particular purpose. Further, Marvell does 
+not warrant the accuracy or completeness of the information, text, graphics, or 
+other items contained within this document. Marvell makes no commitment either to 
+update or to keep current the information contained in this document. Marvell 
+products are not designed for use in life-support equipment or applications that 
+would cause a life-threatening situation if any such products failed. Do not use 
+Marvell products in these types of equipment or applications. The user should 
+contact Marvell to obtain the latest specifications before finalizing a product 
+design. Marvell assumes no responsibility, either for use of these products or 
+for any infringements of patents and trademarks, or other rights of third parties 
+resulting from its use. No license is granted under any patents, patent rights, 
+or trademarks of Marvell.These products may include one or more optional functions. 
+The user has the choice of implementing any particular optional function. Should 
+the user choose to implement any of these optional functions, it is possible that 
+the use could be subject to third party intellectual property rights. Marvell 
+recommends that the user investigate whether third party intellectual property 
+rights are relevant to the intended use of these products and obtain licenses as 
+appropriate under relevant intellectual property rights. 
+Marvell comprises Marvell Technology Group Ltd. (MTGL) and its subsidiaries, 
+Marvell International Ltd. (MIL), Marvell Semiconductor, Inc. (MSI), Marvell 
+Asia Pte Ltd. (MAPL), Marvell Japan K.K. (MJKK), Marvell Semiconductor Israel 
+Ltd. (MSIL), SysKonnect GmbH, and Radlan Computer Communications, Ltd.
+Export Controls.  With respect to any of Marvell’s Information, the user or 
+recipient, in the absence of appropriate U.S. government authorization, agrees:
+ 1) not to re-export or release any such information consisting of technology, 
+software or source code controlled for national security reasons by the U.S. 
+Export Control Regulations ("EAR"), to a national of EAR Country Groups D:1 or 
+E:2; 2) not to export the direct product of such technology or such software, 
+to EAR Country Groups D:1 or E:2, if such technology or software and direct 
+products thereof are controlled for national security reasons by the EAR; and, 
+3) in the case of technology controlled for national security reasons under 
+the EAR where the direct product of the technology is a complete plant or 
+component of a plant, not to export to EAR Country Groups D:1 or E:2 the direct 
+product of the plant or major component thereof, if such direct product is 
+controlled for national security reasons by the EAR, or is subject to controls 
+under the U.S. Munitions List  ("USML").  At all times hereunder, the recipient 
+of any such information agrees that they shall be deemed to have manually signed 
+this document in connection with their receipt of any such information. 
+Copyright © 2004.  Marvell.  All rights reserved.  Marvell, the Marvell logo, 
+Moving Forward Faster, Alaska, Prestera and GalNet are registered trademarks 
+of Marvell.  Discovery, Fastwriter, GalTis, Horizon, Libertas, Link Street, 
+NetGX, PHY Advantage, Raising The Technology Bar, UniMAC, Virtual Cable Tester, 
+and Yukon are trademarks of Marvell.  All other trademarks are the property 
+of their respective owners.
+

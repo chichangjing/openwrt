@@ -1,0 +1,23 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+AD_CFLAGS += -DUCLINUX
+
+C_FILE_LIST += $(wildcard *.c) \
+    ../generic/cmdOsData.c \
+	../generic/cmdStream.c \
+	../generic/u_cmdStreamSocket.c \
+	../generic/u_cmdStreamSerial.c
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

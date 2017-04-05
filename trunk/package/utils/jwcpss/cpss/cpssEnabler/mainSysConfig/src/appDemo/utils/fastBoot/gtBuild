@@ -1,0 +1,33 @@
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+######################
+## CPSS FAMILY TYPE ##
+######################
+ifeq (EXISTS, $(CHX_FAMILY))
+  DX_FAMILY = EXIST
+endif
+ifeq (EXISTS, $(PM_FAMILY))
+  EXMXPM_FAMILY = EXIST
+endif
+
+DX_FILES = appDemoDxChFastBootUtils.c
+
+C_FILE_LIST = $()
+
+ifeq (EXIST, $(DX_FAMILY))
+ C_FILE_LIST = $(DX_FILES)
+endif
+
+LIB_NAME = mainSysConfig.lib
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake
+

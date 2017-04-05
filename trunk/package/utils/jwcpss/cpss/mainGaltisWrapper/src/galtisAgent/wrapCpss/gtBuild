@@ -1,0 +1,55 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+SUBDIRS      =
+
+ifeq (YES, $(INCLUDE_UTF))
+ SUBDIRS      += utfTool
+endif
+
+ifeq (EXISTS, $(TG_FAMILY))
+      SUBDIRS      += exMxTg
+endif
+ifeq (EXISTS, $(EX_FAMILY))
+      SUBDIRS      += exMx
+endif
+ifeq (EXISTS, $(CHX_FAMILY))
+      SUBDIRS      += dxCh
+endif
+ifeq (EXISTS, $(CH3_FAMILY))
+      SUBDIRS      += dxCh3
+endif
+ifeq (EXISTS, $(SAL_FAMILY))
+      SUBDIRS      += dxSal
+endif
+ifeq (EXISTS, $(PM_FAMILY))
+      SUBDIRS      += exMxPm
+endif
+
+ifneq (, $(SUBDIRS))
+  SUBDIRS      += cpssDriver cpssGen systemLab
+endif
+
+ifeq (RHODES, $(FPGA_TYPE))
+SUBDIRS      += rhodes
+else
+  ### check if we me be in NONE PP system
+  ifeq (NOT_USED, $(NO_PP_USED))
+      SUBDIRS = NONE
+      C_EXCLUDE_FILE_LIST = ALL
+  endif
+endif
+
+
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

@@ -1,0 +1,565 @@
+<%#
+LuCI - Lua Configuration Interface
+Copyright 2008 Steven Barth <steven@midlink.org>
+Copyright 2008 Jo-Philipp Wich <xm@leipzig.freifunk.net>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+$Id$
+
+-%>
+<%
+    local ubus = require "luci.ubus"
+    local portNum = ubus.getPortNum()
+    --rstp模式设置
+    local modeStatus = luci.http.formvalue("setMode")
+    if modeStatus then 
+        local modeArr = {["status"] = modeStatus}
+        local setModeStatus = ubus.set_args("rstp", "rstp_set", modeArr, 2)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setModeStatus)
+        
+        return
+    end
+    --协议基本配置
+    local polJson = luci.http.formvalue("setPol")
+    if polJson then 
+        local setPolJson = luci.json.decode(polJson)
+        local setPolSnd = {}
+        setPolSnd = {{["priority"] = setPolJson.priority},{["hello_time"] = setPolJson.hello_time},{["max_age"] = setPolJson.max_age },{["forward_delay"] = setPolJson.forward_delay}}
+        local setPolStatus = ubus.set_args("rstp", "rstp_set", setPolSnd, 1)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setPolStatus)
+        
+        return
+    end
+
+    --端口信息配置
+    local portJson = luci.http.formvalue("setPort")
+    if portJson then
+        local setPortJson = luci.json.decode(portJson)
+        local setPortSnd = {}
+        for i=1, portNum do
+            pVal = string.format("port-%d",i)
+            if setPortJson.data[i].port_status == "2" then
+                setPortSnd[i]={[pVal]={{["port_status"] = setPortJson.data[i].port_status}}} 
+            elseif setPortJson.data[i].port_status == "1" and setPortJson.data[i].port_auto_calculate_cost == "1" then
+                setPortSnd[i]={[pVal]={{["port_status"] = setPortJson.data[i].port_status},{["port_priority"] = setPortJson.data[i].port_priority},{["port_edge"] = setPortJson.data[i].port_edge},{["port_auto_calculate_cost"] = setPortJson.data[i].port_auto_calculate_cost}}} 
+            elseif setPortJson.data[i].port_status == "1" and setPortJson.data[i].port_auto_calculate_cost == "2" then 
+                setPortSnd[i]={[pVal]={{["port_status"] = setPortJson.data[i].port_status},{["port_auto_calculate_cost"] = setPortJson.data[i].port_auto_calculate_cost},{["port_priority"] = setPortJson.data[i].port_priority},{["port_edge"] = setPortJson.data[i].port_edge},{["port_path_cost"] = setPortJson.data[i].port_path_cost}}} 
+            end
+        end
+
+        local setPortStatus = ubus.set_args("rstp","rstp_set",setPortSnd,1)
+        
+        luci.http.prepare_content("application/json")
+        luci.http.write_json(setPortStatus)
+
+        return
+    end
+    
+    --获得页面信息
+    local typeStatus = ubus.getPortType(portNum)
+    ----获得rstp状态信息
+    local getModeStatus = ubus.get_args("rstp", "rstp_get", {"status"}, 2)
+    local rstpModeVal = getModeStatus["ret"][1].status
+    local getRootStatus = {}
+    local getPolStatus = {}
+    local numVal = 0
+    local curPortStatus ={}
+    local getStatus = {}
+    if rstpModeVal == "1" then
+        ----获得根桥配置信息
+        getRootStatus = ubus.get_args("rstp", "rstp_get", {"root_priority","root_hello_time","root_max_age","root_forward_delay", "root_mac_addr"},2)
+        ----获得协议基本配置信息
+        getPolStatus = ubus.get_args("rstp", "rstp_get", {"status","priority","hello_time","max_age","forward_delay", "mac_addr"},2)
+
+        ----获得当前rstp端口信息
+        local chan = {"port_get_name","port_get_role","port_get_state","port_get_cost","port_get_prio","port_get_type"}
+        local channel = {}
+        local getNumStatus = ubus.get_args("rstp", "rstp_get", {"port_get_num"}, 2)
+
+        numVal =  getNumStatus["ret"][1].port_get_num
+        if numVal ~=nil and tonumber(numVal) > 0  then
+            for i=1,tonumber(numVal) do
+                local pa = string.format("indx-%d",i)
+                channel[i]={[pa] = chan}
+            end
+            curPortStatus = ubus.get_args("rstp", "rstp_get", channel, 1)
+        end
+
+        ----获得端口信息配置信息
+        local para = {"port_status","port_priority","port_path_cost","port_auto_calculate_cost", "port_edge"}
+        local snd = {}
+        for i=1,portNum do
+            local pa = string.format("port-%d",i)
+            snd[i]={[pa] = para}
+        end
+
+        getStatus = ubus.get_args("rstp", "rstp_get", snd, 1)
+    end
+%>
+<%+header%>
+<script type="text/javascript" src="<%=resource%>/cbi.js"></script>
+<script type="text/javascript">//<![CDATA[
+    function isInteger(obj) {
+         return parseInt(obj, 10) === obj
+    }
+
+    //设置协议
+    function setPol(){
+     //   "status","priority","hello_time","max_age","forward_delay"
+        var a = JSON.parse("{\"priority\":\"\",\"hello_time\":\"\",\"max_age\":\"\",\"forward_delay\":\"\"}");
+        //a.status = $("input[name=mode]:checked").val();
+        a.priority = $("#priority").val();
+        if((!isInteger(Number(a.priority))) && (!isInteger(Number(a.priority)/4096))){
+            alert("<%:Priority integer only，increment of 4096%>");
+            return
+        }
+        if(Number(a.priority) > 61440){
+            alert("<%:Priority range 0~61440%>");
+            return
+        }
+        
+
+        a.hello_time = $("#helloTime").val();
+        if(!isInteger(Number(a.hello_time))){
+            alert("<%:Hello time integer only%>");
+            return
+        }
+        a.max_age = $("#maxAge").val();
+        if(!isInteger(Number(a.max_age))){
+            alert("<%:max age integer only%>");
+            return
+        }
+        a.forward_delay = $("#forwarDelay").val();
+        if(!isInteger(Number(a.forward_delay))){
+            alert("<%:forward delay integer only%>");
+            return
+        }
+        if(Number(a.max_age) < 2*(Number(a.hello_time) +1)){
+            alert("<%:must be Max age >= 2(hello time +1)%>");
+            return;
+        }
+        
+        if((Number(a.forward_delay)-1) * 2 < Number(a.max_age)){
+            alert("<%:must be 2(forwarding delay -1)>= max age%>");
+            return;
+        }
+
+        //console.log(JSON.stringify(a))
+        //异步提交数据
+        XHR.get('<%=REQUEST_URI%>',{"setPol": JSON.stringify(a),}, 
+                function(x,rv) {
+                    var flag = 0;
+                    for(var i = 0; i < rv.length; i++){
+                        if(rv[i].ret == "-1"){
+                            flag = 1;
+                            alert("<%:NO.%>"+(i+1)+"<%:configuration failure%>");
+                            window.location.reload();
+                            return ;
+                        }
+                    }
+                    if(flag == 0){
+                        alert("<%:Succesfully configured%>");
+                    }
+            }
+        );
+    }
+    //设置端口
+    function setPort(){
+    // "port_status","port_priority","port_path_cost","port_auto_calculate_cost","port_edge"
+        var a = JSON.parse("{\"data\":[]}");
+        //获取行数
+        var colsNum=$("#portConfig tr").length-1;
+        for (var i = 1; i < colsNum; i++) {
+            var para = new Object();
+            para.port_status = $("input[name=state_"+i+"]:checked").val();
+            para.port_priority = String($("#priority_"+i).val()*16);
+            para.port_path_cost = $("#pathCost_"+i).val();
+            para.port_auto_calculate_cost = $("input[name=autCount_"+i+"]:checked").val();   
+            para.port_edge = $("#edge_"+i).val(); 
+
+            a.data.push(para);
+        };
+
+
+        //异步提交数据
+        XHR.get('<%=REQUEST_URI%>',{"setPort": JSON.stringify(a),}, 
+            function(x,rv) {
+                var flag = 0;
+                for(var i = 0; i < rv.length; i++){
+                    if(rv[i].ret == "-1"){
+                        flag = 1;
+                        alert("<%:NO.%>"+(i+1)+"<%:configuration failure%>");
+                        window.location.reload();
+                        return ;
+                    }
+                }
+                if(flag == 0){
+                    alert("<%:Succesfully configured%>");
+                } 
+            }
+        );
+
+    }
+    $(document).ready(function(){
+        //基本配置使能模式
+       /* $("#basConfig tr:eq(0) td:nth-child(2)").find("input[type=radio]").on("click",function() {
+            var modeVal = this.value;
+            $("#basConfig tr:gt(0)").find("input[type=text]").each(function(){
+                this.disabled = modeVal==1?false:true;
+            })
+        });*/
+        //自动计算模式
+        $("#portConfig tr td:nth-child(6)").find("input[type=radio]").on("click", function(){
+            var countAble = this.value;
+            $(this).parent().prevAll().has('input[type=text]').each(function(i){
+                var input = this.children[0];
+                if (countAble==1){
+                    input.disabled = true;
+              //      input.value = i==1?"128":"2000000";
+                }else{
+                    input.disabled = false;
+                }  
+            })
+        });
+        //端口协议使能
+        $("#portConfig tr td:nth-child(2)").find("input[type=radio]").on("click", function(){
+                var countAble = this.value;
+
+                if(countAble==1){
+
+                    $(this).parent().nextAll("td:has(select)").children().each(function(i){
+                        this.disabled = false;
+                    }) 
+                    $(this).parent().nextAll("td:last-child").children().each(function(i){
+                        this.disabled = false;
+                        if( i==1 && this.checked){
+                            $(this).parent().prevAll().has('input[type=text]').each(function(){
+                                this.children[0].disabled = false;
+                            })
+                        }
+                    }) 
+                }else{
+                    $(this).parent().nextAll().children().each(function(i){
+                        this.disabled = true;
+                        //if(i==0){ this.value = "128"; }
+                        //if(i==2){ this.value = "2000000"; }
+                        if(i==3){this.checked = true;}
+                    }) 
+                }
+            });
+        //端口名称
+        var typeRcv = <%=luci.json.encode(typeStatus)%>;
+        setPortHTMLByName(typeRcv);
+        /*
+        $.each(typeRcv, function(i,val) {
+            var rcv = val.ret[0]["port-"+(i+1)];
+            if(rcv[0].type == "4"){
+                 document.getElementById("port"+(i+1)).innerHTML = "G"+(i+1);
+            }
+            else if(rcv[0].type == "2"){
+                 document.getElementById("port"+(i+1)).innerHTML = "F"+(i+1);
+            }
+        });*/
+
+        var mode_status = <%=rstpModeVal%>;
+        //alert(mode_status); 
+        //$("rstpMode").val(String(mode_status));
+        document.getElementById("rstpMode").selectedIndex = mode_status-1;
+        if(mode_status == "1"){
+            //根桥信息
+            var rootStatus = <%=luci.json.encode(getRootStatus)%>;
+
+            $("#rootPriority").val(rootStatus.ret[0]["root_priority"]);
+            $("#rootHelloTime").val(rootStatus.ret[1]["root_hello_time"]);
+            $("#rootMaxAge").val(rootStatus.ret[2]["root_max_age"]);
+            $("#rootForwarDelay").val(rootStatus.ret[3]["root_forward_delay"]);
+            $("#rootAddress").val(rootStatus.ret[4]["root_mac_addr"]);
+
+            //基本配置
+            var basStatus = <%=luci.json.encode(getPolStatus)%>;
+            //var mode = basStatus.ret[0]["status"];
+            //$("input[name=mode][value='"+mode+"']").attr("checked",true);
+            //$("input[name=mode][value='"+mode+"']").click();
+
+            $("#priority").val(basStatus.ret[1]["priority"]);
+            $("#helloTime").val(basStatus.ret[2]["hello_time"]);
+            $("#maxAge").val(basStatus.ret[3]["max_age"]);
+            $("#forwarDelay").val(basStatus.ret[4]["forward_delay"]);
+            $("#macAddress").val(basStatus.ret[5]["mac_addr"]);
+
+            //端口状态信息
+            var typeObj = ["N","Y"];
+            var stateObj = ["DISABLED","DISCARDING","LEARNING","FORWARDING","NONSTP"];
+            var roleObj = ["Altn","Backup","Root","Desg"];
+            var num = <%=tonumber(numVal)%>;
+            var tabObj = document.getElementById("rstpPortTab");//获取添加数据的表格
+            if(num > 0){
+                var rstpPortRcv = <%=luci.json.encode(curPortStatus)%>;
+                //alert(JSON.stringify(rstpPortRcv));
+                for(n=1;n<=num;n++){
+                    var rowsNum = tabObj.rows.length;  //获取当前行数
+                    var myNewRow = tabObj.insertRow(rowsNum);//插入新行
+                    var newTdObj2=myNewRow.insertCell(0);
+                    newTdObj2.innerHTML=rstpPortRcv[n-1]["ret"][0]["indx-"+n][0].port_get_name;
+                    var newTdObj3=myNewRow.insertCell(1);
+                    newTdObj3.innerHTML= roleObj[rstpPortRcv[n-1]["ret"][0]["indx-"+n][1].port_get_role - 1];
+                    var newTdObj4=myNewRow.insertCell(2);
+                    newTdObj4.innerHTML= stateObj[rstpPortRcv[n-1]["ret"][0]["indx-"+n][2].port_get_state];
+                    var newTdObj5=myNewRow.insertCell(3);
+                    newTdObj5.innerHTML= rstpPortRcv[n-1]["ret"][0]["indx-"+n][3].port_get_cost;
+                    var newTdObj6=myNewRow.insertCell(4);
+                    newTdObj6.innerHTML= rstpPortRcv[n-1]["ret"][0]["indx-"+n][4].port_get_prio;
+                    var newTdObj6=myNewRow.insertCell(5);
+                    newTdObj6.innerHTML= typeObj[rstpPortRcv[n-1]["ret"][0]["indx-"+n][5].port_get_type];
+                }
+            }
+
+            //端口信息配置
+            var polStatus = <%=luci.json.encode(getStatus)%>;
+            for (var i = 0; i < polStatus.length; i++) {
+                var data = polStatus[i].ret[0]["port-"+(i+1)];
+                var proMode = data[0]["port_status"];
+                var costAble = data[3]["port_auto_calculate_cost"];
+
+                $("#priority_"+(i+1)).val(data[1]["port_priority"]/16);
+                $("#pathCost_"+(i+1)).val(data[2]["port_path_cost"]);
+                $("#edge_"+(i+1)).val(data[4]["port_edge"]);
+
+
+                $("input[name=autCount_"+(i+1)+"][value='"+costAble+"']").attr("checked",true);
+                $("input[name=autCount_"+(i+1)+"][value='"+costAble+"']").click();
+
+                $("input[name=state_"+(i+1)+"][value='"+proMode+"']").attr("checked",true);
+                $("input[name=state_"+(i+1)+"][value='"+proMode+"']").click();
+
+            }
+        }
+        else if(mode_status == "2"){
+            $("#ableConfig").hide();  
+        }
+        $("#rstpMode").change(function(){
+            if (this.value == 1) {
+                if(confirm("<%:are you sure you want to switch configuration?%>")){
+                    //异步提交数据
+                    XHR.get('<%=REQUEST_URI%>',{"setMode": "1"}, 
+                            function(x,rv) {
+                                if(rv.ret == "-1"){
+                                    alert("<%:switch failure%>");
+                                    return;
+                                }
+                                else if(rv.ret == "0"){
+                                    alert("<%:successfully switch%>");
+                                    $("#ableConfig").show();
+                                    window.location.reload();
+                                }
+                            }
+                    );
+                }
+            }else{
+                if(confirm("<%:are you sure you want to switch configuration?%>")){
+                    //异步提交数据
+                    XHR.get('<%=REQUEST_URI%>',{"setMode": "2"}, 
+                            function(x,rv) {
+                                if(rv.ret == "-1"){
+                                    alert("<%:switch failure%>");
+                                    return ;
+                                }
+                                else if(rv.ret == "0"){
+                                    alert("<%:successfully switch%>");
+                                    $("#ableConfig").hide();
+                                }
+                            }
+                    );
+                }
+            }
+        });
+ 
+    });
+    
+//]]></script> 
+
+
+<div class="RSTP"  id = "RSTPconfig" >
+    <h3 class="h3"><%:RSTP protocol configuration%></h3>
+    <fieldset class="lldp-section">
+        <table>
+            <tr>
+                <th style="text-align:left"><%:RSTP configuration mode :%>
+                    <select id="rstpMode">
+                        <option value="1"><%:Enable%></option>
+                        <option value="2"><%:Disable%></option>
+                    </select>
+                </th>
+            </tr>
+        </table>
+    </fieldset>
+    <div id="ableConfig">
+        <fieldset class=""> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+            <legend><%:root rstp configuration%></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+            <table class="info-section-table" id="basConfig">
+                <tbody>
+                    <tr>
+                        <th><%:Spanning Tree Priority%></th>
+                        <td>
+                            <input type="text" id="rootPriority" name="priority" value="" disabled = "true" >
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><%:Mac address%></th>
+                        <td>
+                            <input type="text" id="rootAddress" name="address" value="" disabled = "true" >
+                        </td>
+                    </tr>
+                    <tr style="background-color: #fff;">
+                        <th><%:Hello Time%></th>
+                        <td>
+                            <input type="text" id="rootHelloTime" name="helloTime" value=""disabled = "true" >
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><%:Max Age Time%></th>
+                        <td>
+                            <input type="text" id="rootMaxAge" name="maxAge" value=""disabled = "true" >
+                        </td>
+                    </tr>
+                    <tr style="background-color: #fff;">
+                        <th><%:Forward Delay Time%></th>
+                        <td>
+                            <input type="text" id="rootForwarDelay" name="forwarDelay" value=""disabled = "true" >
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            </fieldset>
+            <fieldset class=""> <!-- <fieldset> 标签可以将表单内的相关元素分组 -->
+                <legend><%:local rstp configuration%></legend> <!-- <legend> 标签为 <fieldset> 元素定义标题 -->
+                <table class="info-section-table" id="basConfig">
+                    <tbody>
+                        <tr>
+                            <th><%:Spanning Tree Priority%></th>
+                            <td>
+                                <input type="text" id="priority" name="priority" value="">
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><%:Mac address%></th>
+                            <td>
+                                <input type="text" id="macAddress" name="macaddress" value="" disabled = "true" >
+                            </td>
+                        </tr>
+                        <tr style="background-color: #fff;">
+                            <th><%:Hello Time%></th>
+                            <td>
+                                <input type="text" id="helloTime" name="helloTime" value="">
+                                <small>(1-10s)</small>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><%:Max Age Time%></th>
+                            <td>
+                                <input type="text" id="maxAge" name="maxAge" value="">
+                                <small>(6-40s)</small>
+                            </td>
+                        </tr>
+                        <tr style="background-color: #fff;">
+                            <th><%:Forward Delay Time%></th>
+                            <td>
+                                <input type="text" id="forwarDelay" name="forwarDelay" value="">
+                                <small>(4-30s)</small>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2"><input type="button" class="cbi-button cbi-input-apply" name="ok" value="<%:Apply%>" onclick="setPol()"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                </fieldset>
+                <fieldset>
+                    <legend><%:port status information%></legend>
+                    <table id="rstpPortTab">
+                        <tr>
+                            <th><%:Port%></th>
+                            <th><%:Role%></th>
+                            <th><%:status%></th>
+                            <th><%:path cost%></th>
+                            <th><%:priority%></th>
+                            <th><%:Edge port%></th>
+                        </tr>
+                    </table>
+
+                </fieldset>
+                <fieldset>
+                    <legend><%:Port information configuration%></legend>
+                    <table id="portConfig">
+                        <tbody>
+                            <tr>
+                                <th><%:Port%></th>
+                                <th><%:protocol status%></th>
+                                <th><%:Edge port%></th>
+                                <th><%:priority%></th>
+                                <th><%:path cost%></th>
+                                <th><%:calculation of the cost%></th>
+                            </tr>
+                            <% for i=1,portNum do %>
+                            <tr>
+                                <td name = "port<%=i%>" id = "port<%=i%>"><%=i%></td>
+                                <td>
+                                    <input type="radio" name="state_<%=i%>" value="2" />&nbsp;<%:Disable%>
+                                    <input type="radio" name="state_<%=i%>" value="1" />&nbsp;<%:Enable%>
+                                </td>
+                                <td>
+                                    <select id="edge_<%=i%>" name="edge_<%=i%>">
+                                        <option value="1" ><%:Enable%></option>
+                                        <option value="2" ><%:No enable%></option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select id="priority_<%=i%>" name="priority_<%=i%>" autocomplete="off">
+                                        <% for j=0,240,16 do%>
+                                        <option  value="<%=j/16%>"><%=j%></option>
+                                        <% end %>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="text" id="pathCost_<%=i%>" name="pathCost_<%=i%>" value="" style="width:30%;text-align:center">
+                                </td>
+                                <td>
+                                    <input type="radio" name="autCount_<%=i%>" value="1" />&nbsp;<%:Yes%>
+                                    <input type="radio" name="autCount_<%=i%>" value="2" />&nbsp;<%:No%>
+                                </td>      
+                            </tr>
+                            <% end %>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6"><input type="button" class="cbi-button cbi-input-apply" name="ok" value="<%:Apply%>" onclick="setPort()"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </fieldset>
+    </div>
+</div>
+<%+footer%>
+
+
+
+
+
+
+
+
+
+
+
+

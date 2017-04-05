@@ -1,0 +1,308 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Template|Win32">
+      <Configuration>Template</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.Cpp.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\Release\</OutDir>
+    <IntDir>.\Release\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>.\Debug\</OutDir>
+    <IntDir>.\Debug\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <Optimization>MaxSpeed</Optimization>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation>.\Release\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>.\Release\mainLabService.pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>.\Release\</ObjectFileName>
+      <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release\mainLabService.bsc</OutputFile>
+    </Bscmake>
+    <Lib>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release\mainLabService.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <Optimization>Disabled</Optimization>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <WarningLevel>Level3</WarningLevel>
+      <MinimalRebuild>true</MinimalRebuild>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>..\..\..\labServices-Dev\mainOs\h;..\..\port\gop\h;..\..\port\gop\h\port;..\..\port\gop\src\port\serdes\avago;..\..\port\gop\src\port\serdes\avago\aapl\include;..\..\ddr\ddr3libv2\h;..\..\ddr\ddr3libv2\h\Driver;..\..\ddr\ddr3libv2\h\Driver\ddr3;..\..\ddr\ddr3libv2\h\Silicon;..\..\ddr\ddrv1\h;..\..\ddr\bap\h;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ASIC_SIMULATION;CONFIG_DDR3;WIN32;_DEBUG;_LIB;HWS_DEBUG;AP_SHOW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AssemblerListingLocation>.\Debug\</AssemblerListingLocation>
+      <PrecompiledHeaderOutputFile>.\Debug\mainLabService.pch</PrecompiledHeaderOutputFile>
+      <ObjectFileName>.\Debug\</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug\</ProgramDataBaseFileName>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+    </ClCompile>
+    <ResourceCompile>
+      <Culture>0x0409</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Debug\mainLabService.bsc</OutputFile>
+    </Bscmake>
+    <Lib>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Debug\mainLabService.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\ddr\bap\src\mvHwsDdr3Bap.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingHwAlgos.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3Debug.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3Training.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingBist.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingCentralization.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingDb.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingIpEngine.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingIpIf.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingLeveling.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingPbs.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Driver\ddr3\mvHwsDdr3TrainingStatic.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Silicon\mvHwsDdr3Bc2.c" />
+    <ClCompile Include="..\..\ddr\ddr3libv2\src\Silicon\mvHwsDdr3BobK.c" />
+    <ClCompile Include="..\..\port\gop\src\common\configElementDb\mvCfgSeqDbIf.c" />
+    <ClCompile Include="..\..\port\gop\src\common\configElementDb\mvCfgSeqExecuter.c" />
+    <ClCompile Include="..\..\port\gop\src\common\coCpu\mvHwsPortApCoCpuIf.c" />
+    <ClCompile Include="..\..\port\gop\src\common\siliconIf\mvHwsSiliconIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\common\mvHwsPortMiscIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\common\mvHwsPortModeElements.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\cgMac\mvHwsCgMacRev3If.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\geMac\mvHwsGeMac28nmIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\xgMac\mvHwsXgMac28nmIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMac28nmDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMac28nmIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mvHwsIpcApis.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mvHwsPortApCtrlIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mvHwsPortIpcIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\cgPcs\mvHwsCgPcsDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\cgPcs\mvHwsCgPcsIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\cgPcs\mvHwsCgPcsIf_Rev3.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\gPcs\mvHwsGPcs28nmIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\gPcs\mvHwsGPcsDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\gPcs\mvHwsGPcsIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\gPcs\mvHwsGPcsIf_v2.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\hglPcs\mvHwsHglPcsDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\hglPcs\mvHwsHglPcsIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\ilknPcs\mvHwsIlknPcsDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\ilknPcs\mvHwsIlknPcsIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcs28nmDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcs28nmIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcsDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcsDb_v3.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcsIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcsIf_v2_0.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mmPcs\mvHwsMMPcsIf_v3.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\mvHwsPcsIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\tcamPcs\mvHwsTcamPcsDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\tcamPcs\mvHwsTcamPcsIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\xPcs\mvHwsXPcsDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\pcs\xPcs\mvHwsXPcsIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\cgMac\mvHwsCgMacDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\cgMac\mvHwsCgMacIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\geMac\mvHwsGeMacDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\geMac\mvHwsGeMacIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\geMac\mvHwsGeMacSgIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\hglMac\mvHwsHglMacDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\hglMac\mvHwsHglMacIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\hglMac\mvHwsHglMacRev2If.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\ilknMac\mvHwsIlknMacDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\ilknMac\mvHwsIlknMacIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\mvHwsMacIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\tcamMac\mvHwsTcamMacDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\tcamMac\mvHwsTcamMacIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\xgMac\mvHwsXgMacDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\xgMac\mvHwsXgMacIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\xgMac\mvHwsXgMacRev2If.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMacDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMacDbRev3.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMacIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMacRev2If.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mac\xlgMac\mvHwsXlgMacRev3If.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\aacs.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\aacs_server.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\aapl_core.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\gpio_mdio.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\i2c.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\library.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\logging.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\marvell\mv_hws_avago_serdes_if.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\mdio.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\pmd.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\sbus.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\serdes_core.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\spico.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\aapl\user_code.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\avago\mvAvagoSerdesIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH28nmRev3\mvComPhyH28nmRev3Db.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH28nmRev3\mvComPhyH28nmRev3If.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH28nm\mvComPhyH28nmDb.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH28nm\mvComPhyH28nmEom.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH28nm\mvComPhyH28nmIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH\mvComPhyHDb_v1_0.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyHRev2\mvComPhyHDb_v2_0.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH\mvComPhyHEom.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyH\mvComPhyHIf_v1_0.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\comPhyHRev2\mvComPhyHIf_v2_0.c" />
+    <ClCompile Include="..\..\port\gop\src\port\serdes\mvHwsSerdesIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mvHwsPortApIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mvHwsPortCfgIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\mvHwsPortInitIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\apEngine\mvZ80Code.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\alleycat3\mvHwsAlleycat3DevInit.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\alleycat3\mvHwsAlleycat3PortCfgIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\alleycat3\mvHwsAlleycat3PortInitIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\alleycat3\mvHwsAlleycat3PortModeElements.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobcat2\mvHwsBobcat2DevInit.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobcat2\mvHwsBobcat2PortCfgIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobcat2\mvHwsBobcat2PortInitIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobcat2\mvHwsBobcat2PortModeElements.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobk\mvHwsBobKDevInit.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobk\mvHwsBobKPortCfgIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobk\mvHwsBobKPortInitIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\bobk\mvHwsBobKPortModeElements.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\hooper\mvHwsHooperDevInit.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\hooper\mvHwsHooperPortCfgIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\lion2\mvHwsLion2DevInit.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\lion2\mvHwsLion2PortCfgIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\lion2\mvHwsLion2PortInitIf.c" />
+    <ClCompile Include="..\..\port\gop\src\port\silicon\lion2\mvHwsLion2PortModeElements.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\ddr\bap\h\mvHwsDdr3Bap.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIp.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpBist.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpCentralization.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpDb.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpDef.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpEngine.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpFlow.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpPbs.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpPrvIf.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingIpStatic.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\ddr3\mvDdr3TrainingLeveling.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\mvDdrTopologyDef.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\Driver\mvDdrTrainingIpDb.h" />
+    <ClInclude Include="..\..\ddr\ddr3libv2\h\silicon\mvHwsDdr3BC2.h" />
+    <ClInclude Include="..\..\port\gop\h\common\configElementDb\mvCfgElementDb.h" />
+    <ClInclude Include="..\..\port\gop\h\common\siliconIf\mvSiliconIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\mac\mvHwsMacIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\mvHwsIpcApis.h" />
+    <ClInclude Include="..\..\port\gop\h\port\mvHwsIpcDefs.h" />
+    <ClInclude Include="..\..\port\gop\h\port\mvHwsPortCfgIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\pcs\gPcs\mvHwsGPcs28nmIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\pcs\mmPcs\mvHwsMMPcs28nmIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\pcs\xPcs\mvHwsXPcsIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyH28nm\mvComPhyH28nmDb.h" />
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyH28nm\mvComPhyH28nmEomIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyH28nm\mvComPhyH28nmIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyH\mvComPhyEomIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyH\mvComPhyHDb.h" />
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyH\mvComPhyHIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyHRev2\mvComPhyHRev2Db.h" />
+    <ClInclude Include="..\..\port\gop\h\port\serdes\comPhyHRev2\mvComPhyHRev2If.h" />
+    <ClInclude Include="..\..\port\gop\h\port\serdes\mvHwsSerdesPrvIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\pcs\mmPcs\mvHwsMMPcsDb.h" />
+    <ClInclude Include="..\..\port\gop\h\port\pcs\mmPcs\mvHwsMMPcsIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\pcs\mmPcs\mvHwsMMPcsV2If.h" />
+    <ClInclude Include="..\..\port\gop\h\port\pcs\mvHwsPcsIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\private\mvHwsPortApCoCpuIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\mvHwsPortApInitIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\private\mvHwsPortApInitIfPrv.h" />
+    <ClInclude Include="..\..\port\gop\h\port\mvHwsPortInitIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\private\mvHwsPortMiscIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\private\mvHwsPortPrvIf.h" />
+    <ClInclude Include="..\..\port\gop\h\port\private\mvHwsPortTypes.h" />
+    <ClInclude Include="..\..\port\gop\h\port\private\mvPortModeElements.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\aacs_server.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\aapl.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\aapl_core.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\aapl_library.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\asic_info.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\gpio_mdio.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\i2c.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\logging.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\mdio.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\pmd.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\sbus.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\serdes_core.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\spico.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\include\system_includes.h" />
+    <ClInclude Include="..\..\port\gop\src\port\serdes\avago\aapl\marvell\mv_hws_avago_if.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,20 @@
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH = 
+#C_FILE_LIST  =
+#SUBDIRS      =
+
+ifeq (1, $(LINUX_SIM))
+#C_EXCLUDE_FILE_LIST = 
+else
+C_EXCLUDE_FILE_LIST = osFreeBsdIntr.c osFreeBsdSimEther.c
+endif
+
+AD_CFLAGS += -DOS_USERSPACE_MUTEXES
+SUBDIRS = stubs pthreads
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

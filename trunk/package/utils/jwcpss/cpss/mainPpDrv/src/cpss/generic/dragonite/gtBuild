@@ -1,0 +1,24 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+ifneq (A1, $(DRAGONITE_TYPE))
+    C_EXCLUDE_FILE_LIST = ALL
+else
+ifneq (L_ON,$(LOG_ENABLE))
+    C_EXCLUDE_FILE_LIST += prvCpssGenDragoniteLog.c prvCpssGenDragoniteManualLog.c
+endif
+endif
+
+LIB_NAME = cpssGenDragonite.lib
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

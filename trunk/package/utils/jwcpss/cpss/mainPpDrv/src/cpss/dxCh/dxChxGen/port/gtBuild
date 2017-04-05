@@ -1,0 +1,19 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH =
+#C_FILE_LIST  =
+#SUBDIRS      =
+#C_EXCLUDE_FILE_LIST =
+
+LIB_NAME = cpssDxChPort.lib
+ifneq (L_ON,$(LOG_ENABLE))
+    C_EXCLUDE_FILE_LIST += prvCpssDxChPortLog.c prvCpssDxChPortManualLog.c
+endif
+
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake

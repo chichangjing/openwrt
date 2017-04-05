@@ -1,0 +1,85 @@
+struct GT_U64
+
+################################
+################################
+###   cpssCommon
+################################
+################################
+# generic/all_common_lua_c_type_manual_wrappers.c
+enum    GT_BOOL
+struct_custom  GT_ETHERADDR
+struct_custom  GT_IPADDR
+struct_custom  GT_IPV6ADDR
+struct_custom  PACKET_STC
+struct  WRAP_DEV_PORT_STC
+struct  CPSS_INTERFACE_INFO_STC
+struct  TX_PARAMS_STC
+struct  RX_DATA_STC
+struct  CPSS_MAC_ENTRY_EXT_KEY_STC
+struct  CPSS_RLDRAM_CFG_STC
+struct  CPSS_DRAM_CFG_STC
+enum    CPSS_SHIFT_OPERATION_ENT
+enum    CPSS_ADJUST_OPERATION_ENT
+struct  CPSS_GEN_DRAGONITE_DATA_STC
+
+################################
+################################
+###   dxCh
+################################
+################################
+# dxCh/all_dxCh_lua_c_type_manual_wrappers.c
+struct  CPSS_PORT_CN_FB_CALCULATION_CONFIG_STC
+struct  CPSS_DXCH_NET_DSA_TO_CPU_STC
+struct  CPSS_DXCH_NET_DSA_FROM_CPU_STC
+struct  CPSS_DXCH_NET_DSA_TO_ANALYZER_STC
+struct  CPSS_DXCH_NET_DSA_FORWARD_STC
+struct  CPSS_DXCH_NET_DSA_PARAMS_STC
+struct  CPSS_DXCH_NET_TX_PARAMS_STC
+struct  CPSS_DXCH_PCL_LOOKUP_CFG_STC
+struct  CPSS_DXCH_OUTPUT_INTERFACE_STC
+struct  CPSS_DXCH_PCL_ACTION_STC
+struct  CPSS_DXCH_PCL_ACTION_REDIRECT_STC
+struct  CPSS_DXCH_PCL_RULE_FORMAT_EGRESS_COMMON_STC
+struct  CPSS_DXCH3_POLICER_METERING_ENTRY_STC
+struct  CPSS_DXCH_IP_UC_ROUTE_ENTRY_FORMAT_STC
+struct  CPSS_DXCH_IP_UC_ROUTE_ENTRY_STC
+struct  CPSS_DXCH_IP_LTT_ENTRY_STC
+#struct  CPSS_DXCH_IP_TCAM_ROUTE_ENTRY_INFO_UNT
+struct  CPSS_DXCH_PORT_EOM_MATRIX_STC
+struct  CPSS_DXCH_DIAG_DATA_INTEGRITY_EVENT_STC
+struct  CPSS_DXCH_LPM_LEAF_ENTRY_STC
+struct  CPSS_DXCH_OAM_SRV_TRANSMIT_PARAMS_STC
+struct  CPSS_DXCH_IP_LPM_VR_CONFIG_STC
+struct  CPSS_DXCH_PORT_PIZZA_CFG_SLICE_LIST_STC
+struct  CPSS_DXCH_PORT_PIZZA_CFG_PORT_SLICE_LIST_STC
+struct  CPSS_DXCH_LPM_NODE_NEXT_POINTER_STC
+struct  CPSS_DXCH_DEV_PIZZA_ARBITER_STATE_STC
+
+
+
+################################
+################################
+###   exMxPm
+################################
+################################
+# exMxPm/all_exMxPm_lua_c_type_manual_wrappers.c
+struct  CPSS_EXMXPM_NET_DSA_PARAMS_STC
+struct  CPSS_EXMXPM_POLICER_METERING_ENTRY_STC
+struct  CPSS_EXMXPM_NET_DSA_FROM_CPU_STC
+struct  CPSS_EXMXPM_OUTLIF_INFO_STC
+struct  CPSS_EXMXPM_FDB_ENTRY_KEY_STC
+struct  CPSS_EXMXPM_CFG_DEV_INFO_STC
+struct  CPSS_EXMXPM_PCL_ACTION_REDIRECT_STC
+struct  CPSS_EXMXPM_PCL_LOOKUP_CFG_STC
+struct  CPSS_EXMXPM_NET_DSA_FORWARD_STC
+struct  CPSS_EXMXPM_NET_DSA_TO_ANALYZER_STC
+struct  CPSS_EXMXPM_TUNNEL_START_QINQ_ENTRY_STC
+struct  CPSS_EXMXPM_FABRIC_XBAR_FPORT_FIFO_STATUS_STC
+struct  CPSS_EXMXPM_PORT_EOM_MATRIX_STC
+struct  CPSS_EXMXPM_IP_LPM_IPV6_UC_PREFIX_OPERATION_STC
+struct  CPSS_EXMXPM_IP_COUNTER_SET_CFG_STC
+struct  CPSS_EXMXPM_IP_LPM_NODE_NEXT_POINTER_STC
+struct  CPSS_EXMXPM_IP_LPM_IPV4_UC_PREFIX_OPERATION_STC
+struct  CPSS_EXMXPM_IP_UC_ROUTE_ENTRY_STC
+struct  CPSS_EXMXPM_DIT_COUNTER_SET_CFG_STC
+struct  CPSS_EXMXPM_EXTERNAL_TCAM_CMD_PARAMS_STC

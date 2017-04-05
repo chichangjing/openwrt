@@ -1,0 +1,27 @@
+
+
+###
+###  add include path and file list
+###
+
+#INCLUDE_PATH = 
+#C_FILE_LIST  =
+#SUBDIRS      =
+#Exclude entry points from build into .lib 
+#Entry points should be compiled independently
+#C_EXCLUDE_FILE_LIST = 
+
+ifeq (EXISTS, $(PM_FAMILY))
+	C_EXCLUDE_FILE_LIST = RxTxProcess.c
+endif
+
+ifeq (EXISTS, $(CHX_FAMILY))
+	C_EXCLUDE_FILE_LIST = RxTxProcess_PM.c
+endif
+
+
+#LIB_NAME = sharedMemoryUT.lib
+##################################################
+##################################################
+include $(PROJ_BASE)/gtTopMake
+
